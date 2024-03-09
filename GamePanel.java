@@ -26,6 +26,9 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
     private void draw(Graphics g) {
+        // Draw circle at mouse pos
+        g.setColor(Color.WHITE);
+        g.fillRect(Main.inputInfo.mouseX, Main.inputInfo.mouseY, 5, 5);
         // Number of objects
         g.setColor(Color.WHITE);
         g.drawString("Number of objects: " + Main.drawablePool.getObjects().size(), 10, 20);

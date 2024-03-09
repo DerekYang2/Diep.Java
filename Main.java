@@ -8,7 +8,7 @@ public class Main {
     public static IdServer idServer;
     public static int windowWidth, windowHeight;  // Temporary
 
-    public static KeyHandler keyHandler = new KeyHandler();
+    public static InputInfo inputInfo = new InputInfo();
 
     public static void initialize() {
         drawablePool = new Pool<>();
@@ -30,7 +30,9 @@ public class Main {
 
         GamePanel gamePanel = new GamePanel(window.getWidth(), window.getHeight());
 
-        window.addKeyListener(keyHandler);
+        window.addKeyListener(inputInfo);
+        gamePanel.addMouseMotionListener(inputInfo);
+
         window.add(gamePanel);
         window.setVisible(true);
         gamePanel.startGameThread();

@@ -1,5 +1,5 @@
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
 
 public class TestObj implements Updatable, Drawable {
     protected double x, y, vx, vy;
@@ -18,23 +18,46 @@ public class TestObj implements Updatable, Drawable {
     }
 
     public void update() {
-        if (Main.keyHandler.downPressed) {
+        if (Main.inputInfo.downPressed) {
             y += vy;
         }
-        if (Main.keyHandler.upPressed) {
+        if (Main.inputInfo.upPressed) {
             y -= vy;
         }
-        if (Main.keyHandler.leftPressed) {
+        if (Main.inputInfo.leftPressed) {
             x -= vx;
         }
-        if (Main.keyHandler.rightPressed) {
+        if (Main.inputInfo.rightPressed) {
             x += vx;
         }
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.RED);
-        g.fillRect((int)x, (int)y, 50, 50);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(Color.WHITE);
+
+        int rectWidth = 50;
+        int rectHeight = 10;
+
+        // Create an AffineTransform object
+        AffineTransform at = new AffineTransform();
+        at.translate(x, y);
+        // Rotate to the cursor
+        at.rotate(Math.atan2(Main.inputInfo.mouseY - y, Main.inputInfo.mouseX - x));
+        // Move the transform back
+        at.translate(0, -rectHeight / 2.f);
+
+        // Apply the transform to the Graphics2D object
+        g2d.setTransform(at);
+
+        // Draw the rectangle
+        g2d.fillRect(0, 0, rectWidth, rectHeight);
+
+        // Reset the transformations
+        g2d.setTransform(new AffineTransform());
+
+        g.setColor(Color.red);
+        g.fillOval((int)x - 15, (int)y - 15, 30, 30);
     }
 
     // Deletable Methods

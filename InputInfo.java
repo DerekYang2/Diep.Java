@@ -1,9 +1,9 @@
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 
-public class KeyHandler implements KeyListener
+public class InputInfo implements KeyListener, MouseListener, MouseMotionListener
 {
     public boolean upPressed, downPressed, leftPressed, rightPressed, attackPressed;
+    public int mouseX, mouseY;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -47,5 +47,43 @@ public class KeyHandler implements KeyListener
         if (keyCode == KeyEvent.VK_SPACE) {
             attackPressed = false;
         }
+    }
+
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        mouseX = e.getX();
+        mouseY = e.getY();
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        mouseX = e.getX();
+        mouseY = e.getY();
     }
 }

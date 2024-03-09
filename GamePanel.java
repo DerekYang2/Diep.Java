@@ -26,6 +26,9 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
     private void draw(Graphics g) {
+        // Number of objects
+        g.setColor(Color.WHITE);
+        g.drawString("Number of objects: " + Main.drawablePool.getObjects().size(), 10, 20);
         // Draw all the drawable objects
         for (Drawable drawable : Main.drawablePool.getObjects()) {
             drawable.draw(g);

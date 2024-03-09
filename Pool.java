@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.Stack;
+import java.util.Collection;
 
 public class Pool <T extends Deletable> {
     private HashMap<Integer, T> objects;  // id -> pointer to object
@@ -35,7 +36,7 @@ public class Pool <T extends Deletable> {
     }
 
     // Return hashmap.values()
-    public Iterable<T> getObjects() {
+    public Collection<T> getObjects() {
         return objects.values();
     }
 }

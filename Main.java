@@ -6,6 +6,9 @@ public class Main {
     public static Pool<Drawable> drawablePool;
     public static Pool<Updatable> updatablePool;
     public static IdServer idServer;
+    public static int windowWidth, windowHeight;  // Temporary
+
+    public static KeyHandler keyHandler = new KeyHandler();
 
     public static void initialize() {
         drawablePool = new Pool<>();
@@ -18,11 +21,16 @@ public class Main {
         JFrame window = new JFrame("Game");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // set frame to screen size
-        window.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        windowWidth = (int) screenSize.getWidth();
+        windowHeight = (int) screenSize.getHeight();
+        window.setSize(windowWidth, windowHeight);
         // maximize the frame
         window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         GamePanel gamePanel = new GamePanel(window.getWidth(), window.getHeight());
+
+        window.addKeyListener(keyHandler);
         window.add(gamePanel);
         window.setVisible(true);
         gamePanel.startGameThread();

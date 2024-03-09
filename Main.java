@@ -2,12 +2,16 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Main {
+    // Globals
     public static Pool<Drawable> drawablePool;
     public static Pool<Updatable> updatablePool;
+    public static IdServer idServer;
 
     public static void initialize() {
         drawablePool = new Pool<>();
         updatablePool = new Pool<>();
+        idServer = new IdServer();
+        new TestObj();
     }
 
     public static void main(String[] args) {

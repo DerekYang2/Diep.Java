@@ -16,9 +16,10 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void update() {
-        // Handle the pending deletes
-        Main.drawablePool.refreshPool();
-        Main.updatablePool.refreshPool();
+        // Handle the pending operations
+        Main.drawablePool.refresh();
+        Main.updatablePool.refresh();
+        Main.idServer.refresh();
         // Update all the updatable objects
         for (Updatable updatable : Main.updatablePool.getObjects()) {
             updatable.update();

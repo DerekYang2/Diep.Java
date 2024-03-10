@@ -1,12 +1,33 @@
 import javax.swing.JPanel;
 import java.awt.*;
 
+class FPSDraw {
+    private long lastFpsTime;
+    int cur_fps, frame_count;
+
+    public FPSDraw() {
+        lastFpsTime = System.nanoTime();
+        cur_fps = 0;
+        frame_count = 0;
+    }
+
+    public void draw(Graphics g, int x, int y) {
+        g.setColor(Color.WHITE);
+        frame_count++;
+        if (System.nanoTime() - lastFpsTime > 1e9) {
+            lastFpsTime = System.nanoTime();
+            cur_fps = frame_count;
+            frame_count = 0;
+        }
+        g.drawString("FPS: " + cur_fps, x, y);
+    }
+}
+
 public class GamePanel extends JPanel implements Runnable {
-    final int UPDATE_FPS = 120;
-    final int DRAW_FPS = 120;
+    final int FPS = 60;
+    FPSDraw fpsDraw = new FPSDraw();
     int width, height;
     Thread gameThread;
-
 
     public GamePanel(int width, int height) {
         this.width = width;
@@ -29,6 +50,8 @@ public class GamePanel extends JPanel implements Runnable {
         // Draw circle at mouse pos
         g.setColor(Color.WHITE);
         g.fillRect(Main.inputInfo.mouseX, Main.inputInfo.mouseY, 5, 5);
+        // Draw fps
+        fpsDraw.draw(g, 10, 10);
         // Number of objects
         g.setColor(Color.WHITE);
         g.drawString("Number of objects: " + Main.drawablePool.getObjects().size(), 10, 20);
@@ -47,21 +70,16 @@ public class GamePanel extends JPanel implements Runnable {
     public void run() {
         // Initialize
         Main.initialize();
-        double updateInterval = 1e9 / UPDATE_FPS;
-        double drawInterval = 1e9 / DRAW_FPS;
-        double nextUpdateTime = System.nanoTime() + updateInterval;
-        double nextDrawTime = System.nanoTime() + drawInterval;
+        double updateInterval = 1e9 / FPS;
+        double nextTime = System.nanoTime() + updateInterval;
         // Run the game loop
         while (gameThread != null) {
-            if (System.nanoTime() >= nextUpdateTime) {
+            if (System.nanoTime() >= nextTime) {
                 update();
-                nextUpdateTime += updateInterval;
-            }
-            if (System.nanoTime() >= nextDrawTime) {
                 repaint();
-                nextDrawTime += drawInterval;
+                nextTime += updateInterval;
             }
-            double remainingTime = Math.max(0, Math.min(nextUpdateTime, nextDrawTime) - System.nanoTime());
+            double remainingTime = Math.max(0, nextTime - System.nanoTime());
             remainingTime = remainingTime / 1e6;  // convert to milliseconds
             try {
                 Thread.sleep((long)remainingTime);

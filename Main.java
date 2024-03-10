@@ -8,9 +8,12 @@ public class Main {
     public static IdServer idServer;
     public static int windowWidth, windowHeight;  // Temporary
 
+    public static Stopwatch globalClock = new Stopwatch();
+
     public static InputInfo inputInfo = new InputInfo();
 
     public static void initialize() {
+        globalClock.start();
         drawablePool = new Pool<>();
         updatablePool = new Pool<>();
         idServer = new IdServer();

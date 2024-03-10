@@ -18,6 +18,7 @@ public class Main {
         updatablePool = new Pool<>();
         idServer = new IdServer();
         new TestObj();
+        new Square();
     }
 
     public static void main(String[] args) {

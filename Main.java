@@ -58,7 +58,8 @@ public class Main {
         gamePanel.startGameThread();
     }
 
-    public static Graphics2D drawRectCustom(Graphics2D g2d, double x, double y, int width, int length, double theta) {
+    public static Graphics2D drawRectCustom(Graphics g, double x, double y, int width, int length, double theta) {
+        Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
 
         int rectWidth = width;

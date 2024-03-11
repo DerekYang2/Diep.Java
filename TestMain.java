@@ -44,6 +44,8 @@ public class TestMain extends JPanel {
         frame.add(panel);
         // set color
         panel.setBackground(Color.BLACK);
+        // maximize window
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         // set size to be the same as the buffer
         panel.setPreferredSize(new Dimension(bufferWidth, bufferHeight));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -5,9 +5,11 @@ public class TestObj implements Updatable, Drawable {
     protected static double x, y, vx, vy;
     protected int id;
     Stopwatch stopwatch;
-    float friction = 1 / 1.3f;
-    float xAcceleration = 0.4f;
-    float yAcceleration = 0.4f;
+    final double friction = 0.95f;
+    final double mass = 1.0f;
+    final double moveForceX = 0.4f;
+    final double moveForceY = 0.4f;
+    double velMax = 10.0f;  // Max velocity in a single direction
 
     // Delaying shot frequency
     double shootStart = 0.0;
@@ -25,35 +27,33 @@ public class TestObj implements Updatable, Drawable {
         x = Math.random() * Main.windowWidth;
         y = Math.random() * Main.windowHeight;
         vx = vy = 0;
-
-
     }
 
     public void update() {
+        // Cap Velocity
+        vx = Math.signum(vx) * Math.min(Math.abs(vx), velMax);
+        vy = Math.signum(vy) * Math.min(Math.abs(vy), velMax);
+        // Update position
+        x += vx;
+        y += vy;
+        // Apply friction
+        vx *= friction;
+        vy *= friction;
+
         if (Main.inputInfo.downPressed) {
-            if (vy < 5) {
-                vy += yAcceleration;
-            }
-            y += vy;
+            addForce(0, moveForceY);
         } 
         if (Main.inputInfo.upPressed) {
-            if (vy < 5) {
-                vy += yAcceleration;
-            }
-            y -= vy;
-        } 
+            addForce(0, -moveForceY);
+        }
         if (Main.inputInfo.leftPressed) {
-            if (vx < 5) {
-                vx += xAcceleration;
-            }
-            x -= vx;
+            addForce(-moveForceX, 0);
         }
         if (Main.inputInfo.rightPressed) {
-            if (vx < 5) {
-                vx += xAcceleration;
-            }
-            x += vx;
+            addForce(moveForceX, 0);
         }
+
+
         if (Main.inputInfo.attackPressed) {
             System.out.println(stopwatch.ms());
             if (stopwatch.ms() - shootStart > shotDelayMs) {
@@ -63,7 +63,12 @@ public class TestObj implements Updatable, Drawable {
         }
     }
 
-    static void shoot( ) {
+    public void addForce(double fx, double fy) {
+        vx += fx / mass;
+        vy += fy / mass;
+    }
+
+    public static void shoot() {
 
         new Bullet(x, y);
     }

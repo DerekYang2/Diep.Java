@@ -37,8 +37,8 @@ public class Main {
             window.setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
         else if (environment.equals("development")) {
-            windowWidth = 480;
-            windowHeight = 770;
+            windowWidth = (int) (screenSize.getWidth() * 0.5);
+            windowHeight = (int) (screenSize.getHeight() * 0.5);
             window.setSize(windowWidth, windowHeight);
             window.setExtendedState(windowHeight);
         }

@@ -2,9 +2,19 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 
 public class TestObj implements Updatable, Drawable {
-    protected double x, y, vx, vy;
+    protected static double x, y, vx, vy;
     protected int id;
     Stopwatch stopwatch;
+    float friction = 1 / 1.3f;
+    float xAcceleration = 0.4f;
+    float yAcceleration = 0.4f;
+
+    // Delaying shot frequency
+    double shootStart = 0.0;
+    boolean canShoot = true;
+    double shotDelayMs = 500;
+    
+    
     public TestObj() {
         createId();  // Remember to create an id on creation
         addToPools();  // Remember to add object to pool on creation
@@ -14,22 +24,48 @@ public class TestObj implements Updatable, Drawable {
 
         x = Math.random() * Main.windowWidth;
         y = Math.random() * Main.windowHeight;
-        vx = vy = 5;
+        vx = vy = 0;
+
+
     }
 
     public void update() {
         if (Main.inputInfo.downPressed) {
+            if (vy < 5) {
+                vy += yAcceleration;
+            }
             y += vy;
-        }
+        } 
         if (Main.inputInfo.upPressed) {
+            if (vy < 5) {
+                vy += yAcceleration;
+            }
             y -= vy;
-        }
+        } 
         if (Main.inputInfo.leftPressed) {
+            if (vx < 5) {
+                vx += xAcceleration;
+            }
             x -= vx;
         }
         if (Main.inputInfo.rightPressed) {
+            if (vx < 5) {
+                vx += xAcceleration;
+            }
             x += vx;
         }
+        if (Main.inputInfo.attackPressed) {
+            System.out.println(stopwatch.ms());
+            if (stopwatch.ms() - shootStart > shotDelayMs) {
+                shootStart = stopwatch.ms();
+                shoot();
+            } 
+        }
+    }
+
+    static void shoot( ) {
+
+        new Bullet(x, y);
     }
 
     public void draw(Graphics g) {

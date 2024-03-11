@@ -52,7 +52,7 @@ public class InputInfo implements KeyListener, MouseListener, MouseMotionListene
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        
     }
 
     @Override

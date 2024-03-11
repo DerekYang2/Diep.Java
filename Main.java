@@ -8,6 +8,8 @@ public class Main {
     public static IdServer idServer;
     public static int windowWidth, windowHeight;  // Temporary
 
+    public static String environment = "development";
+
     public static Stopwatch globalClock = new Stopwatch();
 
     public static InputInfo inputInfo = new InputInfo();
@@ -26,11 +28,20 @@ public class Main {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // set frame to screen size
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        windowWidth = (int) screenSize.getWidth();
-        windowHeight = (int) screenSize.getHeight();
-        window.setSize(windowWidth, windowHeight);
-        // maximize the frame
-        window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        if (environment.equals("production")) {
+            windowWidth = (int) screenSize.getWidth();
+            windowHeight = (int) screenSize.getHeight();
+            window.setSize(windowWidth, windowHeight);
+
+            // maximize the frame
+            window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
+        else if (environment.equals("development")) {
+            windowWidth = 480;
+            windowHeight = 770;
+            window.setSize(windowWidth, windowHeight);
+            window.setExtendedState(windowHeight);
+        }
 
         GamePanel gamePanel = new GamePanel(window.getWidth(), window.getHeight());
 

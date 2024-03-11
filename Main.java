@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 
 public class Main {
     // Globals
@@ -45,11 +46,40 @@ public class Main {
 
         GamePanel gamePanel = new GamePanel(window.getWidth(), window.getHeight());
 
+        
+
         window.addKeyListener(inputInfo);
         gamePanel.addMouseMotionListener(inputInfo);
+
+        System.out.println("Running");
 
         window.add(gamePanel);
         window.setVisible(true);
         gamePanel.startGameThread();
+    }
+
+    public static Graphics2D drawRectCustom(Graphics2D g2d, double x, double y, int width, int length, double theta) {
+        g2d.setColor(Color.WHITE);
+
+        int rectWidth = width;
+        int rectHeight = length;
+
+        // Create an AffineTransform object
+        AffineTransform at = new AffineTransform();
+        at.translate(x, y);
+        // Rotate to the cursor
+        at.rotate(theta);
+        // Move the transform back
+        at.translate(0, -rectHeight / 2.f);
+
+        // Apply the transform to the Graphics2D object
+        g2d.setTransform(at);
+
+        // Draw the rectangle
+        g2d.fillRect(0, 0, rectWidth, rectHeight);
+
+        // Reset the transformations
+        g2d.setTransform(new AffineTransform());
+        return g2d;
     }
 }

@@ -5,7 +5,7 @@ public class TestObj implements Updatable, Drawable {
     protected static double x, y, vx, vy;
     protected int id;
     Stopwatch stopwatch;
-    final double friction = 0.95f;
+    final double friction = 0.92f;
     final double mass = 1.0f;
     final double moveForceX = 0.4f;
     final double moveForceY = 0.4f;
@@ -68,8 +68,7 @@ public class TestObj implements Updatable, Drawable {
         vy += fy / mass;
     }
 
-    public static void shoot() {
-
+        public static void shoot() {
         new Bullet(x, y);
     }
 

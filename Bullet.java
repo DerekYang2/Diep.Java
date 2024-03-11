@@ -1,4 +1,3 @@
-import java.util.*;
 import java.awt.*;
 
 public class Bullet implements Drawable, Updatable  {
@@ -37,13 +36,6 @@ public class Bullet implements Drawable, Updatable  {
     // System.out.println("cos: " + Math.cos(direction)); 
     // System.out.println("sin: " + Math.sin(direction)); 
 
-    // The head of the tank is slightly off front the coordinate (x, y)
-    double tankHeadDirection;
-    // TODO: fix float comparisent?aw  
-    if (direction > Math.PI) {
-          
-    }
-    
     
     // x and y positions set based on of tank head  
     x = tankX + 50 * -Math.cos(direction); 

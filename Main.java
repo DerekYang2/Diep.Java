@@ -20,7 +20,8 @@ public class Main {
         drawablePool = new Pool<>();
         updatablePool = new Pool<>();
         idServer = new IdServer();
-        new TestObj();
+        // new TestObj();
+        new TestTwin();
         new Square();
     }
 
@@ -50,8 +51,6 @@ public class Main {
 
         window.addKeyListener(inputInfo);
         gamePanel.addMouseMotionListener(inputInfo);
-
-        System.out.println("Running");
 
         window.add(gamePanel);
         window.setVisible(true);
@@ -83,4 +82,12 @@ public class Main {
         g2d.setTransform(new AffineTransform());
         return g2d;
     }
+
+    public static Graphics2D drawPolyCustom(Graphics g, double x, double y, int width, int length, double theta) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(Color.WHITE);
+        // TODO: Custom polygon
+        return g2d;
+    }
+
 }

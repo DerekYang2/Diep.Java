@@ -9,17 +9,18 @@ public class Bullet implements Drawable, Updatable  {
   float friction = 1 / 1.3f;
   float xAcceleration = 0.4f, yAcceleration = 0.4f;
  
-  public Bullet(double tankX, double tankY) {
+  // The bullet trajectory will be determined based on the position where it spawns
+  public Bullet(double spawnX, double spawnY, double xTarget, double yTarget, int cannonWidth) {
     createId();
     addToPools();
     
     stopwatch = new Stopwatch();
     stopwatch.start();
       
-    double deltaY = tankY - Main.inputInfo.mouseY;
-    double deltaX = tankX - Main.inputInfo.mouseX;
+    double deltaX = spawnX - xTarget;
+    double deltaY = spawnY - yTarget; 
     direction = Math.atan2(deltaY, deltaX);
-    vt = 5;
+    vt = 5; // temp, will be based off speed eventually
 
     /* 4 Quadrants:
      * case : sign of cos, sign of sin -> proper bullet velocity sign
@@ -30,7 +31,7 @@ public class Bullet implements Drawable, Updatable  {
     vx = vt * -Math.cos(direction);
     vy = vt * -Math.sin(direction);
     
-    // System.out.println("Direction: " + direction);
+    System.out.println("Direction: " + direction);
     // System.out.println("vX: " + vx);
     // System.out.println("vY: " + vy);
     // System.out.println("cos: " + Math.cos(direction)); 
@@ -38,8 +39,8 @@ public class Bullet implements Drawable, Updatable  {
 
     
     // x and y positions set based on of tank head  
-    x = tankX + 50 * -Math.cos(direction); 
-    y = tankY + 50 * -Math.sin(direction);
+    x = spawnX + cannonWidth * -Math.cos(direction); 
+    y = spawnY + cannonWidth * -Math.sin(direction);
 
   } 
   public void update() {
@@ -49,7 +50,8 @@ public class Bullet implements Drawable, Updatable  {
 
   public void draw(Graphics g) {
     g.setColor(Color.red);
-    g.fillOval((int) x - 8, (int) y - 8, 16, 16);
+    
+    g.fillOval((int) x - 6, (int) y - 6, 12, 12);
   }
 
   public void createId() {

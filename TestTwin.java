@@ -1,8 +1,11 @@
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 
-public class TestObj implements Updatable, Drawable {
+public class TestTwin implements Updatable, Drawable {
     protected static double x, y, vx, vy;
+    protected static double xTranslate, yTranslate;
+
+    protected static double direction, raa;
     protected int id;
     Stopwatch stopwatch;
     final double friction = 0.92f;
@@ -17,7 +20,7 @@ public class TestObj implements Updatable, Drawable {
     double shotDelayMs = 500;
     
     
-    public TestObj() {
+    public TestTwin() {
         createId();  // Remember to create an id on creation
         addToPools();  // Remember to add object to pool on creation
 
@@ -27,6 +30,8 @@ public class TestObj implements Updatable, Drawable {
         x = Math.random() * Main.windowWidth;
         y = Math.random() * Main.windowHeight;
         vx = vy = 0;
+
+        
     }
 
     public void update() {
@@ -39,6 +44,13 @@ public class TestObj implements Updatable, Drawable {
         // Apply friction
         vx *= friction;
         vy *= friction;
+
+        // Get Direction of mouse
+        direction = Math.atan2(Main.inputInfo.mouseY - y, Main.inputInfo.mouseX - x);
+        // TODO: FIX HOW BULLET SPAWNPOINTS ARE CALCULATED
+        // need to use the RAA to find the angle of the bullet spawnpoint
+        raa = Math.signum(direction) * Math.min(Math.abs(direction), Math.PI - Math.abs(direction));
+
 
         if (Main.inputInfo.downPressed) {
             addForce(0, moveForceY);
@@ -67,36 +79,67 @@ public class TestObj implements Updatable, Drawable {
         vy += fy / mass;
     }
 
-        public static void shoot() {
-        new Bullet(x, y, x, y, 50);
+    public static void shoot() {
+        // Calculate origin based on rotation 
+        yTranslate = Math.cos(raa) * (26 / 4 + 0.5);
+        xTranslate = Math.sin(raa) * (26 / 4 + 0.5);
+        // One bullet is translated left and up, the other is right and down
+
+        // System.out.println("xTranslate: " + xTranslate);
+        System.out.println("xTranslate1: " + (x - xTranslate));
+        System.out.println("xTranslate2: " + (x + xTranslate));
+        // System.out.println("yTranslate:" + yTranslate);
+
+
+        // The bullet must be aimed at some distance away from the cursor, making the bullets parallel
+        new Bullet(x - xTranslate, y - yTranslate, Main.inputInfo.mouseX - xTranslate, Main.inputInfo.mouseY - yTranslate, 40);
+       
+        new Bullet(x + xTranslate, y + yTranslate, Main.inputInfo.mouseX + xTranslate, Main.inputInfo.mouseY + yTranslate, 40);
+       
     }
 
     public void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
 
-        int rectWidth = 50;
-        int rectHeight = 10;
+        int[] xPoints = {0, 0, 40, 40, 20, 20, 40, 40, 0};
+        int[] yPoints = {0, 26, 26, 14, 14, 12, 12, 0, 0};
+
+        
+
 
         // Create an AffineTransform object
         AffineTransform at = new AffineTransform();
         at.translate(x, y);
         // Rotate to the cursor
-        at.rotate(Math.atan2(Main.inputInfo.mouseY - y, Main.inputInfo.mouseX - x));
-        // Centering graphic draw origin
-        at.translate(0, -rectHeight / 2.f);
+        at.rotate(direction);
+        // Centering the transformation
+        at.translate(0, -26 / 2.f);
 
         // Apply the transform to the Graphics2D object
         g2d.setTransform(at);
-
-        // Draw the rectangle
-        g2d.fillRect(0, 0, rectWidth, rectHeight);
-
-        // Reset the transformations
+        
+        g2d.fillPolygon(xPoints, yPoints, 9);
+        
         g2d.setTransform(new AffineTransform());
-
+        
         g.setColor(Color.red);
+        
         g.fillOval((int)x - 15, (int)y - 15, 30, 30);
+
+        g.setColor(Color.green);
+        double p1x = x - xTranslate ; 
+        double p1y = y - yTranslate; 
+        double p2x = x + xTranslate ; 
+        double p2y = y + yTranslate; 
+
+        g.fillOval((int)p1x - 2, (int)p1y - 2, 4, 4);
+        g.fillOval((int)p2x - 2, (int)p2y - 2, 4, 4);
+
+        g.setColor(Color.cyan);
+        g.fillOval((int)x - 2, (int)y - 2, 4, 4);
+
+
     }
 
     // Deletable Methods

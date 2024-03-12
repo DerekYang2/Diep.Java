@@ -49,9 +49,9 @@ public class TestTwin implements Updatable, Drawable {
         direction = Math.atan2(Main.inputInfo.mouseY - y, Main.inputInfo.mouseX - x);
         // TODO: FIX HOW BULLET SPAWNPOINTS ARE CALCULATED
         // need to use the RAA to find the angle of the bullet spawnpoint
-        raa = Math.signum(direction) * Math.min(Math.abs(direction), Math.PI - Math.abs(direction));
+        // raa = Math.signum(direction) * Math.min(Math.abs(direction), Math.PI - Math.abs(direction));
 
-
+        
         if (Main.inputInfo.downPressed) {
             addForce(0, moveForceY);
         } 
@@ -80,14 +80,25 @@ public class TestTwin implements Updatable, Drawable {
     }
 
     public static void shoot() {
+        System.out.println("Direction: " + direction);
         // Calculate origin based on rotation 
-        yTranslate = Math.cos(raa) * (26 / 4 + 0.5);
-        xTranslate = Math.sin(raa) * (26 / 4 + 0.5);
+        // TODO: simplify this trig calculation
+        if (direction > 0 && direction < Math.PI / 2 || direction < -Math.PI / 2 && direction > -Math.PI) {
+          System.out.println("Switch Ran");
+          yTranslate = Math.abs(Math.cos(direction) * (26 / 4 + 0.5));
+          xTranslate = -Math.abs(Math.sin(direction) * (26 / 4 + 0.5));
+        } else {
+          yTranslate = Math.abs(Math.cos(direction) * (26 / 4 + 0.5));
+          xTranslate = Math.abs(Math.sin(direction) * (26 / 4 + 0.5));
+        }
         // One bullet is translated left and up, the other is right and down
 
+
+
+
         // System.out.println("xTranslate: " + xTranslate);
-        System.out.println("xTranslate1: " + (x - xTranslate));
-        System.out.println("xTranslate2: " + (x + xTranslate));
+        // System.out.println("xTranslate1: " + (x - xTranslate));
+        // System.out.println("xTranslate2: " + (x + xTranslate));
         // System.out.println("yTranslate:" + yTranslate);
 
 

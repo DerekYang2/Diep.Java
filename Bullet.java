@@ -17,8 +17,8 @@ public class Bullet implements Drawable, Updatable  {
     stopwatch = new Stopwatch();
     stopwatch.start();
       
-    double deltaX = spawnX - xTarget;
-    double deltaY = spawnY - yTarget; 
+    double deltaX = xTarget - spawnX;
+    double deltaY = yTarget - spawnY ; 
     direction = Math.atan2(deltaY, deltaX);
     vt = 5; // temp, will be based off speed eventually
 
@@ -28,10 +28,9 @@ public class Bullet implements Drawable, Updatable  {
      * pi / 2-> pi : cos -, sin + -> x: + y: -
      * ... always flip the sign   
      */
-    vx = vt * -Math.cos(direction);
-    vy = vt * -Math.sin(direction);
+    vx = vt * Math.cos(direction);
+    vy = vt * Math.sin(direction);
     
-    System.out.println("Direction: " + direction);
     // System.out.println("vX: " + vx);
     // System.out.println("vY: " + vy);
     // System.out.println("cos: " + Math.cos(direction)); 
@@ -39,8 +38,8 @@ public class Bullet implements Drawable, Updatable  {
 
     
     // x and y positions set based on of tank head  
-    x = spawnX + cannonWidth * -Math.cos(direction); 
-    y = spawnY + cannonWidth * -Math.sin(direction);
+    x = spawnX + cannonWidth * Math.cos(direction); 
+    y = spawnY + cannonWidth * Math.sin(direction);
 
   } 
   public void update() {

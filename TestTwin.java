@@ -50,10 +50,6 @@ public class TestTwin implements Updatable, Drawable {
 
         // Get Direction of mouse
         direction = Math.atan2(Main.inputInfo.mouseY - y, Main.inputInfo.mouseX - x);
-        direction2 = Math.atan(Main.inputInfo.mouseY - y / Main.inputInfo.mouseX - x);
-        // TODO: FIX HOW BULLET SPAWNPOINTS ARE CALCULATED
-        // need to use the RAA to find the angle of the bullet spawnpoint
-        // raa = Math.signum(direction) * Math.min(Math.abs(direction), Math.PI - Math.abs(direction));
 
         
         if (Main.inputInfo.downPressed) {
@@ -86,22 +82,19 @@ public class TestTwin implements Updatable, Drawable {
     public static void shoot() {
       yTranslate = Math.abs(Math.cos(direction) * (26 / 4 + 0.5));
       xTranslate = Math.abs(Math.sin(direction) * (26 / 4 + 0.5));
-        System.out.println("Direction: " + direction + " Direction2: " + direction2);
+        System.out.println("Direction: " + direction);
+        System.out.println("Cos: " + Math.signum(Math.cos(direction)) + " Sin: " + Math.signum(Math.sin(direction)));
         // Calculate origin based on rotation 
         // TODO: simplify this trig calculation
-        if (direction > 0 && direction < Math.PI / 2 || direction < -Math.PI / 2 && direction > -Math.PI) {
-          System.out.println("Switch Ran");
-        } else {
-          yTranslate = Math.abs(Math.cos(direction) * (26 / 4 + 0.5));
-          xTranslate = Math.abs(Math.sin(direction) * (26 / 4 + 0.5));
-        }
-        // One bullet is translated left and up, the other is right and down
+        yTranslate = Math.abs(Math.cos(direction) * (26 / 4 + 0.5));
+        xTranslate = Math.abs(Math.sin(direction) * (26 / 4 + 0.5));
+
         
         if (direction > 0 && direction < Math.PI / 2) {
           new Bullet(x + xTranslate, y - yTranslate, Main.inputInfo.mouseX + xTranslate, Main.inputInfo.mouseY - yTranslate, 40);
+          new Bullet(x - xTranslate, y + yTranslate, Main.inputInfo.mouseX - xTranslate, Main.inputInfo.mouseY + yTranslate, 40);
           p1x = x + xTranslate;
           p1y = y - yTranslate;
-          new Bullet(x - xTranslate, y + yTranslate, Main.inputInfo.mouseX - xTranslate, Main.inputInfo.mouseY + yTranslate, 40);
           p2x = x - xTranslate;
           p2y = y + yTranslate;
         } else if (direction > Math.PI /2 && direction < Math.PI) {

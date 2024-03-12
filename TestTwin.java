@@ -5,7 +5,7 @@ public class TestTwin implements Updatable, Drawable {
     protected static double x, y, vx, vy;
     protected static double xTranslate, yTranslate;
 
-    protected static double direction, raa;
+    protected static double direction, direction2;
     protected int id;
     Stopwatch stopwatch;
     final double friction = 0.92f;
@@ -18,6 +18,9 @@ public class TestTwin implements Updatable, Drawable {
     double shootStart = 0.0;
     boolean canShoot = true;
     double shotDelayMs = 500;
+
+    // Debugging Variables
+    static double p1x, p1y, p2x, p2y; 
     
     
     public TestTwin() {
@@ -47,6 +50,7 @@ public class TestTwin implements Updatable, Drawable {
 
         // Get Direction of mouse
         direction = Math.atan2(Main.inputInfo.mouseY - y, Main.inputInfo.mouseX - x);
+        direction2 = Math.atan(Main.inputInfo.mouseY - y / Main.inputInfo.mouseX - x);
         // TODO: FIX HOW BULLET SPAWNPOINTS ARE CALCULATED
         // need to use the RAA to find the angle of the bullet spawnpoint
         // raa = Math.signum(direction) * Math.min(Math.abs(direction), Math.PI - Math.abs(direction));
@@ -80,20 +84,48 @@ public class TestTwin implements Updatable, Drawable {
     }
 
     public static void shoot() {
-        System.out.println("Direction: " + direction);
+      yTranslate = Math.abs(Math.cos(direction) * (26 / 4 + 0.5));
+      xTranslate = Math.abs(Math.sin(direction) * (26 / 4 + 0.5));
+        System.out.println("Direction: " + direction + " Direction2: " + direction2);
         // Calculate origin based on rotation 
         // TODO: simplify this trig calculation
         if (direction > 0 && direction < Math.PI / 2 || direction < -Math.PI / 2 && direction > -Math.PI) {
           System.out.println("Switch Ran");
-          yTranslate = Math.abs(Math.cos(direction) * (26 / 4 + 0.5));
-          xTranslate = -Math.abs(Math.sin(direction) * (26 / 4 + 0.5));
         } else {
           yTranslate = Math.abs(Math.cos(direction) * (26 / 4 + 0.5));
           xTranslate = Math.abs(Math.sin(direction) * (26 / 4 + 0.5));
         }
         // One bullet is translated left and up, the other is right and down
-
-
+        
+        if (direction > 0 && direction < Math.PI / 2) {
+          new Bullet(x + xTranslate, y - yTranslate, Main.inputInfo.mouseX + xTranslate, Main.inputInfo.mouseY - yTranslate, 40);
+          p1x = x + xTranslate;
+          p1y = y - yTranslate;
+          new Bullet(x - xTranslate, y + yTranslate, Main.inputInfo.mouseX - xTranslate, Main.inputInfo.mouseY + yTranslate, 40);
+          p2x = x - xTranslate;
+          p2y = y + yTranslate;
+        } else if (direction > Math.PI /2 && direction < Math.PI) {
+          new Bullet(x + xTranslate, y + yTranslate, Main.inputInfo.mouseX + xTranslate, Main.inputInfo.mouseY + yTranslate, 40);
+          new Bullet(x - xTranslate, y - yTranslate, Main.inputInfo.mouseX - xTranslate, Main.inputInfo.mouseY - yTranslate, 40);
+          p1x = x + xTranslate;
+          p1y = y + yTranslate;
+          p2x = x - xTranslate;
+          p2y = y - yTranslate;
+        } else if (direction < 0 && direction > -Math.PI / 2) {
+          new Bullet(x - xTranslate, y - yTranslate, Main.inputInfo.mouseX - xTranslate, Main.inputInfo.mouseY - yTranslate, 40);
+          new Bullet(x + xTranslate, y + yTranslate, Main.inputInfo.mouseX + xTranslate, Main.inputInfo.mouseY + yTranslate, 40);
+          p1x = x - xTranslate;
+          p1y = y - yTranslate;
+          p2x = x + xTranslate;
+          p2y = y + yTranslate;
+        } else if (direction < -Math.PI / 2 && direction > -Math.PI) {
+          new Bullet(x - xTranslate, y + yTranslate, Main.inputInfo.mouseX - xTranslate, Main.inputInfo.mouseY + yTranslate, 40);
+          new Bullet(x + xTranslate, y - yTranslate, Main.inputInfo.mouseX + xTranslate, Main.inputInfo.mouseY - yTranslate, 40);
+          p1x = x - xTranslate;
+          p1y = y + yTranslate;
+          p2x = x + xTranslate;
+          p2y = y - yTranslate;
+        }
 
 
         // System.out.println("xTranslate: " + xTranslate);
@@ -103,9 +135,7 @@ public class TestTwin implements Updatable, Drawable {
 
 
         // The bullet must be aimed at some distance away from the cursor, making the bullets parallel
-        new Bullet(x - xTranslate, y - yTranslate, Main.inputInfo.mouseX - xTranslate, Main.inputInfo.mouseY - yTranslate, 40);
-       
-        new Bullet(x + xTranslate, y + yTranslate, Main.inputInfo.mouseX + xTranslate, Main.inputInfo.mouseY + yTranslate, 40);
+        
        
     }
 
@@ -138,13 +168,11 @@ public class TestTwin implements Updatable, Drawable {
         
         g.fillOval((int)x - 15, (int)y - 15, 30, 30);
 
+        
+        
         g.setColor(Color.green);
-        double p1x = x - xTranslate ; 
-        double p1y = y - yTranslate; 
-        double p2x = x + xTranslate ; 
-        double p2y = y + yTranslate; 
-
         g.fillOval((int)p1x - 2, (int)p1y - 2, 4, 4);
+        g.setColor(Color.pink);
         g.fillOval((int)p2x - 2, (int)p2y - 2, 4, 4);
 
         g.setColor(Color.cyan);

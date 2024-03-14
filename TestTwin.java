@@ -170,8 +170,6 @@ public class TestTwin implements Updatable, Drawable {
 
         g.setColor(Color.cyan);
         g.fillOval((int)x - 2, (int)y - 2, 4, 4);
-
-
     }
 
     // Deletable Methods

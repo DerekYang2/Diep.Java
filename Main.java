@@ -59,7 +59,7 @@ public class Main {
 
     public static Graphics2D drawRectCustom(Graphics g, double x, double y, int width, int length, double theta) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.WHITE);
+        g2d.setColor(Color.WHITE); // TODO: maybe change to pass in colour
 
         int rectWidth = width;
         int rectHeight = length;
@@ -82,12 +82,4 @@ public class Main {
         g2d.setTransform(new AffineTransform());
         return g2d;
     }
-
-    public static Graphics2D drawPolyCustom(Graphics g, double x, double y, int width, int length, double theta) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.WHITE);
-        // TODO: Custom polygon
-        return g2d;
-    }
-
 }

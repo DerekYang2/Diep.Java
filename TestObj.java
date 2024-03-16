@@ -67,7 +67,7 @@ public class TestObj implements Updatable, Drawable {
         vy += fy / mass;
     }
 
-        public static void shoot() {
+    public static void shoot() {
         new Bullet(x, y, x, y, 50);
     }
 
@@ -85,13 +85,13 @@ public class TestObj implements Updatable, Drawable {
         at.rotate(Math.atan2(Main.inputInfo.mouseY - y, Main.inputInfo.mouseX - x));
         // Centering graphic draw origin
         at.translate(0, -rectHeight / 2.f);
-
+        
         // Apply the transform to the Graphics2D object
         g2d.setTransform(at);
-
+        
         // Draw the rectangle
         g2d.fillRect(0, 0, rectWidth, rectHeight);
-
+        
         // Reset the transformations
         g2d.setTransform(new AffineTransform());
 

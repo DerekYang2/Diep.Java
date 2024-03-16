@@ -5,7 +5,7 @@ public class TestTwin implements Updatable, Drawable {
     protected static double x, y, vx, vy;
     protected static double xTranslate, yTranslate;
 
-    protected static double direction, direction2;
+    protected static double direction;
     protected int id;
     Stopwatch stopwatch;
     final double friction = 0.92f;
@@ -72,6 +72,7 @@ public class TestTwin implements Updatable, Drawable {
                 shoot();
             } 
         }
+
     }
 
     public void addForce(double fx, double fy) {
@@ -118,24 +119,17 @@ public class TestTwin implements Updatable, Drawable {
           p1y = y + yTranslate;
           p2x = x + xTranslate;
           p2y = y - yTranslate;
-        }
+        }       
 
 
-        // System.out.println("xTranslate: " + xTranslate);
-        // System.out.println("xTranslate1: " + (x - xTranslate));
-        // System.out.println("xTranslate2: " + (x + xTranslate));
-        // System.out.println("yTranslate:" + yTranslate);
-
-
-        // The bullet must be aimed at some distance away from the cursor, making the bullets parallel
-        
-       
+        // Turret
+        // One Turret will be plus offset, one will be minus offset
     }
 
     public void draw(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
-
+      
         int[] xPoints = {0, 0, 40, 40, 20, 20, 40, 40, 0};
         int[] yPoints = {0, 26, 26, 14, 14, 12, 12, 0, 0};
 
@@ -162,14 +156,14 @@ public class TestTwin implements Updatable, Drawable {
         g.fillOval((int)x - 15, (int)y - 15, 30, 30);
 
         
-        
-        g.setColor(Color.green);
-        g.fillOval((int)p1x - 2, (int)p1y - 2, 4, 4);
-        g.setColor(Color.pink);
-        g.fillOval((int)p2x - 2, (int)p2y - 2, 4, 4);
+        // Testing if spawn points are correct  
+        // g.setColor(Color.green);
+        // g.fillOval((int)p1x - 2, (int)p1y - 2, 4, 4);
+        // g.setColor(Color.pink);
+        // g.fillOval((int)p2x - 2, (int)p2y - 2, 4, 4);
 
-        g.setColor(Color.cyan);
-        g.fillOval((int)x - 2, (int)y - 2, 4, 4);
+        // g.setColor(Color.cyan);
+        // g.fillOval((int)x - 2, (int)y - 2, 4, 4);
     }
 
     // Deletable Methods

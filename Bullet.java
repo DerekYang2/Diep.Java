@@ -10,16 +10,13 @@ public class Bullet implements Drawable, Updatable  {
   float xAcceleration = 0.4f, yAcceleration = 0.4f;
  
   // The bullet trajectory will be determined based on the position where it spawns
-  public Bullet(double spawnX, double spawnY, double xTarget, double yTarget, int cannonWidth) {
+  public Bullet(double spawnX, double spawnY, double direction, int cannonLength) {
     createId();
     addToPools();
     
     stopwatch = new Stopwatch();
     stopwatch.start();
       
-    double deltaX = xTarget - spawnX;
-    double deltaY = yTarget - spawnY ; 
-    direction = Math.atan2(deltaY, deltaX);
     vt = 5; // temp, will be based off speed eventually
 
     /* 4 Quadrants:
@@ -38,8 +35,8 @@ public class Bullet implements Drawable, Updatable  {
 
     
     // x and y positions set based on of tank head  
-    x = spawnX + cannonWidth * Math.cos(direction); 
-    y = spawnY + cannonWidth * Math.sin(direction);
+    x = spawnX + cannonLength * Math.cos(direction); 
+    y = spawnY + cannonLength * Math.sin(direction);
 
   } 
   public void update() {

@@ -68,7 +68,7 @@ public class TestObj implements Updatable, Drawable {
     }
 
     public static void shoot() {
-        new Bullet(x, y, x, y, 50);
+        // new Bullet(x, y, , 50);
     }
 
     public void draw(Graphics g) {

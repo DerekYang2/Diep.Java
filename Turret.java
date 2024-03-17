@@ -6,7 +6,7 @@ public class Turret implements Drawable, Updatable {
   double x, y;
   double xNew, yNew;
   double xOrigin, yOrigin;
-  double prevAngle, newAngle;
+  double prevAngle, curAngle;
   double rotateBy;
   int id;
 
@@ -35,7 +35,8 @@ public class Turret implements Drawable, Updatable {
 
     stopwatch = new Stopwatch();
     stopwatch.start();
-    
+
+    // Default spawn point, along the x axis with an offset from the origin 
     x = xOrigin + offset;
     y = yOrigin;
 
@@ -47,70 +48,65 @@ public class Turret implements Drawable, Updatable {
   }  
 
   public void draw(Graphics g) {
-    // Graphics2D g2d = (Graphics2D) g;
-    // g2d.setColor(Color.WHITE);
+    Graphics2D g2d = (Graphics2D) g;
+    g2d.setColor(Color.WHITE);
 
-    // // Create an AffineTransform object
-    // AffineTransform at = new AffineTransform();
-    // at.translate(x, y);
-    // // Rotate to the cursor
-    // at.rotate(Math.atan2(Main.inputInfo.mouseY - y, Main.inputInfo.mouseX - x));
-    // // Centering graphic draw origin
-    // at.translate(0, -width / 2.f);
+    // Create an AffineTransform object
+    AffineTransform at = new AffineTransform();
+    at.translate(x, y);
+    // Rotate to the cursor
+    at.rotate(Math.atan2(Main.inputInfo.mouseY - yOrigin, Main.inputInfo.mouseX - xOrigin));
+    // Centering graphic draw origin
+    at.translate(0, -width / 2.f);
 
-    // // Apply the transform to the Graphics2D object
-    // g2d.setTransform(at);
+    // Apply the transform to the Graphics2D object
+    g2d.setTransform(at);
 
-    // // Draw the rectangle
-    // g2d.fillRect(0, 0, length, width);
+    // Draw the rectangle
+    g2d.fillRect(0, 0, length, width);
 
-    // // Reset the transformations
-    // g2d.setTransform(new AffineTransform());
-    g.setColor(Color.RED);
+    // Reset the transformations
+    g2d.setTransform(new AffineTransform());
+    g.setColor(Color.GREEN);
     g.fillOval((int) x - 4, (int) y - 4, 8, 8);
   }
 
   public void update() {
-    if (timesPrinted < 2) {
-      System.out.println(x);
-      System.out.println(y);
-      timesPrinted++;
-      newAngle =  Math.atan2(Main.inputInfo.mouseY - yOrigin, Main.inputInfo.mouseX - xOrigin);
-      System.out.println("newAngle: " + newAngle);
-      System.out.println("prevAngle: " + prevAngle);
-      System.out.println("rotate by: " + (newAngle - prevAngle));
+   }
 
-    }
-    // System.out.println("from tur 2: " + turretDirection);
-    newAngle = Math.atan2(Main.inputInfo.mouseY - yOrigin, Main.inputInfo.mouseX - xOrigin);
+  public void updatePos(double tankX, double tankY, double tankAngle) {
+    // Redraw Turret in new position
 
-    rotateBy = newAngle - prevAngle;
+    // Change position based on new position of the tank
+    x = tankX + offset;
+    y = tankY;
+
+    prevAngle = -Math.PI / 2; // spawn pointing upwards
+    
+    tankAngle = Math.atan2(Main.inputInfo.mouseY - tankY, Main.inputInfo.mouseX - tankX);
+
+    rotateBy = tankAngle - prevAngle;
 
     // Calculating new spawn points
-    xNew = (x - xOrigin) * Math.cos(rotateBy) - (y - yOrigin) * Math.sin(rotateBy) + xOrigin;
-    yNew = (x - xOrigin) * Math.sin(rotateBy) + (y - yOrigin) * Math.cos(rotateBy) + yOrigin;
+    xNew = (x - tankX) * Math.cos(rotateBy) - (y - tankY) * Math.sin(rotateBy) + tankX;
+    yNew = (x - tankX) * Math.sin(rotateBy) + (y - tankY) * Math.cos(rotateBy) + tankY;
 
 
     // Setting coordinates to new spawn points, we need the xNew and yNew variables because if we calulate x = ..., the next calculation of y = ... will use the updated x instead of the old one
     x = xNew;
     y = yNew;
-    
-    if (stopwatch.ms() - lastPrint >= 3000 ) {
-      System.out.format("%8s %8s %8s %8s %8s %8s %8s", "rotateBy: ", rotateBy, "x: ", x , "y: ", y, "\n");
-      System.out.format("%8s %8s %8s %8s %8s",  "xOrigin: ", xOrigin, "yOrigin: ", yOrigin, "\n");
 
-      
-      lastPrint = stopwatch.ms();
-      
-    }
-
+    // Set the origin to the new origin of the tank so that the tank barrel can be drawn properly
+    xOrigin = tankX;
+    yOrigin = tankY;
+    curAngle = tankAngle;
         
     // Set the current angle to the prev angle for the next cycle
-    prevAngle = newAngle;
-    
-    
+    prevAngle = tankAngle;
+  }
 
-    // System.out.println(turretDirection);
+  public void shoot() {
+    new Bullet(x, y, curAngle, length);
   }
   
   public void createId() {

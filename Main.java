@@ -22,11 +22,8 @@ public class Main {
         updatablePool = new Pool<>();
         idServer = new IdServer();
         // new TestObj();
-        // new TestTwin();
+        new TestTwin();
         // new Square();
-
-        new Turret(200, 200, 10, 50, 10, -1);
-        new Turret(200, 200, 10, 50, -10, -1);
     }
 
     public static void main(String[] args) {

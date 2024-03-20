@@ -40,9 +40,14 @@ public class TestTwin implements Updatable, Drawable {
         // Wait for the circle to be spawned before
         // Triple shot
         turrets = new Turret[]{
-                new Turret(10, 30, 0, -Math.PI/4),
+                new Turret(10, 30, 0, -Math.PI / 4),
                 new Turret(10, 30, 0, 0),
-                new Turret(10, 30, 0, Math.PI/4),
+                new Turret(10, 30, 0, Math.PI / 4),
+        };
+        // Twins
+        turrets = new Turret[]{
+                new Turret(10, 30, 7, 0),
+                new Turret(10, 30, -7, 0)
         };
     }
 

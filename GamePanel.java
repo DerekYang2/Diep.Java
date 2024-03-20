@@ -50,6 +50,11 @@ public class GamePanel extends JPanel implements Runnable {
         // Draw circle at mouse pos
         g.setColor(Color.WHITE);
         g.fillRect(Main.inputInfo.mouseX, Main.inputInfo.mouseY, 5, 5);
+        // Click test
+        if (Main.inputInfo.attackPressed) {
+            g.setColor(Color.RED);
+            g.fillOval(Main.inputInfo.mouseX - 10, Main.inputInfo.mouseY - 10, 20, 20);
+        }
         // Draw fps
         fpsDraw.draw(g, 10, 10);
         // Number of objects

@@ -42,6 +42,9 @@ public class Bullet implements Drawable, Updatable  {
   public void update() {
     y += vy;
     x += vx;
+    if (stopwatch.s() > 3) {
+        delete();
+    }
   }
 
   public void draw(Graphics g) {
@@ -67,5 +70,4 @@ public class Bullet implements Drawable, Updatable  {
     Main.drawablePool.deleteObj(this.getId());
     Main.updatablePool.deleteObj(this.getId());
   }
-    
 }

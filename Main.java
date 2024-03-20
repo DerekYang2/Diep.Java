@@ -50,6 +50,7 @@ public class Main {
 
         window.addKeyListener(inputInfo);
         gamePanel.addMouseMotionListener(inputInfo);
+        gamePanel.addMouseListener(inputInfo);
 
         window.add(gamePanel);
         window.setVisible(true);

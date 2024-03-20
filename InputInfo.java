@@ -25,9 +25,6 @@ public class InputInfo implements KeyListener, MouseListener, MouseMotionListene
         if (keyCode == KeyEvent.VK_D) {
             rightPressed = true;
         }
-        if (keyCode == KeyEvent.VK_SPACE) {
-            attackPressed = true;
-        }
     }
     @Override
     public void keyReleased(KeyEvent e) {
@@ -44,25 +41,22 @@ public class InputInfo implements KeyListener, MouseListener, MouseMotionListene
         if (keyCode == KeyEvent.VK_D) {
             rightPressed = false;
         }
-        if (keyCode == KeyEvent.VK_SPACE) {
-            attackPressed = false;
-        }
     }
 
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        
+
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        attackPressed = true;
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
+        attackPressed = false;
     }
 
     @Override

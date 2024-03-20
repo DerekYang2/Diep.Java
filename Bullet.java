@@ -66,7 +66,6 @@ public class Bullet implements Drawable, Updatable  {
   public void delete() {
     Main.drawablePool.deleteObj(this.getId());
     Main.updatablePool.deleteObj(this.getId());
-    Main.idServer.returnId(this.getId());
   }
     
 }

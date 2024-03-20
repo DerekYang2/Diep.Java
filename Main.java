@@ -48,8 +48,6 @@ public class Main {
 
         GamePanel gamePanel = new GamePanel(window.getWidth(), window.getHeight());
 
-        
-
         window.addKeyListener(inputInfo);
         gamePanel.addMouseMotionListener(inputInfo);
 

@@ -40,7 +40,7 @@ public class GamePanel extends JPanel implements Runnable {
         // Handle the pending operations
         Main.drawablePool.refresh();
         Main.updatablePool.refresh();
-        Main.idServer.refresh();
+
         // Update all the updatable objects
         for (Updatable updatable : Main.updatablePool.getObjects()) {
             updatable.update();

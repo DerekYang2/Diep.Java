@@ -1,11 +1,12 @@
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 
 public class TestTwin implements Updatable, Drawable {
-    protected static double x, y, vx, vy;
-    protected static double xTranslate, yTranslate;
+    protected double x, y, vx, vy;
+    protected double xTranslate, yTranslate;
 
-    protected static double direction;
+    protected double direction;
     protected int id;
     Stopwatch stopwatch;
     final double friction = 0.92f;
@@ -14,7 +15,7 @@ public class TestTwin implements Updatable, Drawable {
     final double moveForceY = 0.4f;
     double velMax = 10.0f;  // Max velocity in a single direction
 
-    static Turret t1, t2;
+    Turret[] turrets;
 
     // Delaying shot frequency
     double shootStart = 0.0;
@@ -22,7 +23,7 @@ public class TestTwin implements Updatable, Drawable {
     double shotDelayMs = 500;
 
     // Debugging Variables
-    static double p1x, p1y, p2x, p2y; 
+    double p1x, p1y, p2x, p2y;
     
     
     public TestTwin() {
@@ -36,9 +37,12 @@ public class TestTwin implements Updatable, Drawable {
         y = Math.random() * Main.windowHeight;
         vx = vy = 0;
 
-        // Wait for the circle to be spawned before drawing 
-        t1 = new Turret(x, y, 10, 35, 7, -1);
-        t2 = new Turret(x, y, 10, 35, -7, -1);
+        // Wait for the circle to be spawned before drawing
+        turrets = new Turret[]{
+                new Turret(10, 35, 0, -45),
+                new Turret(10, 35, 0, 0),
+                new Turret(10, 35, 0, 45),
+        };
     }
 
     public void update() {
@@ -76,9 +80,10 @@ public class TestTwin implements Updatable, Drawable {
                 shoot();
             } 
         }
-
-        t1.updatePos(x, y, direction);
-        t2.updatePos(x, y, direction);
+        // atan2 mouse angle
+        for (Turret t : turrets) {
+            t.update(x, y, direction);
+        }
     }
 
     public void addForce(double fx, double fy) {
@@ -86,15 +91,20 @@ public class TestTwin implements Updatable, Drawable {
         vy += fy / mass;
     }
 
-    public static void shoot() {
+    public void shoot() {
         // TODO: add bullet params
-        t1.shoot();
-        t2.shoot();
+        for (Turret t : turrets) {
+            t.shoot();
+        }
     }
 
     public void draw(Graphics g) {        
         g.setColor(Color.red);
         g.fillOval((int)x - 15, (int)y - 15, 30, 30);
+        // Draw Turrets
+        for (Turret t : turrets) {
+            t.draw(g);
+        }
     }
 
     // Deletable Methods
@@ -115,6 +125,5 @@ public class TestTwin implements Updatable, Drawable {
         // All added to wait lists
         Main.drawablePool.deleteObj(this.getId());
         Main.updatablePool.deleteObj(this.getId());
-        Main.idServer.returnId(this.getId());
     }
 }

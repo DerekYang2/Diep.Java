@@ -117,6 +117,5 @@ public class TestObj implements Updatable, Drawable {
         // All added to wait lists
         Main.drawablePool.deleteObj(this.getId());
         Main.updatablePool.deleteObj(this.getId());
-        Main.idServer.returnId(this.getId());
     }
 }

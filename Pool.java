@@ -1,14 +1,15 @@
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 import java.util.Collection;
+import java.util.TreeMap;
 
 public class Pool <T extends Deletable> {
-    private HashMap<Integer, T> objects;  // id -> pointer to object
+    private Map<Integer, T> objects;  // id -> pointer to object
     private Stack<T> pendingAdds; // stack of ids waiting to be added
     private Stack<Integer> pendingDeletes;  // stack of ids to waiting to be deleted
 
     public Pool() {
-        objects = new HashMap<>();
+        objects = new TreeMap<>();
         pendingAdds = new Stack<>();
         pendingDeletes = new Stack<>();
     }

@@ -62,14 +62,14 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void startGameThread() {
+        // Initialize
+        Main.initialize();
         gameThread = new Thread(this);
         gameThread.start();
     }
 
     @Override
     public void run() {
-        // Initialize
-        Main.initialize();
         double updateInterval = 1e9 / FPS;
         double nextTime = System.nanoTime() + updateInterval;
         // Run the game loop

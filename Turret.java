@@ -1,6 +1,5 @@
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-
+        import java.awt.geom.AffineTransform;
 
 public class Turret {
   double x, y;
@@ -12,17 +11,16 @@ public class Turret {
 
   Stopwatch stopwatch;
 
-  int width, length;
+  int turretWidth, turretLength;  // renamed variables
   double offset;
-
 
   // Debug
   double lastPrint;
   int timesPrinted = 0;
 
-  Turret(int length, int width, int offset, double theta) {
-    this.width = width;
-    this.length = length;
+  Turret(int width, int length, int offset, double theta) {  // renamed parameters
+    this.turretWidth = width;  // TODO: swapped assignments RENAME!!
+    this.turretLength = length;
 
     this.offset = offset;
 
@@ -33,40 +31,40 @@ public class Turret {
     stopwatch = new Stopwatch();
     stopwatch.start();
 
-    // Default spawn point, along the x axis with an offset from the origin 
+    // Default spawn point, along the x axis with an offset from the origin
     x = xOriginal;
     y = yOriginal;
 
     lastPrint = stopwatch.ms();
     // prevAngle = -Math.PI / 2; // spawn pointing upward
-  }  
+  }
 
   public void draw(Graphics g) {
-    drawRect(g, (int) (x + xAbsolute), (int) (y + yAbsolute), width, length, rotatedAngle + thetaOriginal, Color.GRAY);
+    drawRect(g, (int) (x + xAbsolute), (int) (y + yAbsolute), turretLength, turretWidth, rotatedAngle + thetaOriginal, Color.GRAY);
     g.setColor(Color.GREEN);
     g.fillOval((int) (x + xAbsolute) - 4, (int) (y + yAbsolute) - 4, 8, 8);
   }
 
-  private static void drawRect(Graphics g, int xleft, int ycenter, int width, int height, double theta, Color color) {
-      Graphics2D g2d = (Graphics2D) g;
-      g2d.setColor(color);
+  private static void drawRect(Graphics g, int xleft, int ycenter, int length, int width, double theta, Color color) {  // renamed parameters
+    Graphics2D g2d = (Graphics2D) g;
+    g2d.setColor(color);
 
-      // Create an AffineTransform object
-      AffineTransform at = new AffineTransform();
-      at.translate(xleft, ycenter);
-      // Rotate to the cursor
-      at.rotate(theta);
-      // Centering graphic draw origin
-      at.translate(0, -height / 2.f);
+    // Create an AffineTransform object
+    AffineTransform at = new AffineTransform();
+    at.translate(xleft, ycenter);
+    // Rotate to the cursor
+    at.rotate(theta);
+    // Centering graphic draw origin
+    at.translate(0, -width / 2.f);  // swapped width and height
 
-      // Apply the transform to the Graphics2D object
-      g2d.setTransform(at);
+    // Apply the transform to the Graphics2D object
+    g2d.setTransform(at);
 
-      // Draw the rectangle
-      g2d.fillRect(0, 0, width, height);
+    // Draw the rectangle
+    g2d.fillRect(0, 0, length, width);  // swapped width and height
 
-      // Reset the transformations
-      g2d.setTransform(new AffineTransform());
+    // Reset the transformations
+    g2d.setTransform(new AffineTransform());
   }
 
   public void update(double xAbs, double yAbs, double tankAngle) {
@@ -80,8 +78,7 @@ public class Turret {
   }
 
   public void shoot() {
-    // Spawn at the end of the turret
-    new Bullet(x + xAbsolute, y + yAbsolute, rotatedAngle + thetaOriginal, width);
+    // Spawn at the end of the turret FIX THIS
+    new Bullet(x + xAbsolute, y + yAbsolute, rotatedAngle + thetaOriginal, turretLength);  // swapped width with length
   }
 }
-

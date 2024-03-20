@@ -37,11 +37,12 @@ public class TestTwin implements Updatable, Drawable {
         y = Math.random() * Main.windowHeight;
         vx = vy = 0;
 
-        // Wait for the circle to be spawned before drawing
+        // Wait for the circle to be spawned before
+        // Triple shot
         turrets = new Turret[]{
-                new Turret(10, 35, 0, -45),
-                new Turret(10, 35, 0, 0),
-                new Turret(10, 35, 0, 45),
+                new Turret(10, 30, 0, -Math.PI/4),
+                new Turret(10, 30, 0, 0),
+                new Turret(10, 30, 0, Math.PI/4),
         };
     }
 
@@ -98,13 +99,13 @@ public class TestTwin implements Updatable, Drawable {
         }
     }
 
-    public void draw(Graphics g) {        
-        g.setColor(Color.red);
-        g.fillOval((int)x - 15, (int)y - 15, 30, 30);
+    public void draw(Graphics g) {
         // Draw Turrets
         for (Turret t : turrets) {
             t.draw(g);
         }
+        g.setColor(Color.red);
+        g.fillOval((int)x - 15, (int)y - 15, 30, 30);
     }
 
     // Deletable Methods

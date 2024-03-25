@@ -41,6 +41,7 @@ public class Turret {
 
   public void draw(Graphics g) {
     drawRect(g, (int) (x + xAbsolute), (int) (y + yAbsolute), turretLength, turretWidth, rotatedAngle + thetaOriginal, Color.GRAY);
+    // Debug? TODO: what is this draw underneath
     g.setColor(Color.GREEN);
     g.fillOval((int) (x + xAbsolute) - 4, (int) (y + yAbsolute) - 4, 8, 8);
   }

@@ -25,15 +25,22 @@ public class TestMain extends JPanel {
         super.paintComponent(g);
         // Scale the buffer to match the panel's size
         Graphics2D g2d = (Graphics2D) g;
+        // Height of the current panel
         int panelWidth = getWidth();
         int panelHeight = getHeight();
         // Maintain image aspect ratio
+
+        // Ratio that the image needs to be scaled down by, find the dimension that scaled down the most from the original. 
         float scaleFactor = Math.min((float) panelWidth / buffer.getWidth(), (float) panelHeight / buffer.getHeight());
         int scaledWidth, scaledHeight;
+        // Change the height and widht by the same ratio
         scaledWidth = (int) (buffer.getWidth() * scaleFactor);
         scaledHeight = (int) (buffer.getHeight() * scaleFactor);
+        System.out.println("scaledHeight: " + scaledHeight + " " +  "scaledWidth: " + scaledWidth);
+        // The difference between the panel and the actual size of the screen / 2 splits the empty space (black bars) evenly 
         int x = (panelWidth - scaledWidth) / 2;
         int y = (panelHeight - scaledHeight) / 2;
+        // x, y are the corners of the frame, redraw the image with this scale at x, y
         g2d.drawImage(buffer, x, y, scaledWidth, scaledHeight, null);
 
     }

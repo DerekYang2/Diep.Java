@@ -22,7 +22,8 @@ public class Main {
         updatablePool = new Pool<>();
         idServer = new IdServer();
         // new TestObj();
-        new TestTwin();
+        // new TestTwin();
+        new TestRectangle(200, 200);
         // new Square();
     }
 
@@ -55,28 +56,5 @@ public class Main {
         window.add(gamePanel);
         window.setVisible(true);
         gamePanel.startGameThread();
-    }
-
-    public static Graphics2D drawRectCustom(Graphics g, double x, double y, int width, int length, double theta) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.WHITE); 
-        // Create an AffineTransform object
-        AffineTransform at = new AffineTransform();
-        at.translate(x, y);
-        // Rotate to the cursor
-        at.rotate(theta);
-        // Center the rectangle so that the origin is in the middle of the height
-        at.translate(0, -length / 2.f);
-
-        // Apply the transform to the Graphics2D object
-        g2d.setTransform(at);
-
-        // Draw the rectangle
-        g2d.fillRect((int) x, (int) y, width, length);
-        System.out.println("Running Rect");
-
-        // Reset the transformations
-        g2d.setTransform(new AffineTransform());
-        return g2d;
     }
 }

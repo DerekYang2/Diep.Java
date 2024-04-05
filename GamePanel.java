@@ -14,6 +14,7 @@ class FPSDraw {
     public void draw(Graphics g, int x, int y) {
         g.setColor(Color.WHITE);
         frame_count++;
+        // If the current time and the last time the fps was caluclated is greater than 1s, print the amount of frames that were rendered in that second.
         if (System.nanoTime() - lastFpsTime > 1e9) {
             lastFpsTime = System.nanoTime();
             cur_fps = frame_count;
@@ -28,6 +29,10 @@ public class GamePanel extends JPanel implements Runnable {
     FPSDraw fpsDraw = new FPSDraw();
     int width, height;
     Thread gameThread;
+
+    public static double scaleFactor;
+    public static int cameraX, cameraY;
+    public static int scaledWidth, scaledHeight;
 
     public GamePanel(int width, int height) {
         this.width = width;
@@ -45,6 +50,22 @@ public class GamePanel extends JPanel implements Runnable {
         for (Updatable updatable : Main.updatablePool.getObjects()) {
             updatable.update();
         }
+
+
+        // Dimensions of current game panel
+        double panelWidth = getWidth();
+        double panelHeight = getHeight();
+        // Calculate how much it needs to be scaled down by
+        scaleFactor = Math.min(panelWidth / 1920.0, panelHeight / 1080.0);
+
+        // Calculate new dimensions for the board
+        scaledWidth = (int) (1920 * scaleFactor);
+        scaledHeight = (int) (1080 * scaleFactor);
+
+
+        // Difference between window width and the size of the game panel, then move the top left corner to center the camera
+        cameraX = (int) (panelWidth - scaledWidth) / 2; 
+        cameraY = (int) (panelHeight - scaledHeight) / 2;
     }
     private void draw(Graphics g) {
         // Draw circle at mouse pos
@@ -70,17 +91,22 @@ public class GamePanel extends JPanel implements Runnable {
         // Initialize
         Main.initialize();
         gameThread = new Thread(this);
+        // Start the game thread
         gameThread.start();
     }
 
     @Override
+    // run is called when the thread is started 
     public void run() {
+        // Update the game every 1s / FPS nano seconds 
         double updateInterval = 1e9 / FPS;
         double nextTime = System.nanoTime() + updateInterval;
         // Run the game loop
         while (gameThread != null) {
             if (System.nanoTime() >= nextTime) {
+                // On every frame update all updatables 
                 update();
+                // On every frame call paintComponent 
                 repaint();
                 nextTime += updateInterval;
             }
@@ -99,6 +125,7 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        // Drawing all drawables
         draw(g);
     }
 }

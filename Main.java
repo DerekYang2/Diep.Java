@@ -13,7 +13,7 @@ import java.awt.Insets;
 
 import static com.raylib.java.core.input.Keyboard.KEY_SPACE;
 
-public class Main{
+public class Main {
     public static Pool<Drawable> drawablePool;
     public static Pool<Updatable> updatablePool;
     public static IdServer idServer;
@@ -32,7 +32,8 @@ public class Main{
         updatablePool = new Pool<>();
         idServer = new IdServer();
         // new TestObj();
-        new TestTwin();
+        // new TestTwin();
+        new TestRectangle(200, 200);
         // new Square();
     }
 
@@ -55,8 +56,7 @@ public class Main{
 
     // Clamp Vector2 value with min and max and return a new vector2
     // NOTE: Required for virtual mouse, to clamp inside virtual game size
-    static Vector2 ClampValue(Vector2 value, Vector2 min, Vector2 max)
-    {
+    static Vector2 ClampValue(Vector2 value, Vector2 min, Vector2 max) {
         value.x = Math.min(value.x, max.x);
         value.x = Math.max(value.x, min.x);
         value.y = Math.min(value.y, max.y);
@@ -64,12 +64,11 @@ public class Main{
         return value;
     }
 
-    static int getRandomValue(int min, int max)
-    {
+    static int getRandomValue(int min, int max) {
         return (int) (Math.random() * (max - min + 1) + min);
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = (int) screenSize.getWidth();
@@ -91,7 +90,7 @@ public class Main{
         Color[] colors = new Color[10];
         for (int i = 0; i < 10; i++)
             colors[i] = new Color(getRandomValue(100, 250), getRandomValue(50, 150),
-                    getRandomValue(10, 100), 255 );
+                    getRandomValue(10, 100), 255);
 
         rlj.core.SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
         //--------------------------------------------------------------------------------------
@@ -103,11 +102,10 @@ public class Main{
             //----------------------------------------------------------------------------------
             // Compute required framebuffer scaling
 
-            float scale = Math.min((float) screenWidth/gameScreenWidth,
-                    (float) screenHeight/gameScreenHeight);
+            float scale = Math.min((float) screenWidth / gameScreenWidth,
+                    (float) screenHeight / gameScreenHeight);
 
-            if (rlj.core.IsKeyPressed(KEY_SPACE))
-            {
+            if (rlj.core.IsKeyPressed(KEY_SPACE)) {
                 // Recalculate random colors for the bars
                 for (int i = 0; i < 10; i++)
                     colors[i] = new Color(getRandomValue(100, 250), getRandomValue(50, 150),
@@ -117,8 +115,8 @@ public class Main{
             // Update virtual mouse (clamped mouse value behind game screen)
             Vector2 mouse = rCore.GetMousePosition();
             Vector2 virtualMouse = new Vector2();
-            virtualMouse.x = (mouse.x - (screenWidth - (gameScreenWidth*scale))*0.5f)/scale;
-            virtualMouse.y = (mouse.y - (screenHeight - (gameScreenHeight*scale))*0.5f)/scale;
+            virtualMouse.x = (mouse.x - (screenWidth - (gameScreenWidth * scale)) * 0.5f) / scale;
+            virtualMouse.y = (mouse.y - (screenHeight - (gameScreenHeight * scale)) * 0.5f) / scale;
             ClampValue(virtualMouse, new Vector2(), new Vector2((float) gameScreenWidth, (float) gameScreenHeight));
 
             // Apply the same transformation as the virtual mouse to the real mouse (i.e. to work with raygui)
@@ -136,22 +134,22 @@ public class Main{
 
             rlj.core.ClearBackground(Color.RAYWHITE);         // Clear render texture background color
 
-            for(int i = 0; i < 10; i++)
-                rlj.shapes.DrawRectangle(0, (gameScreenHeight/10)*i, gameScreenWidth, gameScreenHeight/10, colors[i]);
+            for (int i = 0; i < 10; i++)
+                rlj.shapes.DrawRectangle(0, (gameScreenHeight / 10) * i, gameScreenWidth, gameScreenHeight / 10, colors[i]);
 
             rlj.text.DrawText("If executed inside a window,\nyou can resize the window,\nand see the screen scaling!",
                     10, 25, 20, Color.WHITE);
 
-            rlj.text.DrawText("Default Mouse: ["+(int)mouse.x+", "+(int)mouse.y+"]", 350, 25, 20, Color.GREEN);
-            rlj.text.DrawText("Virtual Mouse: ["+(int)virtualMouse.x+ ", "+(int)virtualMouse.y+"]", 350, 55,
+            rlj.text.DrawText("Default Mouse: [" + (int) mouse.x + ", " + (int) mouse.y + "]", 350, 25, 20, Color.GREEN);
+            rlj.text.DrawText("Virtual Mouse: [" + (int) virtualMouse.x + ", " + (int) virtualMouse.y + "]", 350, 55,
                     20, Color.YELLOW);
             rlj.text.DrawText("Test: " + String.valueOf(scale), 350, 85, 20, Color.BLACK);
             rlj.core.EndTextureMode();
 
             // Draw RenderTexture2D to window, properly scaled
-            rTextures.DrawTexturePro(target.texture, new Rectangle(0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height),
-                    new Rectangle((screenWidth - ((float)gameScreenWidth*scale))*0.5f, (screenHeight - ((float)gameScreenHeight*scale))*0.5f,
-                            (float)gameScreenWidth*scale, (float)gameScreenHeight*scale), new Vector2(), 0.0f, Color.WHITE);
+            rTextures.DrawTexturePro(target.texture, new Rectangle(0.0f, 0.0f, (float) target.texture.width, (float) -target.texture.height),
+                    new Rectangle((screenWidth - ((float) gameScreenWidth * scale)) * 0.5f, (screenHeight - ((float) gameScreenHeight * scale)) * 0.5f,
+                            (float) gameScreenWidth * scale, (float) gameScreenHeight * scale), new Vector2(), 0.0f, Color.WHITE);
 
             rlj.core.EndDrawing();
             //--------------------------------------------------------------------------------------
@@ -162,5 +160,4 @@ public class Main{
         rlj.textures.UnloadRenderTexture(target);    // Unload render texture
         //--------------------------------------------------------------------------------------
     }
-
 }

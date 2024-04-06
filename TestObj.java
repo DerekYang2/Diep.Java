@@ -1,8 +1,14 @@
-import java.awt.*;
-import java.awt.geom.AffineTransform;
+import com.raylib.java.core.Color;
+import com.raylib.java.core.rCore;
+import com.raylib.java.raymath.Vector2;
+import com.raylib.java.shapes.Rectangle;
+import com.raylib.java.shapes.rShapes;
+
+import static com.raylib.java.core.input.Keyboard.*;
+import static com.raylib.java.core.input.Mouse.MouseButton.*;
 
 public class TestObj implements Updatable, Drawable {
-    protected static double x, y, vx, vy;
+    protected double x, y, vx, vy;
     protected int id;
     Stopwatch stopwatch;
     final double friction = 0.92f;
@@ -24,8 +30,7 @@ public class TestObj implements Updatable, Drawable {
         stopwatch = new Stopwatch();
         stopwatch.start();
 
-        x = Math.random() * Main.windowWidth;
-        y = Math.random() * Main.windowHeight;
+        x = 0; y = 0;
         vx = vy = 0;
     }
 
@@ -39,27 +44,29 @@ public class TestObj implements Updatable, Drawable {
         // Apply friction
         vx *= friction;
         vy *= friction;
-
-        if (Main.inputInfo.downPressed) {
+        if (Graphics.isKeyPressed(KEY_S) ) {
             addForce(0, moveForceY);
-        } 
-        if (Main.inputInfo.upPressed) {
+        }
+        if (Graphics.isKeyPressed(KEY_W)) {
             addForce(0, -moveForceY);
         }
-        if (Main.inputInfo.leftPressed) {
+        if (Graphics.isKeyPressed(KEY_A)) {
             addForce(-moveForceX, 0);
         }
-        if (Main.inputInfo.rightPressed) {
+        if (Graphics.isKeyPressed(KEY_D)) {
             addForce(moveForceX, 0);
         }
 
+        if (Graphics.isLeftMouseDown()) {
+            //new Bullet(x, y, , 50);
+        }
 
-        if (Main.inputInfo.attackPressed) {
+/*        if (Main.inputInfo.attackPressed) {
             if (stopwatch.ms() - shootStart > shotDelayMs) {
                 shootStart = stopwatch.ms();
                 shoot();
             } 
-        }
+        }*/
     }
 
     public void addForce(double fx, double fy) {
@@ -71,13 +78,12 @@ public class TestObj implements Updatable, Drawable {
         // new Bullet(x, y, , 50);
     }
 
-    public void draw(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.WHITE);
+    public void draw() {
 
         int rectWidth = 50;
         int rectHeight = 10;
 
+/*
         // Create an AffineTransform object
         AffineTransform at = new AffineTransform();
         at.translate(x, y);
@@ -94,9 +100,13 @@ public class TestObj implements Updatable, Drawable {
         
         // Reset the transformations
         g2d.setTransform(new AffineTransform());
+*/
 
-        g.setColor(Color.red);
-        g.fillOval((int)x - 15, (int)y - 15, 30, 30);
+
+        // Equivalent in raylib
+        rShapes.DrawRectanglePro(new Rectangle((float) x, (float) y, rectWidth, rectHeight), new Vector2(0, -rectHeight / 2.f), (float) Math.atan2(Graphics.getVirtualMouse().y - y, Graphics.getVirtualMouse().x - x), Color.WHITE);
+
+        Graphics.drawCircle((int)x-15, (int)y-15, 30, Color.RED);
     }
 
     // Deletable Methods

@@ -1,30 +1,32 @@
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
+import com.raylib.java.core.Color;
+
+import static com.raylib.java.core.input.Keyboard.*;
 
 public class TestTwin implements Updatable, Drawable {
-    protected double x, y, vx, vy;
-    protected double xTranslate, yTranslate;
+    protected float x, y, vx, vy;
+    protected float xTranslate, yTranslate;
 
-    protected double direction;
+    float radius = 30;
+
+    protected float direction;
     protected int id;
     Stopwatch stopwatch;
-    final double friction = 0.92f;
-    final double mass = 1.0f;
-    final double moveForceX = 0.4f;
-    final double moveForceY = 0.4f;
-    double velMax = 10.0f;  // Max velocity in a single direction
+    final float friction = 0.92f;
+    final float mass = 1.0f;
+    final float moveForceX = 0.4f;
+    final float moveForceY = 0.4f;
+    float velMax = 10.0f;  // Max velocity in a single direction
 
+    ShootManager shootManager;
     Turret[] turrets;
 
     // Delaying shot frequency
-    double shootStart = 0.0;
+    float shootStart = 0.f;
     boolean canShoot = true;
-    double shotDelayMs = 500;
+    float shotDelayMs = 500;
 
     // Debugging Variables
-    double p1x, p1y, p2x, p2y;
-    
+    float p1x, p1y, p2x, p2y;
     
     public TestTwin() {
         createId();  // Remember to create an id on creation
@@ -33,22 +35,22 @@ public class TestTwin implements Updatable, Drawable {
         stopwatch = new Stopwatch();
         stopwatch.start();
         
-        x = Math.random() * Main.windowWidth;
-        y = Math.random() * Main.windowHeight;
+        x = 0; y= 0;
         vx = vy = 0;
 
         // Wait for the circle to be spawned before
         // Triple shot
         turrets = new Turret[]{
-                new Turret(10, 30, 0, -Math.PI / 4),
-                new Turret(10, 30, 0, 0),
-                new Turret(10, 30, 0, Math.PI / 4),
+                new Turret(radius / 1.5f, radius * 2.f, 0, -Math.PI / 4),
+                new Turret(radius / 1.5f, radius * 2.f, 0, 0),
+                new Turret(radius / 1.5f, radius * 2.f, 0, Math.PI / 4),
         };
         // Twins
         turrets = new Turret[]{
-                new Turret(10, 30, 7, 0),
-                new Turret(10, 30, -7, 0)
+                new Turret(radius / 1.5f, radius * 2.f, radius * 7.f/15.f, 0),
+                new Turret(radius / 1.5f, radius * 2.f, - radius * 7.f/15.f, 0)
         };
+        shootManager = new ShootManager(new int[]{0, 8}, 16);
     }
 
     public void update() {
@@ -63,36 +65,38 @@ public class TestTwin implements Updatable, Drawable {
         vy *= friction;
 
         // Get Direction of mouse
-        direction = Math.atan2(Main.inputInfo.mouseY - y, Main.inputInfo.mouseX - x);
+        direction = (float) Math.atan2(Graphics.getVirtualMouse().y - y, Graphics.getVirtualMouse().x - x);
 
-        
-        if (Main.inputInfo.downPressed) {
+        if (Graphics.isKeyDown(KEY_S) ) {
             addForce(0, moveForceY);
-        } 
-        if (Main.inputInfo.upPressed) {
+        }
+        if (Graphics.isKeyDown(KEY_W)) {
             addForce(0, -moveForceY);
         }
-        if (Main.inputInfo.leftPressed) {
+        if (Graphics.isKeyDown(KEY_A)) {
             addForce(-moveForceX, 0);
         }
-        if (Main.inputInfo.rightPressed) {
+        if (Graphics.isKeyDown(KEY_D)) {
             addForce(moveForceX, 0);
         }
 
-
-        if (Main.inputInfo.attackPressed) {
-            if (stopwatch.ms() - shootStart > shotDelayMs) {
-                shootStart = stopwatch.ms();
-                shoot();
-            } 
+        if (Graphics.isLeftMouseDown()) {
+            shootManager.update();
+            int fireIndex = shootManager.getFireIndex();
+            if (fireIndex != -1) {
+                turrets[fireIndex].shoot();
+            }
+        } else {
+            shootManager.reset();
         }
+
         // atan2 mouse angle
         for (Turret t : turrets) {
             t.update(x, y, direction);
         }
     }
 
-    public void addForce(double fx, double fy) {
+    public void addForce(float fx, float fy) {
         vx += fx / mass;
         vy += fy / mass;
     }
@@ -104,13 +108,12 @@ public class TestTwin implements Updatable, Drawable {
         }
     }
 
-    public void draw(Graphics g) {
+    public void draw() {
         // Draw Turrets
         for (Turret t : turrets) {
-            t.draw(g);
+            t.draw();
         }
-        g.setColor(Color.red);
-        g.fillOval((int)x - 15, (int)y - 15, 30, 30);
+        Graphics.drawCircle(x, y, radius, Color.RED);
     }
 
     // Deletable Methods

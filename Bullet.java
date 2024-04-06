@@ -1,23 +1,23 @@
-import java.awt.*;
+import com.raylib.java.core.Color;
 
 public class Bullet implements Drawable, Updatable  {
   protected double x, y, vx, vy;
   protected int id;
-  
+  protected float diameter;
   protected double direction, vt;
   Stopwatch stopwatch;
   float friction = 1 / 1.3f;
   float xAcceleration = 0.4f, yAcceleration = 0.4f;
  
   // The bullet trajectory will be determined based on the position where it spawns
-  public Bullet(double spawnX, double spawnY, double direction, int cannonLength) {
+  public Bullet(double spawnX, double spawnY, double direction, float cannonLength, float diameter) {
     createId();
     addToPools();
     
     stopwatch = new Stopwatch();
     stopwatch.start();
-      
-    vt = 5; // temp, will be based off speed eventually
+    this.diameter = diameter;
+    vt = 8; // temp, will be based off speed eventually
 
     /* 4 Quadrants:
      * case : sign of cos, sign of sin -> proper bullet velocity sign
@@ -47,10 +47,8 @@ public class Bullet implements Drawable, Updatable  {
     }
   }
 
-  public void draw(Graphics g) {
-    g.setColor(Color.red);
-    
-    g.fillOval((int) x - 6, (int) y - 6, 12, 12);
+  public void draw() {
+    Graphics.drawCircle((int) x, (int) y, diameter * 0.5f, Color.RED);
   }
 
   public void createId() {

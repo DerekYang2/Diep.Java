@@ -1,5 +1,7 @@
-import java.awt.*;
-        import java.awt.geom.AffineTransform;
+import com.raylib.java.core.Color;
+import com.raylib.java.raymath.Vector2;
+import com.raylib.java.shapes.Rectangle;
+import com.raylib.java.shapes.rShapes;
 
 public class Turret {
   double x, y;
@@ -9,16 +11,10 @@ public class Turret {
   double rotatedAngle;
   int id;
 
-  Stopwatch stopwatch;
-
-  int turretWidth, turretLength;  // renamed variables
+  float turretWidth, turretLength;  // renamed variables
   double offset;
 
-  // Debug
-  double lastPrint;
-  int timesPrinted = 0;
-
-  Turret(int width, int length, int offset, double theta) {  // renamed parameters
+  Turret(float width, float length, float offset, double theta) {  // renamed parameters
     this.turretWidth = width;  // TODO: swapped assignments RENAME!!
     this.turretLength = length;
 
@@ -28,25 +24,22 @@ public class Turret {
     this.yOriginal = 0 + offset;
     thetaOriginal = theta;
 
-    stopwatch = new Stopwatch();
-    stopwatch.start();
-
     // Default spawn point, along the x axis with an offset from the origin
     x = xOriginal;
     y = yOriginal;
 
-    lastPrint = stopwatch.ms();
     // prevAngle = -Math.PI / 2; // spawn pointing upward
   }
 
-  public void draw(Graphics g) {
-    drawRect(g, (int) (x + xAbsolute), (int) (y + yAbsolute), turretLength, turretWidth, rotatedAngle + thetaOriginal, Color.GRAY);
-    // Debug? TODO: what is this draw underneath
+  public void draw() {
+    drawRect((int) (x + xAbsolute), (int) (y + yAbsolute), (int) turretLength, (int) turretWidth, rotatedAngle + thetaOriginal, Color.GRAY);
+/*    // Debug? TODO: what is this draw underneath
     g.setColor(Color.GREEN);
-    g.fillOval((int) (x + xAbsolute) - 4, (int) (y + yAbsolute) - 4, 8, 8);
+    g.fillOval((int) (x + xAbsolute) - 4, (int) (y + yAbsolute) - 4, 8, 8);*/
   }
 
-  private static void drawRect(Graphics g, int xleft, int ycenter, int length, int width, double theta, Color color) {  // renamed parameters
+  private static void drawRect(int xleft, int ycenter, int length, int width, double theta, Color color) {  // renamed parameters
+/*
     Graphics2D g2d = (Graphics2D) g;
     g2d.setColor(color);
 
@@ -66,6 +59,9 @@ public class Turret {
 
     // Reset the transformations
     g2d.setTransform(new AffineTransform());
+*/
+
+    rShapes.DrawRectanglePro(new Rectangle((float) xleft, (float) ycenter, length, width), new Vector2(0, width/2.f), (float) (theta * 180.f / Math.PI), Color.GRAY);
   }
 
   public void update(double xAbs, double yAbs, double tankAngle) {
@@ -80,6 +76,6 @@ public class Turret {
 
   public void shoot() {
     // Spawn at the end of the turret FIX THIS
-    new Bullet(x + xAbsolute, y + yAbsolute, rotatedAngle + thetaOriginal, turretLength);  // swapped width with length
+    new Bullet(x + xAbsolute, y + yAbsolute, rotatedAngle + thetaOriginal, turretLength, turretWidth);  // swapped width with length
   }
 }

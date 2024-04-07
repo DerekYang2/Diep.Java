@@ -1,3 +1,5 @@
+import com.raylib.java.raymath.Raymath;
+import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.textures.Texture2D;
 
@@ -22,6 +24,7 @@ public class Turret {
   // Recoil constants, single turret should not fire in less than 8 frames for now
   final int recoilTime = 8;
   final float recoilFactor = 0.08f, retCoeff = 6.f/recoilTime;
+  final float recoilForceFactor = 0.03f;
 
 
   Turret(float width, float length, float offset, double degrees, float scale) {  // renamed parameters
@@ -96,9 +99,26 @@ public class Turret {
     }
   }
 
-  public void shoot() {
+  /**
+   * TODO: attack or boost type turret shoudl have different factor
+   * @param turretWidth
+   * @return
+   */
+  private float recoilForceFunction(float turretWidth) {
+    float width = turretWidth * scale;
+    return recoilForceFactor * ((width-21) * (width-21));
+  }
+
+  /**
+   * returns recoil direction vector
+   * @return
+   */
+  public Vector2 shoot() {
     recoilFrames = recoilTime;  // Set to max recoil time
     // Spawn at the end of the turret FIX THIS
     new Bullet(x + xAbsolute, y + yAbsolute, rotatedAngle + thetaOriginal, (turretLength * scale), (turretWidth * scale));  // swapped width with length
+    // Return recoil direction
+    Vector2 recoilDirection = new Vector2((float) (-Math.cos(rotatedAngle + thetaOriginal)), (float) (-Math.sin(rotatedAngle + thetaOriginal)));
+    return Raymath.Vector2Scale(recoilDirection, recoilForceFunction(turretWidth));  // Scale the recoil direction
   }
 }

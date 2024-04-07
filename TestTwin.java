@@ -66,12 +66,22 @@ public class TestTwin implements Updatable, Drawable {
         shootManager = new ShootManager(new int[]{0, 1}, new int[]{8, 8}, 1.0f);*/
 
         // Triplet
-        turrets = new Turret[]{
+/*        turrets = new Turret[]{
                 new Turret(13, 24, 7, 0, scale),
                 new Turret(13, 24, -7, 0, scale),
                 new Turret(13, 28, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{4, 4, 4}, 1.0f);
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{4, 4, 4}, 1.0f);*/
+
+        // Pentashot
+        turrets = new Turret[]{
+                new Turret(13, 22, 0, -45, scale),
+                new Turret(13, 22, 0, 45, scale),
+                new Turret(13, 26, 0, -23, scale),
+                new Turret(13, 26, 0, 23, scale),
+                new Turret(13, 30, 0, 0, scale)
+        };
+        shootManager = new ShootManager(new int[]{0, 0, 1, 1, 2}, new int[]{4, 4, 4}, 1.0f);
 
         // Predator
 /*        turrets = new Turret[]{

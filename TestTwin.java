@@ -1,5 +1,6 @@
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.rlgl.RLGL;
+import com.raylib.java.textures.Image;
 import com.raylib.java.textures.Texture2D;
 import com.raylib.java.textures.rTextures;
 
@@ -32,8 +33,7 @@ public class TestTwin implements Updatable, Drawable {
     // Debugging Variables
     float p1x, p1y, p2x, p2y;
 
-    public Texture2D greyCirc;
-    public Texture2D redCirc;
+    public Texture2D whiteCirc;
     public TestTwin() {
         createId();  // Remember to create an id on creation
         addToPools();  // Remember to add object to pool on creation
@@ -45,12 +45,17 @@ public class TestTwin implements Updatable, Drawable {
         vx = vy = 0;
 
         // Wait for the circle to be spawned before
-/*        // Triple shot
-        turrets = new Turret[]{
+       // Triple shot
+/*        turrets = new Turret[]{
                 new Turret(15, 30, 0, -Math.PI / 4, scale),
                 new Turret(15, 30, 0, 0, scale),
                 new Turret(15, 30, 0, Math.PI / 4, scale),
-        };*/
+        };
+        shootManager = new ShootManager(new int[]{0, 1, 2}, 8);*/
+
+        //TODO: shoot manager first shoots index 0 on click but should alternate
+        // fix: after reset, set the counter to the next fire index rather than 0
+
         // Twins
         turrets = new Turret[]{
                 new Turret(13.5f, 28, 7.3f, 0, scale),
@@ -59,14 +64,10 @@ public class TestTwin implements Updatable, Drawable {
         shootManager = new ShootManager(new int[]{0, 8}, 16);
 
         // Create an image with the desired dimensions
-
-        greyCirc = rTextures.LoadTexture("GreyCircle.png");
-        Graphics.rlj.textures.GenTextureMipmaps(greyCirc);
-        rTextures.SetTextureFilter(greyCirc, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_TRILINEAR);
-
-        redCirc = rTextures.LoadTexture("RedCircle.png");
-        Graphics.rlj.textures.GenTextureMipmaps(redCirc);
-        rTextures.SetTextureFilter(redCirc, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        Image img = rTextures.LoadImage("CircleTest.png");
+        whiteCirc = rTextures.LoadTextureFromImage(img);
+        rTextures.UnloadImage(img);
+        rTextures.SetTextureFilter(whiteCirc, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
     }
 
     public void update() {
@@ -129,8 +130,8 @@ public class TestTwin implements Updatable, Drawable {
         for (Turret t : turrets) {
             t.draw();
         }
-        Graphics.drawTextureCentered(greyCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2);
-        Graphics.drawTextureCentered(redCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Main.strokeWidth*0.85f, (radius*scale) * 2 - 2*Main.strokeWidth*0.85f);
+        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Main.strokeRed);
+        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Main.strokeWidth, (radius*scale) * 2 - 2*Main.strokeWidth, Main.redCol);
     }
 
     // Deletable Methods

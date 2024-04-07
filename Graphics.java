@@ -179,6 +179,13 @@ public class Graphics extends Raylib {
         float tWidth = texture.width * scale, tHeight = texture.height * scale;
         rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), 0, scale, Color.WHITE);
     }
+
+    public static void drawTextureCentered(Texture2D texture, Vector2 position, float width, float height, Color tint) {
+        float scale = Math.min(width / texture.width, height / texture.height);
+        float tWidth = texture.width * scale, tHeight = texture.height * scale;
+        rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), 0, scale, tint);
+    }
+
     public static void drawRectangle(Rectangle rect, Color color) {
         rlj.shapes.DrawRectangle((int) rect.x, (int) rect.y, (int) rect.width, (int) rect.height, color);
     }

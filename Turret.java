@@ -24,11 +24,10 @@ public class Turret {
     this.scale = scale;
     this.turretWidth = width;  // TODO: swapped assignments RENAME!!
     this.turretLength = length;
-
     this.offset = offset;
 
     this.xOriginal = 0;
-    this.yOriginal = 0 + offset;
+    this.yOriginal = 0 + offset * scale;
     thetaOriginal = theta;
 
     // Default spawn point, along the x axis with an offset from the origin
@@ -56,7 +55,7 @@ public class Turret {
     //        rShapes.DrawRectanglePro(rectangle, origin, radians * 180.f / (float) Math.PI, color);
     rTextures.DrawTexturePro(testRect, srcRect, new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)(theta * 180/Math.PI), Color.WHITE);
     //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)theta, color);
-    Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * (Main.strokeWidth)), new Vector2((Main.strokeWidth), (width - 2 * (Main.strokeWidth))/2.f), (float)theta, color);
+    Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * Main.strokeWidth), new Vector2(Main.strokeWidth, (width - 2 * Main.strokeWidth)/2.f), (float)theta, color);
   }
 
   public void update(double xAbs, double yAbs, double tankAngle) {

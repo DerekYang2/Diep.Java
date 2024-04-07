@@ -66,20 +66,20 @@ public class TestTwin implements Updatable, Drawable {
         shootManager = new ShootManager(new int[]{0, 1}, new int[]{8, 8}, 1.0f);*/
 
         // Predator
-/*        turrets = new Turret[]{
+        turrets = new Turret[]{
                 new Turret(10.f, 32, 0, 0, scale),
                 new Turret(15.f, 28, 0, 0, scale),
                 new Turret(20.f, 24, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{45, 2, 3}, 1.0f);*/
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{45, 2, 3}, 1.0f);
 
         // Single tank test
 /*        turrets = new Turret[]{
                 new Turret(13.5f, 28, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0}, new int[]{8});*/
+        shootManager = new ShootManager(new int[]{0}, new int[]{8});
 
-        // Fighter
+/*        // Fighter
         turrets = new Turret[]{
                 new Turret(13.5f, 28, 0, 0, scale),
                 new Turret(13.5f, 28, 0, 90, scale),
@@ -87,7 +87,13 @@ public class TestTwin implements Updatable, Drawable {
                 new Turret(13.5f, 28,0, 150, scale),
                 new Turret(13.5f, 28, 0, -150, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 0, 0, 0, 0}, new int[]{16}, 1.0f);
+        shootManager = new ShootManager(new int[]{0, 0, 0, 0, 0}, new int[]{16}, 1.0f);*/
+
+        // Destroyer
+/*        turrets = new Turret[]{
+                new Turret(23f, 30, 0, 0, scale)
+        };
+        shootManager = new ShootManager(new int[]{0}, new int[]{60}, 1.0f);*/
     }
 
     public void update() {

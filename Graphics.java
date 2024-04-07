@@ -9,6 +9,7 @@ import com.raylib.java.rlgl.RLGL;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.shapes.rShapes;
 import com.raylib.java.textures.RenderTexture;
+import com.raylib.java.textures.Texture2D;
 import com.raylib.java.textures.rTextures;
 
 import java.awt.*;
@@ -100,7 +101,11 @@ public class Graphics extends Raylib {
                 new Rectangle((screenWidth - ((float) cameraWidth * screenScale)) * 0.5f, (screenHeight - ((float) cameraHeight * screenScale)) * 0.5f,
                         (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, Color.WHITE);
 
+        try {
         rlj.core.EndDrawing();
+        } catch (java.lang.ArrayIndexOutOfBoundsException e) {
+            System.out.println("Unhandled input exception (middle click, etc).");
+        }
     }
 
     public static void setCameraTarget(Vector2 target) {
@@ -169,6 +174,11 @@ public class Graphics extends Raylib {
         rlj.text.DrawText(rCore.GetFPS() + " FPS", x, y, fontSize, color);
     }
 
+    public static void drawTextureCentered(Texture2D texture, Vector2 position, float width, float height) {
+        float scale = Math.min(width / texture.width, height / texture.height);
+        float tWidth = texture.width * scale, tHeight = texture.height * scale;
+        rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), 0, scale, Color.WHITE);
+    }
     public static void drawRectangle(Rectangle rect, Color color) {
         rlj.shapes.DrawRectangle((int) rect.x, (int) rect.y, (int) rect.width, (int) rect.height, color);
     }
@@ -176,12 +186,13 @@ public class Graphics extends Raylib {
     public static void drawRectangle(float x, float y, float width, float height, Color color) {
         rlj.shapes.DrawRectangle((int) x, (int) y, (int) width, (int) height, color);
     }
-    public static void drawRectangle(float x, float y, float width, float height, Vector2 origin, float radians, Color color) {
-        rShapes.DrawRectanglePro(new Rectangle(x, y, width, height), origin, radians * 180.f / (float) Math.PI, color);
+    public static void drawRectangle(Rectangle rectangle, Vector2 origin, float radians, Color color) {
+        rShapes.DrawRectanglePro(rectangle, origin, radians * 180.f / (float) Math.PI, color);
     }
 
-    public static void drawRectangleLines(float x, float y, float width, float height, float stroke, Color color) {
-        rlj.shapes.DrawRectangleLinesEx(new Rectangle(x, y, width, height), stroke, color);
+    public static void drawRectCustom(float xleft, float ycenter, float length, float width, double radians, float stroke, Color color, Color strokeCol) {
+        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)radians, strokeCol);
+        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * stroke), new Vector2(stroke, (width - 2 * stroke)/2.f), (float)radians, color);
     }
 
     public static void drawRectangleLines(Rectangle rect, float stroke, Color color) {
@@ -192,6 +203,10 @@ public class Graphics extends Raylib {
         rlj.shapes.DrawCircle((int) x, (int) y, radius, color);
     }
 
+    public static void drawCircle(float x, float y, float radius, float stroke, Color color, Color strokeColor) {
+        drawCircle(x, y, radius, strokeColor);
+        drawCircle(x, y, radius - stroke, color);
+    }
     public static void drawLine(float x1, float y1, float x2, float y2, float stroke, Color color) {
         rlj.shapes.DrawLineEx(new Vector2(x1, y1), new Vector2(x2, y2), stroke, color);
     }

@@ -4,6 +4,12 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 public class Main {
+    public static Color redCol = Graphics.rgb(242, 78, 86);
+    public static Color strokeCol = Graphics.rgb(83, 87, 84);
+    public static Color greyCol = Graphics.rgb(153, 153, 153);
+
+    public static float strokeWidth = 3.2f;
+
     public static long counter;
     public static Pool<Drawable> drawablePool;
     public static Pool<Updatable> updatablePool;

@@ -13,7 +13,7 @@ public class Main {
             backgroundCol = Graphics.rgb(204, 204, 204),
             gridLineCol = Graphics.rgb(198, 198, 198);
 
-    public static float strokeWidth = 2.8f;
+    public static float strokeWidth = 2.9f;
 
     public static long counter;
     public static Pool<Drawable> drawablePool;

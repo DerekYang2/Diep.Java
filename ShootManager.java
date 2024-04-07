@@ -15,10 +15,16 @@ public class ShootManager {
      * @param fireOrder integer array where ith element is the order of the ith turret
      * @param delays The frame delay time for the ith order group
      */
-    public ShootManager(int[] fireOrder, int[] delays) {
+    public ShootManager(int[] fireOrder, int[] delays, float initialScale) {
+        // Find the number of groups
+        int groupAmount = 1;
+        for (int i = 0; i < fireOrder.length; i++) {
+            groupAmount = Math.max(groupAmount, fireOrder[i]+1);
+        }
+
         // initialize turret group
         turretGroup = new ArrayList<>();
-        for (int i = 0; i < fireOrder.length; i++) {
+        for (int i = 0; i < groupAmount; i++) {
             turretGroup.add(new ArrayList<>());
         }
 
@@ -34,19 +40,35 @@ public class ShootManager {
             delayFrames[i] = delays[i];
         }
 
+        scale = initialScale;
+        if (scale < 1) {
+            throw new IllegalArgumentException("Scale must be greater than 1");
+        }
+
         groupCounter = 0;
-        frameCounter = delayFrames[0]-1;  // Preload the first fire
+        frameCounter = getDelayFrames(0) -1;  // Preload the first fire
+    }
+
+    public void setScale(float newScale) {
+        if (newScale < 1) {
+            throw new IllegalArgumentException("Scale must be greater than 1");
+        }
+        scale = newScale;
+    }
+
+    private int getDelayFrames(int group) {
+        return (int)Math.round(delayFrames[group] * scale);
     }
 
     public void reset() {
         // Preload the next first fire
-        frameCounter = delayFrames[groupCounter]-1;
+        frameCounter = getDelayFrames(groupCounter)-1;
     }
 
     public ArrayList<Integer> getFireIndices() {
         ArrayList<Integer> retList = new ArrayList<>();  // Empty list
         frameCounter++;
-        if (frameCounter >= delayFrames[groupCounter]) {  // Fire
+        if (frameCounter >= getDelayFrames(groupCounter)) {  // Fire
             retList = turretGroup.get(groupCounter);  // Get the list of turret indices for this group
             frameCounter = 0;
             groupCounter = (groupCounter + 1) % turretGroup.size();  // Cycle through groups

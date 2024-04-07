@@ -48,11 +48,11 @@ public class TestTwin implements Updatable, Drawable {
         // Wait for the circle to be spawned before
        // Triple shot
 /*        turrets = new Turret[]{
-                new Turret(15, 30, 0, -Math.PI / 4, scale),
-                new Turret(15, 30, 0, 0, scale),
-                new Turret(15, 30, 0, Math.PI / 4, scale),
+                new Turret(13.5f, 28, 0, -45, scale),
+                new Turret(13.5f, 28, 0, 0, scale),
+                new Turret(13.5f, 28, 0, 45, scale),
         };
-        shootManager = new ShootManager(new int[]{0, 1, 2}, 8);*/
+        shootManager = new ShootManager(new int[]{0, 0, 0}, new int[]{16});*/
 
         //TODO: shoot manager first shoots index 0 on click but should alternate
         // fix: after reset, set the counter to the next fire index rather than 0
@@ -63,14 +63,31 @@ public class TestTwin implements Updatable, Drawable {
                 new Turret(13.5f, 28, -7.3f, 0, scale)
         };
 
-        shootManager = new ShootManager(new int[]{0, 1}, new int[]{8, 8});*/
+        shootManager = new ShootManager(new int[]{0, 1}, new int[]{8, 8}, 1.0f);*/
 
-        turrets = new Turret[]{
+        // Predator
+/*        turrets = new Turret[]{
                 new Turret(10.f, 32, 0, 0, scale),
                 new Turret(15.f, 28, 0, 0, scale),
                 new Turret(20.f, 24, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{28, 6, 6});
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{45, 2, 3}, 1.0f);*/
+
+        // Single tank test
+/*        turrets = new Turret[]{
+                new Turret(13.5f, 28, 0, 0, scale)
+        };
+        shootManager = new ShootManager(new int[]{0}, new int[]{8});*/
+
+        // Fighter
+        turrets = new Turret[]{
+                new Turret(13.5f, 28, 0, 0, scale),
+                new Turret(13.5f, 28, 0, 90, scale),
+                new Turret(13.5f, 28, 0, -90, scale),
+                new Turret(13.5f, 28,0, 150, scale),
+                new Turret(13.5f, 28, 0, -150, scale)
+        };
+        shootManager = new ShootManager(new int[]{0, 0, 0, 0, 0}, new int[]{16}, 1.0f);
     }
 
     public void update() {
@@ -123,15 +140,8 @@ public class TestTwin implements Updatable, Drawable {
         vy += fy / mass;
     }
 
-    public void shoot() {
-        // TODO: add bullet params
-        for (Turret t : turrets) {
-            t.shoot();
-        }
-    }
-
     public void draw() {
-        // Draw Turrets
+        // Draw Turretsp
         for (Turret t : turrets) {
             t.draw();
         }

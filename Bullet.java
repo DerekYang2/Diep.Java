@@ -53,7 +53,7 @@ public class Bullet implements Drawable, Updatable  {
   }
 
   public void createId() {
-    this.id = Main.idServer.getId();
+    this.id = Main.idServer.getIdFront();
   }
 
   public int getId() {

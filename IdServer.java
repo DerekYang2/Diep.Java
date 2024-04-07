@@ -1,13 +1,28 @@
 import java.util.Stack;
 
 public class IdServer {
-    private int counter;
+    private int rightCounter, leftCounter;
 
     public IdServer() {
-        counter = 0;
+        rightCounter = 1;
+        leftCounter = -1;
     }
 
     public int getId() {
-        return counter++;
+        if (rightCounter == Integer.MAX_VALUE) {
+            throw new RuntimeException("IdServer has reached the maximum number of ids");
+        }
+        return rightCounter++;
+    }
+
+    /**
+     * In order to get a small id to run in update loop first (e.g. draw in the front)
+     * @return
+     */
+    public int getIdFront() {
+        if (leftCounter == Integer.MIN_VALUE) {
+            throw new RuntimeException("IdServer has reached the minimum number of ids");
+        }
+        return leftCounter--;
     }
 }

@@ -1,4 +1,3 @@
-import com.raylib.java.core.Color;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.textures.Texture2D;
 
@@ -11,20 +10,29 @@ public class Turret {
   int id;
   float scale;
 
-  float turretWidth, turretLength;  // renamed variables
+  int recoilFrames = 0;
+
+  float turretWidth, turretLengthOG;  // renamed variables
+  float turretLength;
+
   double offset;
   public Texture2D testRect;
   public Rectangle srcRect;
 
-  Turret(float width, float length, float offset, double theta, float scale) {  // renamed parameters
+  // Recoil constants, single turret should not fire in less than 8 frames for now
+  final int recoilTime = 8;
+  final float recoilFactor = 0.07f, retCoeff = 6.f/recoilTime;
+
+
+  Turret(float width, float length, float offset, double degrees, float scale) {  // renamed parameters
     this.scale = scale;
     this.turretWidth = width;  // TODO: swapped assignments RENAME!!
-    this.turretLength = length;
+    this.turretLengthOG = turretLength = length;
     this.offset = offset;
 
     this.xOriginal = 0;
     this.yOriginal = 0 + offset * scale;
-    thetaOriginal = theta;
+    thetaOriginal = degrees * (Math.PI / 180);
 
     // Default spawn point, along the x axis with an offset from the origin
     x = xOriginal;
@@ -56,7 +64,24 @@ public class Turret {
     Graphics.drawRoundedRect(xleft, ycenter, length, width, radians, Main.strokeWidth, Main.greyCol, Main.greyStroke);
   }
 
+  // https://www.desmos.com/calculator/ikwpyuj8ny
+  private float lengthShift(int frame) {
+    float dist = recoilFactor * (turretWidth * scale);  // Even though its length shift, base on width because more width = stronger turret
+    if (0 <= frame && frame < retCoeff * recoilTime) {
+      return -Math.abs(dist/(retCoeff * recoilTime)) * frame;
+    } else {
+      return -Math.abs(dist/((1-retCoeff) * recoilTime)) * (frame - retCoeff * recoilTime) + dist;
+    }
+  }
+
   public void update(double xAbs, double yAbs, double tankAngle) {
+    // Calculate turret length
+    if (recoilFrames > 0) {
+      turretLength = turretLengthOG + lengthShift(recoilFrames);
+    } else {
+      turretLength = turretLengthOG;
+    }
+
     // Redraw Turret in new position
     xAbsolute = xAbs;
     yAbsolute = yAbs;
@@ -64,9 +89,15 @@ public class Turret {
     // Calculate new position by rotating xOriginal and yOriginal around 0, 0
     x = xOriginal * Math.cos(rotatedAngle) - yOriginal * Math.sin(rotatedAngle);
     y = xOriginal * Math.sin(rotatedAngle) + yOriginal * Math.cos(rotatedAngle);
+
+    recoilFrames--;
+    if (recoilFrames < 0) {
+      recoilFrames = 0;
+    }
   }
 
   public void shoot() {
+    recoilFrames = recoilTime;  // Set to max recoil time
     // Spawn at the end of the turret FIX THIS
     new Bullet(x + xAbsolute, y + yAbsolute, rotatedAngle + thetaOriginal, (turretLength * scale), (turretWidth * scale));  // swapped width with length
   }

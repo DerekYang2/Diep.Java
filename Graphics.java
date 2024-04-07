@@ -2,12 +2,12 @@ import com.raylib.java.Config;
 import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
 import com.raylib.java.core.camera.Camera2D;
-import com.raylib.java.core.input.Keyboard;
 import com.raylib.java.core.rCore;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.rlgl.RLGL;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.shapes.rShapes;
+import com.raylib.java.textures.Image;
 import com.raylib.java.textures.RenderTexture;
 import com.raylib.java.textures.Texture2D;
 import com.raylib.java.textures.rTextures;
@@ -29,6 +29,9 @@ public class Graphics extends Raylib {
     private static RenderTexture target;
 
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
+
+    // Custom textures
+    public static Texture2D whiteCirc, whiteRect, whiteCircNoAA;
 
     public static void initialize(String title) {
         // Screen dimensions (actual monitor pixels)
@@ -56,6 +59,26 @@ public class Graphics extends Raylib {
         camera.setRotation(0.0f);
 
         screenScale = Math.min((float) screenWidth / cameraWidth, (float) screenHeight / cameraHeight);
+
+        initializeTextures();
+    }
+
+    public static void initializeTextures() {
+        Image img = rTextures.LoadImage("whiteCircle.png");
+        whiteCirc = rTextures.LoadTextureFromImage(img);
+        rlj.textures.GenTextureMipmaps(whiteCirc);
+        rTextures.UnloadImage(img);
+        rTextures.SetTextureFilter(whiteCirc, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+
+        img = rTextures.LoadImage("whiteCircle.png");
+        whiteCircNoAA = rTextures.LoadTextureFromImage(img);
+        rTextures.UnloadImage(img);
+
+        img = rTextures.LoadImage("whiteRect.png");
+        whiteRect = rTextures.LoadTextureFromImage(img);
+        rlj.textures.GenTextureMipmaps(whiteRect);
+        rTextures.UnloadImage(img);
+        rTextures.SetTextureFilter(whiteRect, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_TRILINEAR);
     }
 
     public static void close() {
@@ -197,9 +220,13 @@ public class Graphics extends Raylib {
         rShapes.DrawRectanglePro(rectangle, origin, radians * 180.f / (float) Math.PI, color);
     }
 
-    public static void drawRectCustom(float xleft, float ycenter, float length, float width, double radians, float stroke, Color color, Color strokeCol) {
-        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)radians, strokeCol);
-        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * stroke), new Vector2(stroke, (width - 2 * stroke)/2.f), (float)radians, color);
+    public static void drawRoundedRect(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol) {
+        //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)radians, strokeCol);
+        //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
+        float aspectRatio = length/height;
+        Rectangle srcRect = new Rectangle(whiteRect.width - whiteRect.height * aspectRatio, 0, whiteRect.height * aspectRatio, whiteRect.height);
+        rTextures.DrawTexturePro(whiteRect, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), Main.greyStroke);
+        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * Main.strokeWidth), new Vector2(Main.strokeWidth, (height - 2 * Main.strokeWidth)/2.f), (float)radians, color);
     }
 
     public static void drawRectangleLines(Rectangle rect, float stroke, Color color) {
@@ -208,6 +235,11 @@ public class Graphics extends Raylib {
 
     public static void drawCircle(float x, float y, float radius, Color color) {
         rlj.shapes.DrawCircle((int) x, (int) y, radius, color);
+    }
+
+    public static void drawCircleTexture(float x, float y, float radius, float stroke, Color color, Color strokeColor) {
+        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius) * 2, (radius) * 2, strokeColor);
+        Graphics.drawTextureCentered(whiteCircNoAA, new Vector2(x, y), (radius) * 2 - 2*Main.strokeWidth*1.15f, (radius) * 2 - 2*Main.strokeWidth*1.15f, color);
     }
 
     public static void drawCircle(float x, float y, float radius, float stroke, Color color, Color strokeColor) {

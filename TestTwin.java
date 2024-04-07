@@ -4,6 +4,8 @@ import com.raylib.java.textures.Image;
 import com.raylib.java.textures.Texture2D;
 import com.raylib.java.textures.rTextures;
 
+import java.util.ArrayList;
+
 import static com.raylib.java.core.input.Keyboard.*;
 
 public class TestTwin implements Updatable, Drawable {
@@ -33,7 +35,6 @@ public class TestTwin implements Updatable, Drawable {
     // Debugging Variables
     float p1x, p1y, p2x, p2y;
 
-    public Texture2D whiteCirc;
     public TestTwin() {
         createId();  // Remember to create an id on creation
         addToPools();  // Remember to add object to pool on creation
@@ -57,17 +58,19 @@ public class TestTwin implements Updatable, Drawable {
         // fix: after reset, set the counter to the next fire index rather than 0
 
         // Twins
-        turrets = new Turret[]{
+/*        turrets = new Turret[]{
                 new Turret(13.5f, 28, 7.3f, 0, scale),
                 new Turret(13.5f, 28, -7.3f, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 8}, 16);
 
-        // Create an image with the desired dimensions
-        Image img = rTextures.LoadImage("CircleTest.png");
-        whiteCirc = rTextures.LoadTextureFromImage(img);
-        rTextures.UnloadImage(img);
-        rTextures.SetTextureFilter(whiteCirc, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        shootManager = new ShootManager(new int[]{0, 1}, new int[]{8, 8});*/
+
+        turrets = new Turret[]{
+                new Turret(10.f, 32, 0, 0, scale),
+                new Turret(15.f, 28, 0, 0, scale),
+                new Turret(20.f, 24, 0, 0, scale)
+        };
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{28, 6, 6});
     }
 
     public void update() {
@@ -98,12 +101,14 @@ public class TestTwin implements Updatable, Drawable {
         }
 
         if (Graphics.isLeftMouseDown()) {
-            shootManager.update();
-            int fireIndex = shootManager.getFireIndex();
-            if (fireIndex != -1) {
-                turrets[fireIndex].shoot();
+            ArrayList<Integer> fireIndices = shootManager.getFireIndices();
+            if (fireIndices != null) {
+                for (int i : fireIndices) {
+                    turrets[i].shoot();
+                }
             }
-        } else {
+        }
+        if (Graphics.isLeftMouseReleased()) {
             shootManager.reset();
         }
 
@@ -130,8 +135,9 @@ public class TestTwin implements Updatable, Drawable {
         for (Turret t : turrets) {
             t.draw();
         }
-        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Main.strokeRed);
-        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Main.strokeWidth, (radius*scale) * 2 - 2*Main.strokeWidth, Main.redCol);
+//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Main.strokeRed);
+//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Main.strokeWidth, (radius*scale) * 2 - 2*Main.strokeWidth, Main.redCol);
+        Graphics.drawCircleTexture(x, y, radius*scale, Main.strokeWidth, Main.redCol, Main.strokeRed);
     }
 
     // Deletable Methods

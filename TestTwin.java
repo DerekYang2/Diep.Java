@@ -1,8 +1,4 @@
 import com.raylib.java.raymath.Vector2;
-import com.raylib.java.rlgl.RLGL;
-import com.raylib.java.textures.Image;
-import com.raylib.java.textures.Texture2D;
-import com.raylib.java.textures.rTextures;
 
 import java.util.ArrayList;
 
@@ -12,8 +8,9 @@ public class TestTwin implements Updatable, Drawable {
     protected float x, y, vx, vy;
     protected float xTranslate, yTranslate;
 
-    float scale = 2.0f;
-    float radius = 15;
+    float scale = 1.0f;
+    // 54.7766480515
+    float radius = (float) (54.7766480515);
 
     protected float direction;
     protected int id;
@@ -47,23 +44,23 @@ public class TestTwin implements Updatable, Drawable {
 
         // Wait for the circle to be spawned before
        // Triple shot
-/*       turrets = new Turret[]{
-                new Turret(13f, 28, 0, -45, scale),
-                new Turret(13f, 28, 0, 0, scale),
-                new Turret(13f, 28, 0, 45, scale),
+       turrets = new Turret[]{
+                new Turret(42, 95, 0, -0.7853981633974483, scale),
+                new Turret(42, 95, 0, 0, scale),
+                new Turret(42, 95, 0, 0.7853981633974483, scale),
         };
-        shootManager = new ShootManager(new int[]{0, 0, 0}, new int[]{16}, 1.0f);*/
+        shootManager = new ShootManager(new int[]{0, 0, 0}, new int[]{16}, 1.0f);
 
         //TODO: shoot manager first shoots index 0 on click but should alternate
         // fix: after reset, set the counter to the next fire index rather than 0
 
-        // Twins
-/*        turrets = new Turret[]{
-                new Turret(13f, 28, 7f, 0, scale),
-                new Turret(13f, 28, -7f, 0, scale)
+        // Twins (looks off?)
+       turrets = new Turret[]{
+                new Turret(42f, 95, -26f, 0, scale),
+                new Turret(42f, 95, 26f, 0, scale)
         };
 
-        shootManager = new ShootManager(new int[]{0, 1}, new int[]{8, 8}, 1.0f);*/
+        shootManager = new ShootManager(new int[]{0, 1}, new int[]{8, 8}, 1.0f);
 
         // Triplet
 /*        turrets = new Turret[]{
@@ -74,22 +71,22 @@ public class TestTwin implements Updatable, Drawable {
         shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{4, 4, 4}, 1.0f);*/
 
         // Pentashot
-        turrets = new Turret[]{
-                new Turret(13, 22, 0, -45, scale),
-                new Turret(13, 22, 0, 45, scale),
-                new Turret(13, 26, 0, -23, scale),
-                new Turret(13, 26, 0, 23, scale),
-                new Turret(13, 30, 0, 0, scale)
+/*        turrets = new Turret[]{
+                new Turret(42, 80, 0, -0.7853981633974483, scale),
+                new Turret(42 , 80, 0, 0.7853981633974483, scale),
+                new Turret(42, 95, 0, -0.39269908169872414, scale),
+                new Turret(42, 95, 0, 0.39269908169872414, scale),
+                new Turret(42, 110, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 0, 1, 1, 2}, new int[]{4, 4, 4}, 1.0f);
+        shootManager = new ShootManager(new int[]{0, 0, 1, 1, 2}, new int[]{4, 4, 4}, 1.0f);*/
 
         // Predator
-/*        turrets = new Turret[]{
-                new Turret(10.f, 32, 0, 0, scale),
-                new Turret(15.f, 28, 0, 0, scale),
-                new Turret(20.f, 24, 0, 0, scale)
+        turrets = new Turret[]{
+                new Turret(42, 110, 0, 0, scale),
+                new Turret(1.35f * 42, 95, 0, 0, scale),
+                new Turret(1.7f*42, 80, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{45, 2, 3}, 1.0f);*/
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{45, 2, 3}, 1.0f);
 
         // Single tank test
 /*
@@ -178,9 +175,9 @@ public class TestTwin implements Updatable, Drawable {
         for (Turret t : turrets) {
             t.draw();
         }
-//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Main.strokeRed);
-//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Main.strokeWidth, (radius*scale) * 2 - 2*Main.strokeWidth, Main.redCol);
-        Graphics.drawCircleTexture(x, y, radius*scale, Main.strokeWidth, Main.blueCol, Main.strokeBlue);
+//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
+//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Main.strokeWidth, (radius*scale) * 2 - 2*Main.strokeWidth, Graphics.redCol);
+        Graphics.drawCircleTexture(x, y, radius*scale, Main.strokeWidth, Graphics.BLUE, Graphics.BLUE_STROKE);
     }
 
     // Deletable Methods

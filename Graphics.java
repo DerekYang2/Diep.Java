@@ -20,7 +20,7 @@ public class Graphics extends Raylib {
     final static int FPS = 60;
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
-    final public static int cameraHeight = 1080 - TASKBAR_HEIGHT - TITLEBAR_HEIGHT;
+    final public static int cameraHeight = (1080 - TASKBAR_HEIGHT - TITLEBAR_HEIGHT);
     public static int screenWidth, screenHeight;
     private static float screenScale;  // Scale of render texture to screen
 
@@ -33,6 +33,19 @@ public class Graphics extends Raylib {
     // Custom textures
     public static Texture2D whiteCirc, whiteRect, whiteCircNoAA;
 
+    // Colors
+    public static Color RED = Graphics.rgb(241, 78, 84),
+            RED_STROKE = Graphics.rgb(180, 58, 63),
+            BLUE = Graphics.rgb(0, 178, 225),
+            BLUE_STROKE = Graphics.rgb(0, 133, 168),
+            GREY_STROKE = Graphics.rgb(114, 114, 114),
+            GREY = Graphics.rgb(153, 153, 153),
+            GRID = Graphics.rgb(205, 205, 205),
+            GRID_STROKE = Graphics.rgba(0, 0, 0, 15);
+
+    public static Color getColor(String hexStr) {
+        return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
+    }
     public static void initialize(String title) {
         // Screen dimensions (actual monitor pixels)
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -225,7 +238,7 @@ public class Graphics extends Raylib {
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
         float aspectRatio = length/height;
         Rectangle srcRect = new Rectangle(whiteRect.width - whiteRect.height * aspectRatio, 0, whiteRect.height * aspectRatio, whiteRect.height);
-        rTextures.DrawTexturePro(whiteRect, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), Main.greyStroke);
+        rTextures.DrawTexturePro(whiteRect, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), Graphics.GREY_STROKE);
         Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * Main.strokeWidth), new Vector2(Main.strokeWidth, (height - 2 * Main.strokeWidth)/2.f), (float)radians, color);
     }
 

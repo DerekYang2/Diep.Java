@@ -4,17 +4,7 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 public class Main {
-    public static Color redCol = Graphics.rgb(245, 78, 91),
-            blueCol = Graphics.rgb(0, 178, 221),
-            strokeBlue = Graphics.rgb(0, 133, 164),
-            strokeRed = Graphics.rgb(185, 59, 69),
-            greyStroke = Graphics.rgb(114, 114, 114),
-            greyCol = Graphics.rgb(153, 153, 153),
-            backgroundCol = Graphics.rgb(204, 204, 204),
-            gridLineCol = Graphics.rgb(198, 198, 198);
-
-    public static float strokeWidth = 2.9f;
-
+    public static float strokeWidth = 5f;
     public static long counter;
     public static Pool<Drawable> drawablePool;
     public static Pool<Updatable> updatablePool;
@@ -90,7 +80,7 @@ public class Main {
         updateCamera();
     }
 
-    final private static float GRID_SIZE = 20;
+    final private static float GRID_SIZE = 25;
     private static void drawCamera() {
         Rectangle cameraBounds = Graphics.getCameraBounds();
         Graphics.drawRectangleLines(cameraBounds, 3, Color.RED);
@@ -98,15 +88,29 @@ public class Main {
     private static void drawGrid() {
         float zoom = Graphics.getCameraZoom();
         Rectangle cameraBounds = Graphics.getCameraBounds();
+        double scaledGrid = GRID_SIZE * zoom;
+        Vector2 originScreen = Graphics.rlj.core.GetWorldToScreen2D(new Vector2(0, 0), Graphics.camera);
 
-        float firstX = GRID_SIZE - (player.x - Graphics.cameraWidth/2.f) % GRID_SIZE;  // Modulo position of first x grid
-        for (float xi = firstX; xi < Graphics.cameraWidth; xi += GRID_SIZE * zoom) {
-            Graphics.drawLine(xi, 0, xi, Graphics.cameraHeight, 1, gridLineCol);
+        double firstX = originScreen.x;
+        if (firstX > 0) {
+            firstX %= (scaledGrid);
+        } else {
+            firstX = -Math.abs(firstX) % (scaledGrid);
         }
 
-        float firstY = GRID_SIZE - cameraBounds.y % GRID_SIZE;  // Modulo position of first y grid
-        for (float yi = firstY; yi < Graphics.cameraHeight; yi += GRID_SIZE * zoom) {
-            Graphics.drawLine(0, yi, Graphics.cameraWidth, yi, 1, gridLineCol);
+        for (float xi = (float) firstX; xi < Graphics.cameraWidth; xi += scaledGrid) {
+            Graphics.drawLine(xi, 0, xi, Graphics.cameraHeight, 1, Graphics.GRID_STROKE);
+        }
+
+        double firstY = originScreen.y;
+        if (firstY > 0) {
+            firstY %= (scaledGrid);
+        } else {
+            firstY = -Math.abs(firstY) % (scaledGrid);
+        }
+
+        for (float yi = (float) firstY; yi < Graphics.cameraHeight; yi += scaledGrid) {
+            Graphics.drawLine(0, yi, Graphics.cameraWidth, yi, 1, Graphics.GRID_STROKE);
         }
     }
 
@@ -125,7 +129,7 @@ public class Main {
             // Draw
             //----------------------------------------------------------------------------------
             Graphics.beginDrawMode();
-            Graphics.drawBackground(backgroundCol);
+            Graphics.drawBackground(Graphics.GRID);
             drawGrid();
             Graphics.beginCameraMode();
             drawCamera();

@@ -27,7 +27,7 @@ public class Turret {
   final float recoilForceFactor = 0.03f;
 
 
-  Turret(float width, float length, float offset, double degrees, float scale) {  // renamed parameters
+  Turret(float width, float length, float offset, double radians, float scale) {  // renamed parameters
     this.scale = scale;
     this.turretWidth = width;  // TODO: swapped assignments RENAME!!
     this.turretLengthOG = turretLength = length;
@@ -35,7 +35,7 @@ public class Turret {
 
     this.xOriginal = 0;
     this.yOriginal = 0 + offset * scale;
-    thetaOriginal = degrees * (Math.PI / 180);
+    thetaOriginal = radians;
 
     // Default spawn point, along the x axis with an offset from the origin
     x = xOriginal;
@@ -64,7 +64,7 @@ public class Turret {
 
     //rTextures.DrawTexturePro(testRect, srcRect, new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)(theta * 180/Math.PI), Main.strokeCol);
     //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * Main.strokeWidth), new Vector2(Main.strokeWidth, (width - 2 * Main.strokeWidth)/2.f), (float)theta, color);
-    Graphics.drawRoundedRect(xleft, ycenter, length, width, radians, Main.strokeWidth, Main.greyCol, Main.greyStroke);
+    Graphics.drawRoundedRect(xleft, ycenter, length, width, radians, Main.strokeWidth, Graphics.GREY, Graphics.GREY_STROKE);
   }
 
   // https://www.desmos.com/calculator/ikwpyuj8ny
@@ -118,7 +118,8 @@ public class Turret {
     // Spawn at the end of the turret FIX THIS
     new Bullet(x + xAbsolute, y + yAbsolute, rotatedAngle + thetaOriginal, (turretLength * scale), (turretWidth * scale));  // swapped width with length
     // Return recoil direction
-    Vector2 recoilDirection = new Vector2((float) (-Math.cos(rotatedAngle + thetaOriginal)), (float) (-Math.sin(rotatedAngle + thetaOriginal)));
-    return Raymath.Vector2Scale(recoilDirection, recoilForceFunction(turretWidth));  // Scale the recoil direction
+/*    Vector2 recoilDirection = new Vector2((float) (-Math.cos(rotatedAngle + thetaOriginal)), (float) (-Math.sin(rotatedAngle + thetaOriginal)));
+    return Raymath.Vector2Scale(recoilDirection, recoilForceFunction(turretWidth));  // Scale the recoil direction*/
+    return new Vector2(0, 0);
   }
 }

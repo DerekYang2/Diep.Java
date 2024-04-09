@@ -13,7 +13,7 @@ public class Bullet implements Drawable, Updatable  {
     addToPools();
 
     this.diameter = diameter;
-    vt = 24; // temp, will be based off speed eventually
+    vt = 8; // temp, will be based off speed eventually
 
     /* 4 Quadrants:
      * case : sign of cos, sign of sin -> proper bullet velocity sign

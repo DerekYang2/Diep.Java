@@ -22,8 +22,8 @@ public class Turret {
   public Rectangle srcRect;
 
   // Recoil constants, single turret should not fire in less than 8 frames for now
-  final int recoilTime = 8;
-  final float recoilFactor = 0.08f, retCoeff = 6.f/recoilTime;
+  final int recoilTime = 16;
+  final float recoilFactor = 0.1f, retCoeff = 6.f/recoilTime;
   final float recoilForceFactor = 0.03f;
 
 
@@ -69,12 +69,14 @@ public class Turret {
 
   // https://www.desmos.com/calculator/ikwpyuj8ny
   private float lengthShift(int frame) {
-    float dist = recoilFactor * (turretWidth * scale);  // Even though its length shift, base on width because more width = stronger turret
+/*    float dist = recoilFactor * (turretWidth * scale);  // Even though its length shift, base on width because more width = stronger turret
     if (0 <= frame && frame < retCoeff * recoilTime) {
       return -Math.abs(dist/(retCoeff * recoilTime)) * frame;
     } else {
       return -Math.abs(dist/((1-retCoeff) * recoilTime)) * (frame - retCoeff * recoilTime) + dist;
-    }
+    }*/
+    float dist = recoilFactor * (turretWidth * scale);  // Even though its length shift, base on width because more width = stronger turret
+    return (float) (-Math.abs(dist) * Math.cos((Math.PI/recoilTime) * (frame - recoilTime*0.5f)));
   }
 
   public void update(double xAbs, double yAbs, double tankAngle) {

@@ -15,11 +15,11 @@ public class TestTwin implements Updatable, Drawable {
     protected float direction;
     protected int id;
     Stopwatch stopwatch;
-    final float friction = 0.95f;
+    final float friction = 0.9f;
     final float mass = 1.0f;
     final float moveForceX = 0.3f;
     final float moveForceY = 0.3f;
-    float velMax = 7.0f;  // Max velocity in a single direction
+    float velMax = 5.0f;  // Max velocity in a single direction
 
     ShootManager shootManager;
     Turret[] turrets;
@@ -63,30 +63,32 @@ public class TestTwin implements Updatable, Drawable {
         shootManager = new ShootManager(new int[]{0, 1}, new int[]{8, 8}, 1.0f);
 
         // Triplet
-/*        turrets = new Turret[]{
-                new Turret(13, 24, 7, 0, scale),
-                new Turret(13, 24, -7, 0, scale),
-                new Turret(13, 28, 0, 0, scale)
+        turrets = new Turret[]{
+                new Turret(42, 80, 26, 0, scale),
+                new Turret(42, 80, -26, 0, scale),
+                new Turret(42, 95, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{4, 4, 4}, 1.0f);*/
+        int reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);
 
         // Pentashot
-/*        turrets = new Turret[]{
+        /*turrets = new Turret[]{
                 new Turret(42, 80, 0, -0.7853981633974483, scale),
                 new Turret(42 , 80, 0, 0.7853981633974483, scale),
                 new Turret(42, 95, 0, -0.39269908169872414, scale),
                 new Turret(42, 95, 0, 0.39269908169872414, scale),
                 new Turret(42, 110, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 0, 1, 1, 2}, new int[]{4, 4, 4}, 1.0f);*/
+        int reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
+        shootManager = new ShootManager(new int[]{0, 0, 1, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);*/
 
         // Predator
-        turrets = new Turret[]{
+        /*turrets = new Turret[]{
                 new Turret(42, 110, 0, 0, scale),
                 new Turret(1.35f * 42, 95, 0, 0, scale),
                 new Turret(1.7f*42, 80, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{45, 2, 3}, 1.0f);
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{45, 2, 3}, 1.0f);*/
 
         // Single tank test
 /*

@@ -27,7 +27,6 @@ public class Main {
         idServer = new IdServer();
         // new TestObj();
         player = new TestTwin();
-        new Square();
         counter = 0;
     }
 
@@ -50,7 +49,7 @@ public class Main {
         Graphics.drawFPS(10, 10, 20, Color.BLACK);
 
         // Number of objects
-        Graphics.drawText("Number of objects: " + drawablePool.getObjects().size(), 10, 20, 20, Color.WHITE);
+        Graphics.drawText("Number of objects: " + drawablePool.getObjects().size(), 10, 25, 20, Color.WHITE);
 
         // Draw all the drawable objects
         for (Drawable drawable : Main.drawablePool.getObjects()) {
@@ -120,12 +119,13 @@ public class Main {
         // Main game loop
         while (!Graphics.shouldWindowClose())    // Detect window close button or ESC key
         {
-            // Update
-            //----------------------------------------------------------------------------------
-            // Compute required framebuffer scaling
-            Graphics.updateMouse();
-            update();
-
+            for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
+                // Update
+                //----------------------------------------------------------------------------------
+                // Compute required framebuffer scaling
+                Graphics.updateMouse();
+                update();
+            }
             // Draw
             //----------------------------------------------------------------------------------
             Graphics.beginDrawMode();

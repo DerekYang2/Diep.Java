@@ -17,10 +17,11 @@ import java.awt.*;
 import static com.raylib.java.core.input.Mouse.MouseButton.*;
 
 public class Graphics extends Raylib {
-    final static int FPS = 60;
+    public static int PERFORMANCE_MODE = 1;
+    final static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
-    final public static int cameraHeight = (1080 - TASKBAR_HEIGHT - TITLEBAR_HEIGHT);
+    final public static int cameraHeight = (1080 /*- TASKBAR_HEIGHT - TITLEBAR_HEIGHT*/);
     public static int screenWidth, screenHeight;
     private static float screenScale;  // Scale of render texture to screen
 
@@ -50,12 +51,13 @@ public class Graphics extends Raylib {
         // Screen dimensions (actual monitor pixels)
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         screenWidth = (int) screenSize.getWidth();
-        screenHeight = (int) screenSize.getHeight() - TASKBAR_HEIGHT - TITLEBAR_HEIGHT;
+        screenHeight = (int) screenSize.getHeight()/* - TASKBAR_HEIGHT - TITLEBAR_HEIGHT*/;
 
         // Raylib window
         rlj = new Raylib();
-        rCore.SetConfigFlags(Config.ConfigFlag.FLAG_MSAA_4X_HINT);
+        rCore.SetConfigFlags(Config.ConfigFlag.FLAG_MSAA_4X_HINT | Config.ConfigFlag.FLAG_WINDOW_RESIZABLE | Config.ConfigFlag.FLAG_WINDOW_MAXIMIZED);
         rlj.core.InitWindow(screenWidth, screenHeight, title);
+        rlj.core.MaximizeWindow();
         rlj.core.SetWindowMinSize(320, 240);
         rlj.core.SetWindowPosition(0, TITLEBAR_HEIGHT);
 

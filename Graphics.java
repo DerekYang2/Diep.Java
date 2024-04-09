@@ -17,7 +17,8 @@ import java.awt.*;
 import static com.raylib.java.core.input.Mouse.MouseButton.*;
 
 public class Graphics extends Raylib {
-    public static int PERFORMANCE_MODE = 1;
+    public static float strokeWidth = 7.5f;
+    public static int PERFORMANCE_MODE = 0;
     final static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
@@ -42,7 +43,7 @@ public class Graphics extends Raylib {
             GREY_STROKE = Graphics.rgb(114, 114, 114),
             GREY = Graphics.rgb(153, 153, 153),
             GRID = Graphics.rgb(205, 205, 205),
-            GRID_STROKE = Graphics.rgba(0, 0, 0, 15);
+            GRID_STROKE = Graphics.rgba(0, 0, 0, 8);
 
     public static Color getColor(String hexStr) {
         return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
@@ -70,8 +71,7 @@ public class Graphics extends Raylib {
         camera = new Camera2D();
         camera.setTarget(new Vector2(0, 0));
         camera.setOffset(new Vector2(cameraWidth / 2.f, cameraHeight / 2.f));
-        //        this.cameraData.FOV = (.55 * fieldFactor) / Math.pow(1.01, (this.cameraData.values.level - 1) / 2);
-        camera.setZoom((float) ((1.0f) / Math.pow(1.01, (45 - 1) *0.5f)));
+        // this.cameraData.FOV = (.55 * fieldFactor) / Math.pow(1.01, (this.cameraData.values.level - 1) / 2);
         camera.setRotation(0.0f);
 
         screenScale = Math.min((float) screenWidth / cameraWidth, (float) screenHeight / cameraHeight);
@@ -147,6 +147,7 @@ public class Graphics extends Raylib {
         }
     }
 
+    // Camera -----------------------------------------------------------------------------------------
     public static void setCameraTarget(Vector2 target) {
         camera.setTarget(target);
     }
@@ -169,6 +170,15 @@ public class Graphics extends Raylib {
 
     public static float getCameraZoom() {
        return  camera.getZoom();
+    }
+
+    /**
+     * Set the zoom of the camera
+     * @param fieldFactor Field factor of the turret
+     * @param level Level of the player
+     */
+    public static void setZoom(float fieldFactor, int level) {
+        camera.setZoom((float) ((.55f * fieldFactor) / Math.pow(1.01, (level - 1) *0.5f)));
     }
 
     // IO --------------------------------------------------------------------------------------------
@@ -242,7 +252,7 @@ public class Graphics extends Raylib {
         float aspectRatio = length/height;
         Rectangle srcRect = new Rectangle(whiteRect.width - whiteRect.height * aspectRatio, 0, whiteRect.height * aspectRatio, whiteRect.height);
         rTextures.DrawTexturePro(whiteRect, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), Graphics.GREY_STROKE);
-        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * Main.strokeWidth), new Vector2(Main.strokeWidth, (height - 2 * Main.strokeWidth)/2.f), (float)radians, color);
+        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * Graphics.strokeWidth), new Vector2(Graphics.strokeWidth, (height - 2 * Graphics.strokeWidth)/2.f), (float)radians, color);
     }
 
     public static void drawRectangleLines(Rectangle rect, float stroke, Color color) {
@@ -255,7 +265,7 @@ public class Graphics extends Raylib {
 
     public static void drawCircleTexture(float x, float y, float radius, float stroke, Color color, Color strokeColor) {
         Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius) * 2, (radius) * 2, strokeColor);
-        Graphics.drawTextureCentered(whiteCircNoAA, new Vector2(x, y), (radius) * 2 - 2*Main.strokeWidth*1.15f, (radius) * 2 - 2*Main.strokeWidth*1.15f, color);
+        Graphics.drawTextureCentered(whiteCircNoAA, new Vector2(x, y), (radius) * 2 - 2*Graphics.strokeWidth, (radius) * 2 - 2*Graphics.strokeWidth, color);
     }
 
     public static void drawCircle(float x, float y, float radius, float stroke, Color color, Color strokeColor) {

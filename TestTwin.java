@@ -7,9 +7,10 @@ import static com.raylib.java.core.input.Keyboard.*;
 public class TestTwin implements Updatable, Drawable {
     protected float x, y, vx, vy;
     protected float xTranslate, yTranslate;
-    float scale = 1.0f;
+    int level = 45;
+    float scale = (float)Math.pow(1.01, (level - 1));
     // 54.7766480515
-    float radius = (float) (54.7766480515);
+    float radius = (float) (50);
     protected float direction;
     protected int id;
     Stopwatch stopwatch;
@@ -40,44 +41,45 @@ public class TestTwin implements Updatable, Drawable {
         x = 0; y= 0;
         vx = vy = 0;
 
+        Graphics.setZoom(1.0f, level);
+
+        int reloadTime;
         // Wait for the circle to be spawned before
        // Triple shot
-       turrets = new Turret[]{
+       /*turrets = new Turret[]{
                 new Turret(42, 95, 0, -0.7853981633974483, scale),
                 new Turret(42, 95, 0, 0, scale),
                 new Turret(42, 95, 0, 0.7853981633974483, scale),
         };
-        shootManager = new ShootManager(new int[]{0, 0, 0}, new int[]{16}, 1.0f);
-
-        //TODO: shoot manager first shoots index 0 on click but should alternate
-        // fix: after reset, set the counter to the next fire index rather than 0
+        shootManager = new ShootManager(new int[]{0, 0, 0}, new int[]{16}, 1.0f);*/
 
         // Twins (looks off?)
        turrets = new Turret[]{
                 new Turret(42f, 95, -26f, 0, scale),
                 new Turret(42f, 95, 26f, 0, scale)
         };
+       reloadTime = (int) ((1.f/2) * Math.ceil((15 - 9)*1.0f) * 120 /25);
 
-        shootManager = new ShootManager(new int[]{0, 1}, new int[]{8, 8}, 1.0f);
+        shootManager = new ShootManager(new int[]{0, 1}, new int[]{reloadTime, reloadTime}, 1.0f);
 
         // Triplet
-        turrets = new Turret[]{
+        /*turrets = new Turret[]{
                 new Turret(42, 80, 26, 0, scale),
                 new Turret(42, 80, -26, 0, scale),
                 new Turret(42, 95, 0, 0, scale)
         };
         int reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);*/
 
         // Pentashot
-        /*turrets = new Turret[]{
+/*        turrets = new Turret[]{
                 new Turret(42, 80, 0, -0.7853981633974483, scale),
                 new Turret(42 , 80, 0, 0.7853981633974483, scale),
                 new Turret(42, 95, 0, -0.39269908169872414, scale),
                 new Turret(42, 95, 0, 0.39269908169872414, scale),
                 new Turret(42, 110, 0, 0, scale)
         };
-        int reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
+        reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
         shootManager = new ShootManager(new int[]{0, 0, 1, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);*/
 
         // Predator
@@ -86,7 +88,9 @@ public class TestTwin implements Updatable, Drawable {
                 new Turret(1.35f * 42, 95, 0, 0, scale),
                 new Turret(1.7f*42, 80, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{45, 2, 3}, 1.0f);*/
+        reloadTime = (int) (Math.ceil((15 - 9)*3f) * 120 /25);
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{reloadTime, (int) (reloadTime * 0.1f), (int) (reloadTime * 0.1f)}, 1.0f);
+        */
 
         // Single tank test
 /*
@@ -108,12 +112,14 @@ public class TestTwin implements Updatable, Drawable {
         };
         shootManager = new ShootManager(new int[]{0, 0, 0, 0, 0}, new int[]{16}, 1.0f);*/
 
-
+        /*
         // Destroyer
-/*        turrets = new Turret[]{
-                new Turret(23f, 30, 0, 0, scale)
+        turrets = new Turret[]{
+                new Turret(1.7f * 42, 95, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0}, new int[]{60}, 1.0f);*/
+        //ceil((15 - reload stat points) * base reload);
+        reloadTime = (int) ((Math.ceil((15 - 9)*4.f*120.f /25)));
+        shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);*/
     }
 
     public void update() {
@@ -176,8 +182,8 @@ public class TestTwin implements Updatable, Drawable {
             t.draw();
         }
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
-//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Main.strokeWidth, (radius*scale) * 2 - 2*Main.strokeWidth, Graphics.redCol);
-        Graphics.drawCircleTexture(x, y, radius*scale, Main.strokeWidth, Graphics.BLUE, Graphics.BLUE_STROKE);
+//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
+        Graphics.drawCircleTexture(x, y, radius*scale, Graphics.strokeWidth, Graphics.BLUE, Graphics.BLUE_STROKE);
     }
 
     // Deletable Methods

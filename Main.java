@@ -4,7 +4,6 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 public class Main {
-    public static float strokeWidth = 5f;
     public static long counter;
     public static Pool<Drawable> drawablePool;
     public static Pool<Updatable> updatablePool;
@@ -34,10 +33,10 @@ public class Main {
         counter++;
         Graphics.setCameraTarget(new Vector2((float) player.x, (float) player.y));
         if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() - 0.02f);
+            Graphics.setCameraZoom(Graphics.getCameraZoom() - 0.005f);
         }
         if (Graphics.isKeyDown(Keyboard.KEY_UP)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() + 0.02f);
+            Graphics.setCameraZoom(Graphics.getCameraZoom() + 0.005f);
         }
     }
 
@@ -79,7 +78,7 @@ public class Main {
         updateCamera();
     }
 
-    final private static float GRID_SIZE = 25;
+    final private static float GRID_SIZE = 50;
     private static void drawCamera() {
         Rectangle cameraBounds = Graphics.getCameraBounds();
         Graphics.drawRectangleLines(cameraBounds, 3, Color.RED);
@@ -119,9 +118,10 @@ public class Main {
         // Main game loop
         while (!Graphics.shouldWindowClose())    // Detect window close button or ESC key
         {
+            // Update
+            //----------------------------------------------------------------------------------
             for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
-                // Update
-                //----------------------------------------------------------------------------------
+
                 // Compute required framebuffer scaling
                 Graphics.updateMouse();
                 update();

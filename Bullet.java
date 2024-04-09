@@ -46,7 +46,7 @@ public class Bullet implements Drawable, Updatable  {
 
   public void draw() {
     float radius = diameter * 0.5f;
-    Graphics.drawCircle((int) x, (int) y, radius, Main.strokeWidth, Graphics.BLUE, Graphics.BLUE_STROKE);
+    Graphics.drawCircle((int) x, (int) y, radius, Graphics.strokeWidth, Graphics.BLUE, Graphics.BLUE_STROKE);
   }
 
   public void createId() {

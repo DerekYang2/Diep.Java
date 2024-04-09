@@ -63,8 +63,8 @@ public class Turret {
     //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)theta, color);
 
     //rTextures.DrawTexturePro(testRect, srcRect, new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)(theta * 180/Math.PI), Main.strokeCol);
-    //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * Main.strokeWidth), new Vector2(Main.strokeWidth, (width - 2 * Main.strokeWidth)/2.f), (float)theta, color);
-    Graphics.drawRoundedRect(xleft, ycenter, length, width, radians, Main.strokeWidth, Graphics.GREY, Graphics.GREY_STROKE);
+    //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * Graphics.strokeWidth), new Vector2(Graphics.strokeWidth, (width - 2 * Graphics.strokeWidth)/2.f), (float)theta, color);
+    Graphics.drawRoundedRect(xleft, ycenter, length, width, radians, Graphics.strokeWidth, Graphics.GREY, Graphics.GREY_STROKE);
   }
 
   // https://www.desmos.com/calculator/ikwpyuj8ny

@@ -7,11 +7,9 @@ import static com.raylib.java.core.input.Keyboard.*;
 public class TestTwin implements Updatable, Drawable {
     protected float x, y, vx, vy;
     protected float xTranslate, yTranslate;
-
     float scale = 1.0f;
     // 54.7766480515
     float radius = (float) (54.7766480515);
-
     protected float direction;
     protected int id;
     Stopwatch stopwatch;

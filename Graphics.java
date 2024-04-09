@@ -70,7 +70,8 @@ public class Graphics extends Raylib {
         camera = new Camera2D();
         camera.setTarget(new Vector2(0, 0));
         camera.setOffset(new Vector2(cameraWidth / 2.f, cameraHeight / 2.f));
-        camera.setZoom(1.f);
+        //        this.cameraData.FOV = (.55 * fieldFactor) / Math.pow(1.01, (this.cameraData.values.level - 1) / 2);
+        camera.setZoom((float) ((1.0f) / Math.pow(1.01, (45 - 1) *0.5f)));
         camera.setRotation(0.0f);
 
         screenScale = Math.min((float) screenWidth / cameraWidth, (float) screenHeight / cameraHeight);

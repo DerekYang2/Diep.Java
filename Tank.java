@@ -10,6 +10,7 @@ public class TestTwin extends GameObject {
     Stopwatch stopwatch;
     final float moveForceX = 0.3f;
     final float moveForceY = 0.3f;
+    float direction = 0;
     ShootManager shootManager;
     Turret[] turrets;
 
@@ -106,31 +107,23 @@ public class TestTwin extends GameObject {
         shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);
     }
 
+    @Override
     public void update() {
-        // Cap Velocity
-        vx = Math.signum(vx) * Math.min(Math.abs(vx), velMax);
-        vy = Math.signum(vy) * Math.min(Math.abs(vy), velMax);
-        // Update position
-        x += vx;
-        y += vy;
-        // Apply friction
-        vx *= friction;
-        vy *= friction;
-
+        super.update();
         // Get Direction of mouse
-        direction = (float) Math.atan2(Graphics.getVirtualMouse().y - y, Graphics.getVirtualMouse().x - x);
+        direction = (float) Math.atan2(Graphics.getVirtualMouse().y - pos.y, Graphics.getVirtualMouse().x - pos.x);
 
         if (Graphics.isKeyDown(KEY_S) ) {
-            addForce(0, moveForceY);
+            addForce(new Vector2(0, moveForceY));
         }
         if (Graphics.isKeyDown(KEY_W)) {
-            addForce(0, -moveForceY);
+            addForce(new Vector2(0, -moveForceY));
         }
         if (Graphics.isKeyDown(KEY_A)) {
-            addForce(-moveForceX, 0);
+            addForce(new Vector2(-moveForceX, 0));
         }
         if (Graphics.isKeyDown(KEY_D)) {
-            addForce(moveForceX, 0);
+            addForce(new Vector2(moveForceX, 0));
         }
 
         if (Graphics.isLeftMouseDown()) {
@@ -147,46 +140,18 @@ public class TestTwin extends GameObject {
 
         // atan2 mouse angle
         for (Turret t : turrets) {
-            t.update(x, y, direction);
+            t.update(pos.x, pos.y, direction);
         }
     }
 
-    public void addForce(Vector2 force) {
-        vx += force.x / mass;
-        vy += force.y / mass;
-    }
-    public void addForce(float fx, float fy) {
-        vx += fx / mass;
-        vy += fy / mass;
-    }
-
+    @Override
     public void draw() {
-        // Draw Turretsp
+        // Draw Turrets
         for (Turret t : turrets) {
             t.draw();
         }
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
-        Graphics.drawCircleTexture(x, y, radius*scale, Graphics.strokeWidth, Graphics.BLUE, Graphics.BLUE_STROKE);
-    }
-
-    // Deletable Methods
-    public void createId() {
-        this.id = Main.idServer.getId();
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void addToPools() {
-        Main.drawablePool.addObj(this);
-        Main.updatablePool.addObj(this);
-    }
-
-    public void delete() {
-        // All added to wait lists
-        Main.drawablePool.deleteObj(this.getId());
-        Main.updatablePool.deleteObj(this.getId());
+        Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, Graphics.BLUE, Graphics.BLUE_STROKE);
     }
 }

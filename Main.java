@@ -27,6 +27,8 @@ public class Main {
         idServer = new IdServer();
         // new TestObj();
         player = new Tank();
+        for (int i = 0; i < 1; i++)
+            new GameObject(new Vector2((float) (Math.random() * 300), (float) (Math.random() * 300)), 50);
         Graphics.setCameraTarget(player.pos);
         counter = 0;
     }
@@ -76,7 +78,7 @@ public class Main {
         // Collide all the game objects
         for (GameObject gameObject : Main.gameObjectPool.getObjects()) {
             for (GameObject other : Main.gameObjectPool.getObjects()) {
-                if (gameObject != other) {
+                if (gameObject != other && gameObject.group != other.group) {
                     if (gameObject.checkCollision(other)) {
                         gameObject.receiveKnockback(other);
                     }

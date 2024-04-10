@@ -3,31 +3,33 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 public class GameObject implements Updatable, Drawable {
+    // Create a group integer where collision is ignored if group is the same
+    int group;
     protected Vector2 pos, vel;
-    float friction = 0.9f;
+    float friction = 0.9782890432f;  // 0.9^(25/120)
     protected int id;
     float scale = 1.0f;
-    int radius;  // For collision detection and sometimes drawing (if circle)
+    float radius;  // For collision detection and sometimes drawing (if circle)
 
     // Collision
-    float absorptionFactor = 8, pushFactor = 1;  // Default
-    public GameObject(Vector2 pos, float friction, int radius) {
+    float absorptionFactor = 1, pushFactor = 8;  // Default
+    public GameObject(Vector2 pos, int radius) {
         this.pos = pos;
         this.vel = new Vector2(0, 0);
-        this.friction = friction;
         this.radius = radius;
         createId();
         addToPools();
+        group = id;
     }
-    public GameObject(Vector2 pos, float friction, int radius, float absorptionFactor, float pushFactor) {
+    public GameObject(Vector2 pos, int radius, float absorptionFactor, float pushFactor) {
         this.pos = pos;
         this.vel = new Vector2(0, 0);
-        this.friction = friction;
         this.radius = radius;
         this.absorptionFactor = absorptionFactor;
         this.pushFactor = pushFactor;
         createId();
         addToPools();
+        group = id;
     }
 
     @Override
@@ -76,9 +78,9 @@ public class GameObject implements Updatable, Drawable {
     }
 
     public void receiveKnockback(GameObject other) {
-        float knockbackMagnitude = this.absorptionFactor * other.pushFactor * (125.f/25);
+        float knockbackMagnitude = this.absorptionFactor * other.pushFactor * 0.04f;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
-        float knockbackAngle = (float)Math.atan2(diffY, diffX);
+        float knockbackAngle = (float) Math.atan2(diffY, diffX);
         addForce(knockbackMagnitude, knockbackAngle);
     }
 

@@ -4,6 +4,7 @@ import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.textures.Texture2D;
 
 public class Turret {
+  int group;
   double x, y;
   double xOriginal, yOriginal;
   double xAbsolute, yAbsolute;
@@ -29,7 +30,7 @@ public class Turret {
 
   Turret(float width, float length, float offset, double radians, float scale) {  // renamed parameters
     this.scale = scale;
-    this.turretWidth = width;  // TODO: swapped assignments RENAME!!
+    this.turretWidth = width;
     this.turretLengthOG = turretLength = length;
     this.offset = offset;
 
@@ -48,6 +49,10 @@ public class Turret {
     float aspectRatio = length/width;
     System.out.println("Aspect Ratio: " + aspectRatio);
     srcRect = new Rectangle(testRect.width - testRect.height * aspectRatio, 0, testRect.height * aspectRatio, testRect.height);*/
+  }
+
+  public void setGroup(int group) {
+    this.group = group;
   }
 
   public void draw() {
@@ -118,7 +123,8 @@ public class Turret {
   public Vector2 shoot() {
     recoilFrames = recoilTime;  // Set to max recoil time
     // Spawn at the end of the turret FIX THIS
-    new Bullet(x + xAbsolute, y + yAbsolute, rotatedAngle + thetaOriginal, (turretLength * scale), (turretWidth * scale));  // swapped width with length
+    Bullet b = new Bullet((float) (x + xAbsolute), (float) (y + yAbsolute), (float) (rotatedAngle + thetaOriginal), (turretLength * scale), (turretWidth * scale));  // swapped width with length
+    b.group = group;
     // Return recoil direction
 /*    Vector2 recoilDirection = new Vector2((float) (-Math.cos(rotatedAngle + thetaOriginal)), (float) (-Math.sin(rotatedAngle + thetaOriginal)));
     return Raymath.Vector2Scale(recoilDirection, recoilForceFunction(turretWidth));  // Scale the recoil direction*/

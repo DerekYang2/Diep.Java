@@ -8,7 +8,7 @@ public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
     Stopwatch stopwatch;
-    int movementSpeed = 1;  // Integer stat for upgrade
+    int movementSpeed = 15;  // Integer stat for upgrade
     float baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, movementSpeed) / Math.pow(1.015, level - 1));
     float direction = 0;
     ShootManager shootManager;
@@ -20,7 +20,7 @@ public class Tank extends GameObject {
     float shotDelayMs = 500;
 
     public Tank() {
-        super(new Vector2(0, 0), (float)Math.pow(0.9, 25.f/120), 50);
+        super(new Vector2(0, 0), 50);
         scale = (float)Math.pow(1.01, (level - 1));
         
         stopwatch = new Stopwatch();
@@ -53,8 +53,8 @@ public class Tank extends GameObject {
                 new Turret(42, 80, -26, 0, scale),
                 new Turret(42, 95, 0, 0, scale)
         };
-        reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);
+        reloadTime = (int) ((1.f/2) * Math.ceil((15 - 9)*1.0f) * 120.f /25);
+        shootManager = new ShootManager(new int[]{1, 1, 0}, new int[]{reloadTime, reloadTime}, 1.0f);
 
         // Pentashot
         /*turrets = new Turret[]{
@@ -78,13 +78,13 @@ public class Tank extends GameObject {
         */
 
         // Single tank test
-/*
+        /*
         turrets = new Turret[]{
-                new Turret(13.5f, 28, 0, 0, scale)
+                new Turret(42, 95, 0, 0, scale)
         };
-        shootManager = new ShootManager(new int[]{0}, new int[]{8}, 1.0f);
-*/
-
+        reloadTime = (int) (Math.ceil((15 - 9)*1) * 120 /25);
+        shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);
+        */
 
 
 /*        // Fighter
@@ -105,6 +105,10 @@ public class Tank extends GameObject {
         //ceil((15 - reload stat points) * base reload);
         reloadTime = (int) ((Math.ceil((15 - 9)*4.f*120.f /25)));
         shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);*/
+
+        for (Turret t : turrets) {
+            t.setGroup(group);
+        }
     }
 
     @Override

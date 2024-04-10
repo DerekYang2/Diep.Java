@@ -27,7 +27,7 @@ public class Main {
         idServer = new IdServer();
         // new TestObj();
         player = new Tank();
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 20; i++)
             new GameObject(new Vector2((float) (Math.random() * 300), (float) (Math.random() * 300)), 50);
         Graphics.setCameraTarget(player.pos);
         counter = 0;

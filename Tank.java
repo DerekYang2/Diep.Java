@@ -8,7 +8,7 @@ public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
     Stopwatch stopwatch;
-    int movementSpeed = 15;  // Integer stat for upgrade
+    int movementSpeed = 0;  // Integer stat for upgrade
     float baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, movementSpeed) / Math.pow(1.015, level - 1));
     float direction = 0;
     ShootManager shootManager;

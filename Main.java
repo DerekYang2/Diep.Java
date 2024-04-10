@@ -7,6 +7,8 @@ public class Main {
     public static long counter;
     public static Pool<Drawable> drawablePool;
     public static Pool<Updatable> updatablePool;
+    public static Pool<GameObject> gameObjectPool;
+
     public static IdServer idServer;
 
     public static String environment = "development";
@@ -23,6 +25,7 @@ public class Main {
         globalClock.start();
         drawablePool = new Pool<>();
         updatablePool = new Pool<>();
+        gameObjectPool = new Pool<>();
         idServer = new IdServer();
         // new TestObj();
         player = new TestTwin();
@@ -38,6 +41,7 @@ public class Main {
         if (Graphics.isKeyDown(Keyboard.KEY_UP)) {
             Graphics.setCameraZoom(Graphics.getCameraZoom() + 0.005f);
         }
+
     }
 
     private static void draw() {
@@ -69,13 +73,24 @@ public class Main {
         // Handle the pending operations
         Main.drawablePool.refresh();
         Main.updatablePool.refresh();
+        Main.gameObjectPool.refresh();
+        updateCamera();
 
         // Update all the updatable objects
         for (Updatable updatable : Main.updatablePool.getObjects()) {
             updatable.update();
         }
 
-        updateCamera();
+        // Collide all the game objects
+        for (GameObject gameObject : Main.gameObjectPool.getObjects()) {
+            for (GameObject other : Main.gameObjectPool.getObjects()) {
+                if (gameObject != other) {
+                    if (gameObject.checkCollision(other)) {
+                        gameObject.receiveKnockback(other);
+                    }
+                }
+            }
+        }
     }
 
     final private static float GRID_SIZE = 50;

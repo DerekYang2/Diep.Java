@@ -4,22 +4,12 @@ import java.util.ArrayList;
 
 import static com.raylib.java.core.input.Keyboard.*;
 
-public class TestTwin implements Updatable, Drawable {
-    protected float x, y, vx, vy;
-    protected float xTranslate, yTranslate;
+public class TestTwin extends GameObject {
     int level = 45;
-    float scale = (float)Math.pow(1.01, (level - 1));
     // 54.7766480515
-    float radius = (float) (50);
-    protected float direction;
-    protected int id;
     Stopwatch stopwatch;
-    final float friction = 0.9f;
-    final float mass = 1.0f;
     final float moveForceX = 0.3f;
     final float moveForceY = 0.3f;
-    float velMax = 5.0f;  // Max velocity in a single direction
-
     ShootManager shootManager;
     Turret[] turrets;
 
@@ -28,18 +18,12 @@ public class TestTwin implements Updatable, Drawable {
     boolean canShoot = true;
     float shotDelayMs = 500;
 
-    // Debugging Variables
-    float p1x, p1y, p2x, p2y;
-
     public TestTwin() {
-        createId();  // Remember to create an id on creation
-        addToPools();  // Remember to add object to pool on creation
+        super(new Vector2(0, 0), 0.9f, 5.0f, 50);
+        scale = (float)Math.pow(1.01, (level - 1));
         
         stopwatch = new Stopwatch();
         stopwatch.start();
-        
-        x = 0; y= 0;
-        vx = vy = 0;
 
         Graphics.setZoom(1.0f, level);
 
@@ -68,11 +52,11 @@ public class TestTwin implements Updatable, Drawable {
                 new Turret(42, 80, -26, 0, scale),
                 new Turret(42, 95, 0, 0, scale)
         };
-        int reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
+        reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
         shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);*/
 
         // Pentashot
-/*        turrets = new Turret[]{
+        /*turrets = new Turret[]{
                 new Turret(42, 80, 0, -0.7853981633974483, scale),
                 new Turret(42 , 80, 0, 0.7853981633974483, scale),
                 new Turret(42, 95, 0, -0.39269908169872414, scale),
@@ -112,14 +96,14 @@ public class TestTwin implements Updatable, Drawable {
         };
         shootManager = new ShootManager(new int[]{0, 0, 0, 0, 0}, new int[]{16}, 1.0f);*/
 
-        /*
+
         // Destroyer
         turrets = new Turret[]{
                 new Turret(1.7f * 42, 95, 0, 0, scale)
         };
         //ceil((15 - reload stat points) * base reload);
         reloadTime = (int) ((Math.ceil((15 - 9)*4.f*120.f /25)));
-        shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);*/
+        shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);
     }
 
     public void update() {

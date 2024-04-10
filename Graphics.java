@@ -3,6 +3,7 @@ import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
 import com.raylib.java.core.camera.Camera2D;
 import com.raylib.java.core.rCore;
+import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.rlgl.RLGL;
 import com.raylib.java.shapes.Rectangle;
@@ -18,7 +19,7 @@ import static com.raylib.java.core.input.Mouse.MouseButton.*;
 
 public class Graphics extends Raylib {
     public static float strokeWidth = 7.5f;
-    public static int PERFORMANCE_MODE = 1;
+    public static int PERFORMANCE_MODE = 0;
     final static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
@@ -152,6 +153,10 @@ public class Graphics extends Raylib {
         camera.setTarget(target);
     }
 
+    public static void shiftCameraTarget(Vector2 shift) {
+        camera.setTarget(Raymath.Vector2Add(camera.target, shift));
+    }
+
     public static void setCameraZoom(float zoom) {
         camera.setZoom(zoom);
     }
@@ -170,6 +175,10 @@ public class Graphics extends Raylib {
 
     public static float getCameraZoom() {
        return  camera.getZoom();
+    }
+
+    public static Vector2 getCameraTarget() {
+        return camera.target;
     }
 
     /**

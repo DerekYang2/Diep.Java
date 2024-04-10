@@ -1,5 +1,6 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.core.input.Keyboard;
+import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
@@ -10,12 +11,9 @@ public class Main {
     public static Pool<GameObject> gameObjectPool;
 
     public static IdServer idServer;
-
-    public static String environment = "development";
-
     public static Stopwatch globalClock = new Stopwatch();
 
-    static TestTwin player;
+    static Tank player;
 
     // Called in GamePanel.java to initialize game
     public static void initialize() {
@@ -28,13 +26,15 @@ public class Main {
         gameObjectPool = new Pool<>();
         idServer = new IdServer();
         // new TestObj();
-        player = new TestTwin();
+        player = new Tank();
+        Graphics.setCameraTarget(player.pos);
         counter = 0;
     }
 
     private static void updateCamera() {
         counter++;
-        Graphics.setCameraTarget(new Vector2((float) player.x, (float) player.y));
+        Vector2 difference = Raymath.Vector2Subtract(player.pos, Graphics.getCameraTarget());
+        Graphics.shiftCameraTarget(Raymath.Vector2Scale(difference, 0.055f));
         if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
             Graphics.setCameraZoom(Graphics.getCameraZoom() - 0.005f);
         }
@@ -43,9 +43,10 @@ public class Main {
         }
 
     }
-
+    //static float xt = 0;
     private static void draw() {
-
+        //Graphics.drawCircle(xt, 100, 10, Color.RED);
+        //xt += 6 * GRID_SIZE/120;
         // Draw circle at mouse pos
         Graphics.drawRectangle(Graphics.getVirtualMouse().x, Graphics.getVirtualMouse().y, 5, 5, Color.WHITE);
         // Draw fps
@@ -60,15 +61,6 @@ public class Main {
         }
     }
 
-    // Clamp Vector2 value with min and max and return a new vector2
-    // NOTE: Required for virtual mouse, to clamp inside virtual game size
-    static Vector2 ClampValue(Vector2 value, Vector2 min, Vector2 max) {
-        value.x = Math.min(value.x, max.x);
-        value.x = Math.max(value.x, min.x);
-        value.y = Math.min(value.y, max.y);
-        value.y = Math.max(value.y, min.y);
-        return value;
-    }
     private static void update() {
         // Handle the pending operations
         Main.drawablePool.refresh();
@@ -100,7 +92,6 @@ public class Main {
     }
     private static void drawGrid() {
         float zoom = Graphics.getCameraZoom();
-        Rectangle cameraBounds = Graphics.getCameraBounds();
         double scaledGrid = GRID_SIZE * zoom;
         Vector2 originScreen = Graphics.rlj.core.GetWorldToScreen2D(new Vector2(0, 0), Graphics.camera);
 
@@ -111,7 +102,7 @@ public class Main {
             firstX = -Math.abs(firstX) % (scaledGrid);
         }
 
-        for (float xi = (float) firstX; xi < Graphics.cameraWidth; xi += scaledGrid) {
+        for (float xi = (float) firstX; xi < Graphics.cameraWidth; xi += (float) scaledGrid) {
             Graphics.drawLine(xi, 0, xi, Graphics.cameraHeight, 1, Graphics.GRID_STROKE);
         }
 
@@ -122,7 +113,7 @@ public class Main {
             firstY = -Math.abs(firstY) % (scaledGrid);
         }
 
-        for (float yi = (float) firstY; yi < Graphics.cameraHeight; yi += scaledGrid) {
+        for (float yi = (float) firstY; yi < Graphics.cameraHeight; yi += (float) scaledGrid) {
             Graphics.drawLine(0, yi, Graphics.cameraWidth, yi, 1, Graphics.GRID_STROKE);
         }
     }

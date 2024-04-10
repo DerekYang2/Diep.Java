@@ -23,7 +23,7 @@ public class Turret {
 
   // Recoil constants, single turret should not fire in less than 8 frames for now
   final int recoilTime = 16;
-  final float recoilFactor = 0.1f, retCoeff = 6.f/recoilTime;
+  final float recoilFactor = 0.1f;
   final float recoilForceFactor = 0.03f;
 
 

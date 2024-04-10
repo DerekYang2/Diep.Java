@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 import static com.raylib.java.core.input.Keyboard.*;
 
-public class TestTwin extends GameObject {
+public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
     Stopwatch stopwatch;
-    final float moveForceX = 0.3f;
-    final float moveForceY = 0.3f;
+    int movementSpeed = 1;  // Integer stat for upgrade
+    float baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, movementSpeed) / Math.pow(1.015, level - 1));
     float direction = 0;
     ShootManager shootManager;
     Turret[] turrets;
@@ -19,8 +19,8 @@ public class TestTwin extends GameObject {
     boolean canShoot = true;
     float shotDelayMs = 500;
 
-    public TestTwin() {
-        super(new Vector2(0, 0), 0.9f, 5.0f, 50);
+    public Tank() {
+        super(new Vector2(0, 0), (float)Math.pow(0.9, 25.f/120), 50);
         scale = (float)Math.pow(1.01, (level - 1));
         
         stopwatch = new Stopwatch();
@@ -48,13 +48,13 @@ public class TestTwin extends GameObject {
         shootManager = new ShootManager(new int[]{0, 1}, new int[]{reloadTime, reloadTime}, 1.0f);
 
         // Triplet
-        /*turrets = new Turret[]{
+        turrets = new Turret[]{
                 new Turret(42, 80, 26, 0, scale),
                 new Turret(42, 80, -26, 0, scale),
                 new Turret(42, 95, 0, 0, scale)
         };
         reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);*/
+        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);
 
         // Pentashot
         /*turrets = new Turret[]{
@@ -99,12 +99,12 @@ public class TestTwin extends GameObject {
 
 
         // Destroyer
-        turrets = new Turret[]{
+        /*turrets = new Turret[]{
                 new Turret(1.7f * 42, 95, 0, 0, scale)
         };
         //ceil((15 - reload stat points) * base reload);
         reloadTime = (int) ((Math.ceil((15 - 9)*4.f*120.f /25)));
-        shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);
+        shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);*/
     }
 
     @Override
@@ -113,17 +113,29 @@ public class TestTwin extends GameObject {
         // Get Direction of mouse
         direction = (float) Math.atan2(Graphics.getVirtualMouse().y - pos.y, Graphics.getVirtualMouse().x - pos.x);
 
+        float moveDirection = -1;
         if (Graphics.isKeyDown(KEY_S) ) {
-            addForce(new Vector2(0, moveForceY));
+            moveDirection = (float) (Math.PI * 0.5);
+        } else if (Graphics.isKeyDown(KEY_W)) {
+            moveDirection = (float) (Math.PI * 1.5);
+        } else if (Graphics.isKeyDown(KEY_A)) {
+            moveDirection = (float) Math.PI;
+        } else if (Graphics.isKeyDown(KEY_D)) {
+            moveDirection = 0;
         }
-        if (Graphics.isKeyDown(KEY_W)) {
-            addForce(new Vector2(0, -moveForceY));
+        // Two are held
+        if (Graphics.isKeyDown(KEY_W) && Graphics.isKeyDown(KEY_A)) {
+            moveDirection = (float) (Math.PI * 1.25);
+        } else if (Graphics.isKeyDown(KEY_W) && Graphics.isKeyDown(KEY_D)) {
+            moveDirection = (float) (Math.PI * 1.75);
+        } else if (Graphics.isKeyDown(KEY_S) && Graphics.isKeyDown(KEY_A)) {
+            moveDirection = (float) (Math.PI * 0.75);
+        } else if (Graphics.isKeyDown(KEY_S) && Graphics.isKeyDown(KEY_D)) {
+            moveDirection = (float) (Math.PI * 0.25);
         }
-        if (Graphics.isKeyDown(KEY_A)) {
-            addForce(new Vector2(-moveForceX, 0));
-        }
-        if (Graphics.isKeyDown(KEY_D)) {
-            addForce(new Vector2(moveForceX, 0));
+
+        if (moveDirection != -1) {
+            addForce(baseAcceleration, moveDirection);
         }
 
         if (Graphics.isLeftMouseDown()) {

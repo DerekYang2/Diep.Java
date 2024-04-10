@@ -3,7 +3,7 @@ public class Bullet implements Drawable, Updatable  {
   protected int id;
   protected float diameter;
   protected double direction, vt;
-  int lifeFrames = 60 * 3;
+  int lifeFrames = 120 * 3;
   float friction = 1 / 1.3f;
   float xAcceleration = 0.4f, yAcceleration = 0.4f;
  

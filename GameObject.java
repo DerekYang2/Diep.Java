@@ -4,21 +4,28 @@ import com.raylib.java.shapes.Rectangle;
 
 public class GameObject implements Updatable, Drawable {
     protected Vector2 pos, vel;
-    float friction = 0.90f;
-    float velMax;
+    float friction = 0.9f;
     protected int id;
     float scale = 1.0f;
     int radius;  // For collision detection and sometimes drawing (if circle)
 
     // Collision
-    float absorptionFactor, pushFactor;
-
-    public GameObject(Vector2 pos, float friction, float velMax, int radius) {
+    float absorptionFactor = 8, pushFactor = 1;  // Default
+    public GameObject(Vector2 pos, float friction, int radius) {
         this.pos = pos;
         this.vel = new Vector2(0, 0);
         this.friction = friction;
-        this.velMax = velMax;
         this.radius = radius;
+        createId();
+        addToPools();
+    }
+    public GameObject(Vector2 pos, float friction, int radius, float absorptionFactor, float pushFactor) {
+        this.pos = pos;
+        this.vel = new Vector2(0, 0);
+        this.friction = friction;
+        this.radius = radius;
+        this.absorptionFactor = absorptionFactor;
+        this.pushFactor = pushFactor;
         createId();
         addToPools();
     }
@@ -32,6 +39,12 @@ public class GameObject implements Updatable, Drawable {
     @Override
     public void update() {
         vel = Raymath.Vector2Scale(vel, friction);
+/*        float velSquared = vel.x * vel.x + vel.y * vel.y;
+        if (velSquared > velMax * velMax) {
+            // Normalize the vector
+            vel = Raymath.Vector2Scale(vel, 1.0f / (float)Math.sqrt(velSquared));
+            vel = Raymath.Vector2Scale(vel, velMax);
+        }*/
         pos = Raymath.Vector2Add(pos, vel);
 
         /**

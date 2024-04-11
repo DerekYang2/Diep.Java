@@ -14,12 +14,15 @@ import com.raylib.java.textures.Texture2D;
 import com.raylib.java.textures.rTextures;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 
 import static com.raylib.java.core.input.Mouse.MouseButton.*;
 
 public class Graphics extends Raylib {
     public static float strokeWidth = 7.5f;
-    public static int PERFORMANCE_MODE = 1;
+    public static int PERFORMANCE_MODE = 0;  // Defaults to false (high performance)
     final static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
@@ -44,12 +47,16 @@ public class Graphics extends Raylib {
             GREY_STROKE = Graphics.rgb(114, 114, 114),
             GREY = Graphics.rgb(153, 153, 153),
             GRID = Graphics.rgb(205, 205, 205),
-            GRID_STROKE = Graphics.rgba(0, 0, 0, 8);
+            GRID_STROKE = Graphics.rgba(0, 0, 0, 8),
+            BOUNDARY = Graphics.rgba(0, 0, 0, 25);
 
     public static Color getColor(String hexStr) {
         return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
     }
     public static void initialize(String title) {
+        // Get environment setup
+        setPerformanceMode();
+
         // Screen dimensions (actual monitor pixels)
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         screenWidth = (int) screenSize.getWidth();
@@ -96,6 +103,25 @@ public class Graphics extends Raylib {
         rlj.textures.GenTextureMipmaps(whiteRect);
         rTextures.UnloadImage(img);
         rTextures.SetTextureFilter(whiteRect, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_TRILINEAR);
+    }
+
+    public static void setPerformanceMode() {
+        try {
+            File file = new File(".env");
+
+            if (file.exists()) {  // If file exists, read from it
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                while (reader.ready()) {
+                    String line = reader.readLine();
+                    if (line.contains("PERFORMANCE_MODE")) {  // Read performance mode from file if it exists
+                        PERFORMANCE_MODE = Integer.parseInt(line.split("=")[1]);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void close() {

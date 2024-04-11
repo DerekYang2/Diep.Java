@@ -74,8 +74,8 @@ public class GameObject implements Updatable, Drawable {
     }
 
     public boolean checkCollision(GameObject other) {
-        float distanceCenter = Raymath.Vector2Distance(pos, other.pos);
-        return (distanceCenter < radius*scale + other.radius*other.scale);
+        float touchingDistance = radius*scale + other.radius*other.scale;
+        return ((pos.x - other.pos.x) * (pos.x - other.pos.x) + (pos.y - other.pos.y) * (pos.y - other.pos.y) < touchingDistance * touchingDistance);
     }
 
     public void receiveKnockback(GameObject other) {

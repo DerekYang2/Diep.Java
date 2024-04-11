@@ -21,3 +21,6 @@ gen/
 ### VSCODE ###
 .vscode/
 *.code-workspace
+
+### Environment ###
+.env

@@ -8,7 +8,7 @@ public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
     Stopwatch stopwatch;
-    int movementSpeed = 0;  // Integer stat for upgrade
+    int movementSpeed = 15;  // Integer stat for upgrade
     float baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, movementSpeed) / Math.pow(1.015, level - 1));
     float direction = 0;
     ShootManager shootManager;
@@ -157,6 +157,29 @@ public class Tank extends GameObject {
         // atan2 mouse angle
         for (Turret t : turrets) {
             t.update(pos.x, pos.y, direction);
+        }
+
+        // Keep tank in bounds
+        // Keep things within the arena
+        if (pos.x < 0) {
+            pos.x = 0;
+            // A bit of bounce right
+            vel.x = Math.abs(vel.x * absorptionFactor * 0.3f);
+        }
+        if (pos.x > Main.arenaWidth) {
+            pos.x = Main.arenaWidth;
+            // A bit of bounce left
+            vel.x = -Math.abs(vel.x * absorptionFactor * 0.3f);
+        }
+        if (pos.y < 0) {
+            pos.y = 0;
+            // A bit of bounce down
+            vel.y = Math.abs(vel.y * absorptionFactor * 0.3f);
+        }
+        if (pos.y > Main.arenaHeight) {
+            pos.y = Main.arenaHeight;
+            // A bit of bounce up
+            vel.y = -Math.abs(vel.y * absorptionFactor * 0.3f);
         }
     }
 

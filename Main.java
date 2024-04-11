@@ -5,6 +5,11 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 public class Main {
+    final public static float GRID_SIZE = 50;
+
+    public static float arenaWidth = GRID_SIZE * 50, arenaHeight = GRID_SIZE * 50;
+    public final static float ARENA_PADDING = GRID_SIZE * 4;
+
     public static long counter;
     public static Pool<Drawable> drawablePool;
     public static Pool<Updatable> updatablePool;
@@ -72,7 +77,6 @@ public class Main {
         CollisionManager.updateCollision();
     }
 
-    final private static float GRID_SIZE = 50;
     private static void drawCamera() {
         Rectangle cameraBounds = Graphics.getCameraBounds();
         Graphics.drawRectangleLines(cameraBounds, 3, Color.RED);
@@ -105,8 +109,35 @@ public class Main {
         }
     }
 
+    public static void drawBounds() {
+        // Get camera bounds as world coordinates
+        float xLeft = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).x;
+        float xRight = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(Graphics.cameraWidth, 0), Graphics.camera).x;
+        float yTop = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).y;
+        float yBottom = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, Graphics.cameraHeight), Graphics.camera).y;
+
+        // Draw left and right boundaries
+        Graphics.drawRectangle(xLeft, yTop, ARENA_PADDING-xLeft, yBottom-yTop, Graphics.BOUNDARY);  // Draw from left of the screen to ARENA_PADDING
+        Graphics.drawRectangle(arenaWidth - ARENA_PADDING, yTop, xRight - (arenaWidth - ARENA_PADDING), yBottom-yTop, Graphics.BOUNDARY);  // Draw from (arena - ARENA_PADDING) to right of the screen
+
+
+        // Draw top and bottom boundaries
+        float xLeft2 =  Math.max(xLeft, ARENA_PADDING);
+        float xRight2 = Math.min(xRight, arenaWidth - ARENA_PADDING);
+
+        int widthFix = ((int) (arenaWidth - ARENA_PADDING) != (int) (xLeft2) + (int)(xRight2-xLeft2))? 1 : 0; // Right side: integer cast issues, add 1 pixel to fix
+        int posFix = ((int) xLeft + (int)(ARENA_PADDING-xLeft) != (int) xLeft2) ? -1 : 0; // Left side: integer case issues, subtract 1 pixel to fix
+        if (posFix == -1) {  // If left position was changed, increase width so right position stays the same
+            widthFix++;
+        }
+
+        Graphics.drawRectangle((int)xLeft2 + posFix, yTop, (int)(xRight2-xLeft2) + widthFix, ARENA_PADDING - yTop, Graphics.BOUNDARY);
+        Graphics.drawRectangle((int)xLeft2 + posFix, arenaHeight - ARENA_PADDING, (int)(xRight2-xLeft2) + widthFix, yBottom - (arenaHeight - ARENA_PADDING), Graphics.BOUNDARY);
+    }
+
     //static float xt = 0;
     private static void draw() {
+        drawBounds();
         //Graphics.drawCircle(xt, 100, 10, Color.RED);
         //xt += 6 * GRID_SIZE/120;
         // Draw circle at mouse pos

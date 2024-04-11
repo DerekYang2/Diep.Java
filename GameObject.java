@@ -41,13 +41,18 @@ public class GameObject implements Updatable, Drawable {
     @Override
     public void update() {
         vel = Raymath.Vector2Scale(vel, friction);
-/*        float velSquared = vel.x * vel.x + vel.y * vel.y;
+
+        pos = Raymath.Vector2Add(pos, vel);
+
+        /*
+        // Max speed limiting
+        float velSquared = vel.x * vel.x + vel.y * vel.y;
         if (velSquared > velMax * velMax) {
             // Normalize the vector
             vel = Raymath.Vector2Scale(vel, 1.0f / (float)Math.sqrt(velSquared));
             vel = Raymath.Vector2Scale(vel, velMax);
-        }*/
-        pos = Raymath.Vector2Add(pos, vel);
+        }
+        */
 
         /**
          *         if (this.velocity.magnitude < 0.01) this.velocity.magnitude = 0;
@@ -56,8 +61,6 @@ public class GameObject implements Updatable, Drawable {
          *         this.positionData.x += this.velocity.x;
          *         this.positionData.y += this.velocity.y;
          */
-
-        // Keep things within the arena
     }
 
     public void addForce(Vector2 force) {

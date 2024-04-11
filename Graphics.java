@@ -48,7 +48,7 @@ public class Graphics extends Raylib {
             GREY = Graphics.rgb(153, 153, 153),
             GRID = Graphics.rgb(205, 205, 205),
             GRID_STROKE = Graphics.rgba(0, 0, 0, 8),
-            BOUNDARY = Graphics.rgba(0, 0, 0, 25);
+            BOUNDARY = Graphics.rgba(0, 0, 0, 20);
 
     public static Color getColor(String hexStr) {
         return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));

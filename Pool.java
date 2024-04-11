@@ -40,4 +40,8 @@ public class Pool <T extends Deletable> {
     public Collection<T> getObjects() {
         return objects.values();
     }
+
+    public T getObj(int id) {
+        return objects.get(id);
+    }
 }

@@ -45,23 +45,6 @@ public class Main {
         }
 
     }
-    //static float xt = 0;
-    private static void draw() {
-        //Graphics.drawCircle(xt, 100, 10, Color.RED);
-        //xt += 6 * GRID_SIZE/120;
-        // Draw circle at mouse pos
-        Graphics.drawRectangle(Graphics.getVirtualMouse().x, Graphics.getVirtualMouse().y, 5, 5, Color.WHITE);
-        // Draw fps
-        Graphics.drawFPS(10, 10, 20, Color.BLACK);
-
-        // Number of objects
-        Graphics.drawText("Number of objects: " + drawablePool.getObjects().size(), 10, 25, 20, Color.WHITE);
-
-        // Draw all the drawable objects
-        for (Drawable drawable : Main.drawablePool.getObjects()) {
-            drawable.draw();
-        }
-    }
 
     private static void update() {
         // Handle the pending operations
@@ -76,7 +59,7 @@ public class Main {
         }
 
         // Collide all the game objects
-        for (GameObject gameObject : Main.gameObjectPool.getObjects()) {
+/*        for (GameObject gameObject : Main.gameObjectPool.getObjects()) {
             for (GameObject other : Main.gameObjectPool.getObjects()) {
                 if (gameObject != other && gameObject.group != other.group) {
                     if (gameObject.checkCollision(other)) {
@@ -84,7 +67,9 @@ public class Main {
                     }
                 }
             }
-        }
+        }*/
+
+        CollisionManager.updateCollision();
     }
 
     final private static float GRID_SIZE = 50;
@@ -117,6 +102,24 @@ public class Main {
 
         for (float yi = (float) firstY; yi < Graphics.cameraHeight; yi += (float) scaledGrid) {
             Graphics.drawLine(0, yi, Graphics.cameraWidth, yi, 1, Graphics.GRID_STROKE);
+        }
+    }
+
+    //static float xt = 0;
+    private static void draw() {
+        //Graphics.drawCircle(xt, 100, 10, Color.RED);
+        //xt += 6 * GRID_SIZE/120;
+        // Draw circle at mouse pos
+        Graphics.drawRectangle(Graphics.getVirtualMouse().x, Graphics.getVirtualMouse().y, 5, 5, Color.WHITE);
+        // Draw fps
+        Graphics.drawFPS(10, 10, 20, Color.BLACK);
+
+        // Number of objects
+        Graphics.drawText("Number of objects: " + drawablePool.getObjects().size(), 10, 25, 20, Color.WHITE);
+
+        // Draw all the drawable objects
+        for (Drawable drawable : Main.drawablePool.getObjects()) {
+            drawable.draw();
         }
     }
 

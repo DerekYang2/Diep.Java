@@ -19,7 +19,7 @@ import static com.raylib.java.core.input.Mouse.MouseButton.*;
 
 public class Graphics extends Raylib {
     public static float strokeWidth = 7.5f;
-    public static int PERFORMANCE_MODE = 0;
+    public static int PERFORMANCE_MODE = 1;
     final static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;

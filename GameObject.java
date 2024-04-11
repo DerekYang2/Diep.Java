@@ -59,6 +59,7 @@ public class GameObject implements Updatable, Drawable {
 
         // Keep things within the arena
     }
+
     public void addForce(Vector2 force) {
         vel = Raymath.Vector2Add(vel, force);
     }
@@ -78,7 +79,7 @@ public class GameObject implements Updatable, Drawable {
     }
 
     public void receiveKnockback(GameObject other) {
-        float knockbackMagnitude = this.absorptionFactor * other.pushFactor * 0.04f;
+        float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.04f;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
         float knockbackAngle = (float) Math.atan2(diffY, diffX);
         addForce(knockbackMagnitude, knockbackAngle);

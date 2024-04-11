@@ -25,4 +25,12 @@ public class IdServer {
         }
         return leftCounter--;
     }
+
+    public int peekFrontId() {
+        return leftCounter;
+    }
+
+    public int peekBackId() {
+        return rightCounter;
+    }
 }

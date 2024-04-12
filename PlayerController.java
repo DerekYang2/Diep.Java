@@ -39,6 +39,7 @@ public class PlayerController implements Controller {
     @Override
     public float moveDirection() {
         // Push key to top of queue if pressed
+        // Issue when performance mode on, added to queue twice
         if (Graphics.isKeyPressed(KEY_W)) {
             keyQueue.add(KEY_W);
         }
@@ -51,6 +52,14 @@ public class PlayerController implements Controller {
         if (Graphics.isKeyPressed(KEY_D)) {
             keyQueue.add(KEY_D);
         }
+
+        // Remove any duplicates
+        if (keyQueue.size() > 1) {
+            if (keyQueue.getLast() == keyQueue.get(keyQueue.size() - 2)) {
+                keyQueue.removeLast();
+            }
+        }
+
         // Remove key from queue if released
         if (Graphics.isKeyReleased(KEY_W)) {
             keyQueue.remove((Integer) KEY_W);
@@ -63,6 +72,11 @@ public class PlayerController implements Controller {
         }
         if (Graphics.isKeyReleased(KEY_D)) {
             keyQueue.remove((Integer) KEY_D);
+        }
+
+        if (Main.counter % 120 == 0) {
+            // Output the key queue
+            System.out.println(keyQueue);
         }
 
         // Calculate move direction

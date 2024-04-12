@@ -46,7 +46,6 @@ public class BotController implements Controller {
 
     @Override
     public boolean fire() {
-
         if (Math.random() < 1) {
             shouldFire = true;
         }

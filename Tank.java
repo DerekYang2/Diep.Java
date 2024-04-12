@@ -7,10 +7,10 @@ import com.raylib.java.core.Color;
 public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
-    int movementSpeed = 0;  // Integer stat for upgrade
+    int movementSpeed = 5;  // Integer stat for upgrade
     int healthPoints = 0;  // Integer stat for upgrade
     int bulletDamage = 0;  // Integer stat for upgrade
-    int bulletPenetration = 0;  // Integer stat for upgrade
+    int bulletPenetration = 9;  // Integer stat for upgrade
     int bodyDamage = 0;  // Integer stat for upgrade
     float baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, movementSpeed) / Math.pow(1.015, level - 1));
     float direction = 0;
@@ -28,7 +28,7 @@ public class Tank extends GameObject {
     public Tank(Vector2 pos, Controller controller) {
         super(pos, 50);
         super.setMaxHealth(50 + (2 * (level - 1)) + (20 * healthPoints));
-        super.setDamage(20 + (4 * bodyDamage) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
+        super.setDamage((20 + (4 * bodyDamage)) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
         this.controller = controller;
         this.controller.setHost(this);
 
@@ -86,13 +86,12 @@ public class Tank extends GameObject {
         */
 
         // Single tank test
-        /*
+
         turrets = new Turret[]{
                 new Turret(42, 95, 0, 0, scale)
         };
         reloadTime = (int) (Math.ceil((15 - 9)*1) * 120 /25);
         shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);
-        */
 
 
 /*        // Fighter

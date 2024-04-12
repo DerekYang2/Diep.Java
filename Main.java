@@ -31,10 +31,10 @@ public class Main {
         gameObjectPool = new Pool<>();
         idServer = new IdServer();
         // Set arena size
-        arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(30 + 1/*number of players*/)) * GRID_SIZE * 2);
+        arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(1 + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();
         player = new Player(new Vector2(0,0));
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 1; i++)
             new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController());
         Graphics.setCameraTarget(player.pos);
         counter = 0;

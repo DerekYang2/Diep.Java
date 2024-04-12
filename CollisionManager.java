@@ -1,4 +1,3 @@
-import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 import java.util.ArrayList;
@@ -27,7 +26,10 @@ public class CollisionManager {
     public static void updateSectors() {
         collisionGroups.clear();
 
-        minX = Float.MAX_VALUE; maxX = Float.MIN_VALUE; minY = Float.MAX_VALUE; maxY = Float.MIN_VALUE;  // Initialize to extreme values
+        minX = Float.MAX_VALUE;
+        maxX = Float.MIN_VALUE;
+        minY = Float.MAX_VALUE;
+        maxY = Float.MIN_VALUE;  // Initialize to extreme values
         // Find the minimum and maximum x, y positions of all game objects
         for (GameObject object : Main.gameObjectPool.getObjects()) {
             Rectangle boundingBox = object.boundingBox();
@@ -60,28 +62,39 @@ public class CollisionManager {
         collidedPairs.clear();
         int minId = Main.idServer.peekFrontId();
         int idRange = Main.idServer.peekBackId() - minId + 1;  // Maximum value of id - minimum value of id
+        //HashSet<String> testPairs = new HashSet<>();
 
-        int collisions = 0;
         for (ArrayList<Integer> group : collisionGroups.values()) {
-            if (group.size() == 1) continue;
-            for (int id : group) {
-                for (int id2 : group) {
-                    if (id != id2) {
-                        GameObject obj1 = Main.gameObjectPool.getObj(id), obj2 = Main.gameObjectPool.getObj(id2);
+            if (group.size() <= 1) continue;
+            for (int i = 0; i < group.size(); i++) {
+                for (int j = i + 1; j < group.size(); j++) {
+                    int idSmall = group.get(i), idLarge = group.get(j);  // Get the two ids ordered
+                    if (idSmall != idLarge) {
+                        if (idSmall > idLarge) {  // Swap if idSmall > idLarge
+                            int temp = idSmall;
+                            idSmall = idLarge;
+                            idLarge = temp;
+                        }
+
+                        GameObject obj1 = Main.gameObjectPool.getObj(idSmall), obj2 = Main.gameObjectPool.getObj(idLarge);
                         if (obj1.group != obj2.group) {  // Collision only if groups are different
-                            collisions++;
                             int objHash = (obj1.id - minId) * idRange + (obj2.id - minId);  // Unique hash for a pair of ids
                             if (obj1.checkCollision(obj2) && !collidedPairs.contains(objHash)) {
                                 obj1.receiveKnockback(obj2);
+                                obj2.receiveKnockback(obj1);
+                                GameObject.receiveDamage(obj1, obj2);
                                 collidedPairs.add(objHash);
+
+                                /*
+                                String collideStr = obj1.id + " " + obj2.id;
+                                assert(!testPairs.contains(collideStr)); // Make sure no duplicate pairs
+                                testPairs.add(collideStr);
+                                */
                             }
                         }
                     }
                 }
             }
-        }
-        if (Main.counter % 120 == 0) {
-            System.out.println("Collisions: " + collisions);
         }
     }
 }

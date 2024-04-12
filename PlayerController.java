@@ -74,11 +74,6 @@ public class PlayerController implements Controller {
             keyQueue.remove((Integer) KEY_D);
         }
 
-        if (Main.counter % 120 == 0) {
-            // Output the key queue
-            System.out.println(keyQueue);
-        }
-
         // Calculate move direction
         float moveDirection = -1;
         if (isKeyDown(KEY_S) ) {

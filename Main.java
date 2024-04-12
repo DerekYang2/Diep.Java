@@ -7,7 +7,6 @@ import com.raylib.java.shapes.Rectangle;
 public class Main {
     final public static float GRID_SIZE = 50;
     static Rectangle cameraBox;
-
     public static float arenaWidth = GRID_SIZE * 100, arenaHeight = GRID_SIZE * 100;
     public final static float ARENA_PADDING = GRID_SIZE * 4;
 
@@ -31,16 +30,17 @@ public class Main {
         updatablePool = new Pool<>();
         gameObjectPool = new Pool<>();
         idServer = new IdServer();
+        // Set arena size
+        arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(30 + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();
         player = new Player(new Vector2(0,0));
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < 30; i++)
             new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController());
         Graphics.setCameraTarget(player.pos);
         counter = 0;
     }
 
     private static void updateCamera() {
-        counter++;
         Vector2 difference = Raymath.Vector2Subtract(player.pos, Graphics.getCameraTarget());
         Graphics.shiftCameraTarget(Raymath.Vector2Scale(difference, 0.055f));
         if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
@@ -52,12 +52,18 @@ public class Main {
 
     }
 
+    // TEMP: Debugging/analysis
+    static float percentage;
+    static Stopwatch stopwatch = new Stopwatch();
+
     private static void update() {
-        float xLeft = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).x;
-        float xRight = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(Graphics.cameraWidth, 0), Graphics.camera).x;
-        float yTop = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).y;
-        float yBottom = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, Graphics.cameraHeight), Graphics.camera).y;
-        cameraBox = new Rectangle(xLeft, yTop, xRight - xLeft, yBottom - yTop);
+        counter++;
+
+        if (Main.counter % 120 == 0) {
+            stopwatch.start();
+        }
+
+        cameraBox = Graphics.getCameraWorld();
 
         // Handle the pending operations
         Main.drawablePool.refresh();
@@ -81,7 +87,12 @@ public class Main {
             }
         }*/
 
+
         CollisionManager.updateCollision();
+
+        if (Main.counter % 120 == 0) {
+            percentage = 100 * (float) stopwatch.ms() / (1000.f/120);  // Time taken / max time allowed
+        }
     }
 
     private static void drawGrid() {
@@ -114,11 +125,7 @@ public class Main {
 
     public static void drawBounds() {
         // Get camera bounds as world coordinates
-        float xLeft = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).x;
-        float xRight = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(Graphics.cameraWidth, 0), Graphics.camera).x;
-        float yTop = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).y;
-        float yBottom = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, Graphics.cameraHeight), Graphics.camera).y;
-
+        float xLeft = cameraBox.x, xRight = cameraBox.x + cameraBox.width, yTop = cameraBox.y, yBottom = cameraBox.y + cameraBox.height;
         // Draw left and right boundaries
         Graphics.drawRectangle(xLeft, yTop, ARENA_PADDING-xLeft, yBottom-yTop, Graphics.BOUNDARY);  // Draw from left of the screen to ARENA_PADDING
         Graphics.drawRectangle(arenaWidth - ARENA_PADDING, yTop, xRight - (arenaWidth - ARENA_PADDING), yBottom-yTop, Graphics.BOUNDARY);  // Draw from (arena - ARENA_PADDING) to right of the screen
@@ -172,7 +179,8 @@ public class Main {
             Graphics.drawBackground(Graphics.GRID);
 
             Graphics.drawFPS(10, 10, 20, Color.BLACK);
-            Graphics.drawText("Number of objects: " + drawablePool.getObjects().size(), 10, 25, 20, Color.WHITE);
+            Graphics.drawText("Number of objects: " + drawablePool.getObjects().size(), 10, 25, 20, Color.BLACK);
+            Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
 
             drawGrid();
             Graphics.beginCameraMode();

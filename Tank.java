@@ -8,6 +8,10 @@ public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
     int movementSpeed = 0;  // Integer stat for upgrade
+    int healthPoints = 0;  // Integer stat for upgrade
+    int bulletDamage = 0;  // Integer stat for upgrade
+    int bulletPenetration = 0;  // Integer stat for upgrade
+    int bodyDamage = 0;  // Integer stat for upgrade
     float baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, movementSpeed) / Math.pow(1.015, level - 1));
     float direction = 0;
 
@@ -20,12 +24,17 @@ public class Tank extends GameObject {
     Color fillCol = Graphics.RED;
     Color strokeCol = Graphics.RED_STROKE;
 
+
     public Tank(Vector2 pos, Controller controller) {
         super(pos, 50);
+        super.setMaxHealth(50 + (2 * (level - 1)) + (20 * healthPoints));
+        super.setDamage(20 + (4 * bodyDamage) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
         this.controller = controller;
         this.controller.setHost(this);
 
         scale = (float)Math.pow(1.01, (level - 1));
+
+        // Set health
 
         int reloadTime;
         // Wait for the circle to be spawned before
@@ -106,7 +115,6 @@ public class Tank extends GameObject {
         shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);*/
 
         for (Turret t : turrets) {
-            t.setGroup(group);
             t.setHost(this);
         }
     }
@@ -157,11 +165,14 @@ public class Tank extends GameObject {
         if (controller.unload()) {
             unload();
         }
-
     }
 
     @Override
     public void draw() {
+        super.draw();
+        if (pos.x + (radius*2*scale) < Main.cameraBox.x || pos.x - (radius*2*scale) > Main.cameraBox.x + Main.cameraBox.width || pos.y + (radius*2*scale) < Main.cameraBox.y || pos.y - (radius*2*scale) > Main.cameraBox.y + Main.cameraBox.height) {
+            return;
+        }
         // Draw Turrets
         for (Turret t : turrets) {
             t.draw();
@@ -169,6 +180,7 @@ public class Tank extends GameObject {
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
         Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, fillCol, strokeCol);
+        drawHealthBar();  // TODO: all draw orders need to be redone
     }
 
     protected void setDirection(double radians) {

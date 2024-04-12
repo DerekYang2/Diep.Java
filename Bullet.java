@@ -5,13 +5,16 @@ public class Bullet extends GameObject {
     protected float acceleration = 0.2f;
     float direction;
     int lifeFrames = 120 * 3;
-
     Color fillCol;
     Color strokeCol;
 
     // The bullet trajectory will be determined based on the position where it spawns
-    public Bullet(float centerX, float centerY, float direction, float cannonLength, float diameter, Color fillCol, Color strokeCol) {
+    public Bullet(float centerX, float centerY, float direction, float cannonLength, float diameter, float damage, float maxHealth, Color fillCol, Color strokeCol) {
         super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), 1, 1.4f);
+
+        super.setDamage(damage);
+        super.setMaxHealth(maxHealth);
+
         this.fillCol = fillCol;
         this.strokeCol = strokeCol;
         radius = diameter * 0.5f;
@@ -32,7 +35,8 @@ public class Bullet extends GameObject {
 
     @Override
     public void draw() {
-        if (pos.x < Main.cameraBox.x || pos.x > Main.cameraBox.x + Main.cameraBox.width || pos.y < Main.cameraBox.y || pos.y > Main.cameraBox.y + Main.cameraBox.height) {
+        super.draw();
+        if (pos.x + radius < Main.cameraBox.x || pos.x - radius > Main.cameraBox.x + Main.cameraBox.width || pos.y + radius < Main.cameraBox.y || pos.y - radius > Main.cameraBox.y + Main.cameraBox.height) {
             return;
         }
         Graphics.drawCircle((int) pos.x, (int) pos.y, radius, Graphics.strokeWidth, fillCol, strokeCol);

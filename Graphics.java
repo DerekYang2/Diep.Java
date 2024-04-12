@@ -61,7 +61,7 @@ public class Graphics extends Raylib {
         // Screen dimensions (actual monitor pixels)
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         screenWidth = (int) screenSize.getWidth();
-        screenHeight = (int) screenSize.getHeight()/* - TASKBAR_HEIGHT - TITLEBAR_HEIGHT*/;
+        screenHeight = (int) screenSize.getHeight() - TASKBAR_HEIGHT - TITLEBAR_HEIGHT;
 
         // Raylib window
         rlj = new Raylib();
@@ -218,6 +218,15 @@ public class Graphics extends Raylib {
      */
     public static void setZoom(float fieldFactor, int level) {
         camera.setZoom((float) ((.55f * fieldFactor) / Math.pow(1.01, (level - 1) *0.5f)));
+    }
+
+    // Get the camera bounds
+    public static Rectangle getCameraWorld() {
+        float xLeft = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).x;
+        float xRight = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(Graphics.cameraWidth, 0), Graphics.camera).x;
+        float yTop = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).y;
+        float yBottom = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, Graphics.cameraHeight), Graphics.camera).y;
+        return new Rectangle(xLeft, yTop, xRight - xLeft, yBottom - yTop);
     }
 
     // IO --------------------------------------------------------------------------------------------

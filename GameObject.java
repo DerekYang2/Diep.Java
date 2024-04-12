@@ -1,3 +1,4 @@
+import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
@@ -10,6 +11,11 @@ public class GameObject implements Updatable, Drawable {
     protected int id;
     float scale = 1.0f;
     float radius;  // For collision detection and sometimes drawing (if circle)
+
+    // Health
+    float maxHealth = 0, health = 0;
+    float damage = 0;
+    boolean isDead = false;
 
     // Collision
     float absorptionFactor = 1, pushFactor = 8;  // Default
@@ -32,14 +38,39 @@ public class GameObject implements Updatable, Drawable {
         group = id;
     }
 
+    public void setMaxHealth(float maxHealth) {
+        this.maxHealth = maxHealth;
+        this.health = maxHealth;
+    }
+
+    public void setDamage(float damage) {
+        this.damage = damage;
+    }
+
     @Override
     public void draw() {
-        // Default draw
-        Graphics.drawCircle(pos.x, pos.y, radius*scale, Graphics.RED);
+
+    }
+
+    public void drawHealthBar() {
+        // Draw health bar
+        if (health < maxHealth) {
+            float healthBarWidth = radius*scale * 2;
+            float healthBarHeight = 10;
+            float healthBarX = pos.x - healthBarWidth / 2;
+            float healthBarY = pos.y - radius*scale - 1.5f * healthBarHeight;
+            float healthBarFill = health / maxHealth;
+            Graphics.drawRectangle((int) healthBarX, (int) healthBarY, (int) healthBarWidth, (int) healthBarHeight, Color.BLACK);
+            Graphics.drawRectangle((int) healthBarX + 1, (int) healthBarY+1, (int) (healthBarWidth * healthBarFill) - 2, (int) healthBarHeight - 2, Color.GREEN);
+        }
     }
 
     @Override
     public void update() {
+        if (health <= 0) {
+            delete();  // TODO: delete animation
+        }
+
         vel = Raymath.Vector2Scale(vel, friction);
 
         pos = Raymath.Vector2Add(pos, vel);
@@ -88,6 +119,31 @@ public class GameObject implements Updatable, Drawable {
         addForce(knockbackMagnitude, knockbackAngle);
     }
 
+    public static void receiveDamage(GameObject a, GameObject b) {
+        if (a.isDead || b.isDead) {
+            return;
+        }
+        if (a.damage > b.health) {  // Overkill
+            float scaleDown = b.health / a.damage;  // Scale down damage so that b just dies
+            b.health -= scaleDown * a.damage;
+            a.health -= scaleDown * b.damage;
+        } else if (b.damage > a.health) {
+            float scaleDown = a.health / b.damage;  // Scale down damage so that a just dies
+            a.health -= scaleDown * b.damage;
+            b.health -= scaleDown * a.damage;
+        } else {
+            a.health -= b.damage;
+            b.health -= a.damage;
+        }
+        // Update if dead
+        if (a.health <= 0) {
+            a.delete();
+        }
+        if (b.health <= 0) {
+            b.delete();
+        }
+    }
+
     @Override
     public void createId() {
         this.id = Main.idServer.getId();
@@ -107,6 +163,7 @@ public class GameObject implements Updatable, Drawable {
 
     @Override
     public void delete() {
+        isDead = true;
         // All added to wait lists
         Main.drawablePool.deleteObj(this.getId());
         Main.updatablePool.deleteObj(this.getId());

@@ -4,7 +4,6 @@ import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.textures.Texture2D;
 
 public class Turret {
-  int group;
   double x, y;
   double xOriginal, yOriginal;
   double xAbsolute, yAbsolute;
@@ -27,7 +26,6 @@ public class Turret {
   final float recoilFactor = 0.1f;
   final float recoilForceFactor = 0.03f;
   Tank host;  // For color and other things that may appear in the future
-
 
   Turret(float width, float length, float offset, double radians, float scale) {  // renamed parameters
     this.scale = scale;
@@ -55,10 +53,6 @@ public class Turret {
     public void setHost(Tank host) {
         this.host = host;
     }
-
-  public void setGroup(int group) {
-    this.group = group;
-  }
 
   public void draw() {
     drawRect((int) (x + xAbsolute), (int) (y + yAbsolute), (int) (turretLength * scale), (int) (turretWidth * scale), rotatedAngle + thetaOriginal);
@@ -127,9 +121,14 @@ public class Turret {
    */
   public Vector2 shoot() {
     recoilFrames = recoilTime;  // Set to max recoil time
-    // Spawn at the end of the turret FIX THIS
-    Bullet b = new Bullet((float) (x + xAbsolute), (float) (y + yAbsolute), (float) (rotatedAngle + thetaOriginal), (turretLength * scale), (turretWidth * scale), host.fillCol, host.strokeCol);  // swapped width with length
-    b.group = group;
+    // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
+    final float mDamage = 1.0f;  // TODO: this multiplier is actually a stat in tank.json (usually 1, destroyer is 3, etc)
+    float damage = (7 + (3 * host.bulletDamage)) * mDamage * (25.f/125);  // Scale down because of different fps
+    float mHealth = 1.0f;  // TODO: this multiplier is actually a stat in tank.json (usually 1, destroyer is 2, etc)
+    final float health = (8 + (6 * host.bulletPenetration)) * mHealth;
+
+    Bullet b = new Bullet((float) (x + xAbsolute), (float) (y + yAbsolute), (float) (rotatedAngle + thetaOriginal), (turretLength * scale), (turretWidth * scale), damage, health, host.fillCol, host.strokeCol);  // swapped width with length
+    b.group = host.group;
     // Return recoil direction
 /*    Vector2 recoilDirection = new Vector2((float) (-Math.cos(rotatedAngle + thetaOriginal)), (float) (-Math.sin(rotatedAngle + thetaOriginal)));
     return Raymath.Vector2Scale(recoilDirection, recoilForceFunction(turretWidth));  // Scale the recoil direction*/

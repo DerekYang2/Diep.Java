@@ -61,6 +61,7 @@ public class CollisionManager {
         int minId = Main.idServer.peekFrontId();
         int idRange = Main.idServer.peekBackId() - minId + 1;  // Maximum value of id - minimum value of id
 
+        int collisions = 0;
         for (ArrayList<Integer> group : collisionGroups.values()) {
             if (group.size() == 1) continue;
             for (int id : group) {
@@ -68,6 +69,7 @@ public class CollisionManager {
                     if (id != id2) {
                         GameObject obj1 = Main.gameObjectPool.getObj(id), obj2 = Main.gameObjectPool.getObj(id2);
                         if (obj1.group != obj2.group) {  // Collision only if groups are different
+                            collisions++;
                             int objHash = (obj1.id - minId) * idRange + (obj2.id - minId);  // Unique hash for a pair of ids
                             if (obj1.checkCollision(obj2) && !collidedPairs.contains(objHash)) {
                                 obj1.receiveKnockback(obj2);
@@ -77,6 +79,9 @@ public class CollisionManager {
                     }
                 }
             }
+        }
+        if (Main.counter % 120 == 0) {
+            System.out.println("Collisions: " + collisions);
         }
     }
 }

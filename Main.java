@@ -6,8 +6,9 @@ import com.raylib.java.shapes.Rectangle;
 
 public class Main {
     final public static float GRID_SIZE = 50;
+    static Rectangle cameraBox;
 
-    public static float arenaWidth = GRID_SIZE * 50, arenaHeight = GRID_SIZE * 50;
+    public static float arenaWidth = GRID_SIZE * 100, arenaHeight = GRID_SIZE * 100;
     public final static float ARENA_PADDING = GRID_SIZE * 4;
 
     public static long counter;
@@ -32,8 +33,8 @@ public class Main {
         idServer = new IdServer();
         // new TestObj();
         player = new Player(new Vector2(0,0));
-        for (int i = 0; i < 20; i++)
-            new GameObject(new Vector2((float) (Math.random() * 300), (float) (Math.random() * 300)), 50);
+        for (int i = 0; i < 2; i++)
+            new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController());
         Graphics.setCameraTarget(player.pos);
         counter = 0;
     }
@@ -52,6 +53,12 @@ public class Main {
     }
 
     private static void update() {
+        float xLeft = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).x;
+        float xRight = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(Graphics.cameraWidth, 0), Graphics.camera).x;
+        float yTop = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).y;
+        float yBottom = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, Graphics.cameraHeight), Graphics.camera).y;
+        cameraBox = new Rectangle(xLeft, yTop, xRight - xLeft, yBottom - yTop);
+
         // Handle the pending operations
         Main.drawablePool.refresh();
         Main.updatablePool.refresh();
@@ -77,10 +84,6 @@ public class Main {
         CollisionManager.updateCollision();
     }
 
-    private static void drawCamera() {
-        Rectangle cameraBounds = Graphics.getCameraBounds();
-        Graphics.drawRectangleLines(cameraBounds, 3, Color.RED);
-    }
     private static void drawGrid() {
         float zoom = Graphics.getCameraZoom();
         double scaledGrid = GRID_SIZE * zoom;
@@ -142,11 +145,6 @@ public class Main {
         //xt += 6 * GRID_SIZE/120;
         // Draw circle at mouse pos
         Graphics.drawRectangle(Graphics.getVirtualMouse().x, Graphics.getVirtualMouse().y, 5, 5, Color.WHITE);
-        // Draw fps
-        Graphics.drawFPS(10, 10, 20, Color.BLACK);
-
-        // Number of objects
-        Graphics.drawText("Number of objects: " + drawablePool.getObjects().size(), 10, 25, 20, Color.WHITE);
 
         // Draw all the drawable objects
         for (Drawable drawable : Main.drawablePool.getObjects()) {
@@ -172,9 +170,12 @@ public class Main {
             //----------------------------------------------------------------------------------
             Graphics.beginDrawMode();
             Graphics.drawBackground(Graphics.GRID);
+
+            Graphics.drawFPS(10, 10, 20, Color.BLACK);
+            Graphics.drawText("Number of objects: " + drawablePool.getObjects().size(), 10, 25, 20, Color.WHITE);
+
             drawGrid();
             Graphics.beginCameraMode();
-            drawCamera();
             draw();  // Main draw function
             Graphics.endCameraMode();
             Graphics.endDrawMode();

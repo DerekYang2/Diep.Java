@@ -107,6 +107,7 @@ public class Tank extends GameObject {
 
         for (Turret t : turrets) {
             t.setGroup(group);
+            t.setHost(this);
         }
     }
     

@@ -26,6 +26,7 @@ public class Turret {
   final int recoilTime = 16;
   final float recoilFactor = 0.1f;
   final float recoilForceFactor = 0.03f;
+  Tank host;  // For color and other things that may appear in the future
 
 
   Turret(float width, float length, float offset, double radians, float scale) {  // renamed parameters
@@ -50,6 +51,10 @@ public class Turret {
     System.out.println("Aspect Ratio: " + aspectRatio);
     srcRect = new Rectangle(testRect.width - testRect.height * aspectRatio, 0, testRect.height * aspectRatio, testRect.height);*/
   }
+
+    public void setHost(Tank host) {
+        this.host = host;
+    }
 
   public void setGroup(int group) {
     this.group = group;
@@ -123,7 +128,7 @@ public class Turret {
   public Vector2 shoot() {
     recoilFrames = recoilTime;  // Set to max recoil time
     // Spawn at the end of the turret FIX THIS
-    Bullet b = new Bullet((float) (x + xAbsolute), (float) (y + yAbsolute), (float) (rotatedAngle + thetaOriginal), (turretLength * scale), (turretWidth * scale));  // swapped width with length
+    Bullet b = new Bullet((float) (x + xAbsolute), (float) (y + yAbsolute), (float) (rotatedAngle + thetaOriginal), (turretLength * scale), (turretWidth * scale), host.fillCol, host.strokeCol);  // swapped width with length
     b.group = group;
     // Return recoil direction
 /*    Vector2 recoilDirection = new Vector2((float) (-Math.cos(rotatedAngle + thetaOriginal)), (float) (-Math.sin(rotatedAngle + thetaOriginal)));

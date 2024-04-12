@@ -23,7 +23,7 @@ import static com.raylib.java.core.input.Mouse.MouseButton.*;
 public class Graphics extends Raylib {
     public static float strokeWidth = 7.5f;
     public static int PERFORMANCE_MODE = 0;  // Defaults to false (high performance)
-    final static int FPS = 60 * (2 - PERFORMANCE_MODE);
+    public static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
     final public static int cameraHeight = (1080 /*- TASKBAR_HEIGHT - TITLEBAR_HEIGHT*/);
@@ -56,6 +56,7 @@ public class Graphics extends Raylib {
     public static void initialize(String title) {
         // Get environment setup
         setPerformanceMode();
+        FPS = 60 * (2 - PERFORMANCE_MODE);
 
         // Screen dimensions (actual monitor pixels)
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -113,8 +114,11 @@ public class Graphics extends Raylib {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 while (reader.ready()) {
                     String line = reader.readLine();
+                    System.out.println(
+                            line
+                    );
                     if (line.contains("PERFORMANCE_MODE")) {  // Read performance mode from file if it exists
-                        PERFORMANCE_MODE = Integer.parseInt(line.split("=")[1]);
+                        PERFORMANCE_MODE = Integer.parseInt(line.split("=")[1].trim());
                         break;
                     }
                 }

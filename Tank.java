@@ -2,31 +2,30 @@ import com.raylib.java.raymath.Vector2;
 
 import java.util.ArrayList;
 
-import static com.raylib.java.core.input.Keyboard.*;
+import com.raylib.java.core.Color;
 
 public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
-    Stopwatch stopwatch;
-    int movementSpeed = 15;  // Integer stat for upgrade
+    int movementSpeed = 0;  // Integer stat for upgrade
     float baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, movementSpeed) / Math.pow(1.015, level - 1));
     float direction = 0;
-    ShootManager shootManager;
+
+    // Objects that control the tank
     Turret[] turrets;
+    ShootManager shootManager;
+    Controller controller;
 
-    // Delaying shot frequency
-    float shootStart = 0.f;
-    boolean canShoot = true;
-    float shotDelayMs = 500;
+    // Colors
+    Color fillCol = Graphics.RED;
+    Color strokeCol = Graphics.RED_STROKE;
 
-    public Tank() {
-        super(new Vector2(0, 0), 50);
+    public Tank(Vector2 pos, Controller controller) {
+        super(pos, 50);
+        this.controller = controller;
+        this.controller.setHost(this);
+
         scale = (float)Math.pow(1.01, (level - 1));
-        
-        stopwatch = new Stopwatch();
-        stopwatch.start();
-
-        Graphics.setZoom(1.0f, level);
 
         int reloadTime;
         // Wait for the circle to be spawned before
@@ -110,57 +109,20 @@ public class Tank extends GameObject {
             t.setGroup(group);
         }
     }
-
+    
     @Override
     public void update() {
         super.update();
-        // Get Direction of mouse
-        direction = (float) Math.atan2(Graphics.getVirtualMouse().y - pos.y, Graphics.getVirtualMouse().x - pos.x);
+        // Update the direction barrel is facing
+        setDirection(controller.barrelDirection());
 
-        float moveDirection = -1;
-        if (Graphics.isKeyDown(KEY_S) ) {
-            moveDirection = (float) (Math.PI * 0.5);
-        } else if (Graphics.isKeyDown(KEY_W)) {
-            moveDirection = (float) (Math.PI * 1.5);
-        } else if (Graphics.isKeyDown(KEY_A)) {
-            moveDirection = (float) Math.PI;
-        } else if (Graphics.isKeyDown(KEY_D)) {
-            moveDirection = 0;
-        }
-        // Two are held
-        if (Graphics.isKeyDown(KEY_W) && Graphics.isKeyDown(KEY_A)) {
-            moveDirection = (float) (Math.PI * 1.25);
-        } else if (Graphics.isKeyDown(KEY_W) && Graphics.isKeyDown(KEY_D)) {
-            moveDirection = (float) (Math.PI * 1.75);
-        } else if (Graphics.isKeyDown(KEY_S) && Graphics.isKeyDown(KEY_A)) {
-            moveDirection = (float) (Math.PI * 0.75);
-        } else if (Graphics.isKeyDown(KEY_S) && Graphics.isKeyDown(KEY_D)) {
-            moveDirection = (float) (Math.PI * 0.25);
-        }
-
-        if (moveDirection != -1) {
+        // Update input movement
+        float moveDirection = controller.moveDirection();
+        if (moveDirection != -1) {  // If valid direction
             addForce(baseAcceleration, moveDirection);
         }
 
-        if (Graphics.isLeftMouseDown()) {
-            ArrayList<Integer> fireIndices = shootManager.getFireIndices();
-            if (fireIndices != null) {
-                for (int i : fireIndices) {
-                    addForce(turrets[i].shoot());
-                }
-            }
-        }
-        if (Graphics.isLeftMouseReleased()) {
-            shootManager.reset();
-        }
-
-        // atan2 mouse angle
-        for (Turret t : turrets) {
-            t.update(pos.x, pos.y, direction);
-        }
-
-        // Keep tank in bounds
-        // Keep things within the arena
+        // Keep tank within the arena
         if (pos.x < 0) {
             pos.x = 0;
             // A bit of bounce right
@@ -181,6 +143,20 @@ public class Tank extends GameObject {
             // A bit of bounce up
             vel.y = -Math.abs(vel.y * absorptionFactor * 0.3f);
         }
+
+        // Update all turrets
+        for (Turret t : turrets) {
+            t.update(pos.x, pos.y, direction);
+        }
+
+        // Fire
+        if (controller.fire()) {
+            fire();
+        }
+        if (controller.unload()) {
+            unload();
+        }
+
     }
 
     @Override
@@ -191,6 +167,28 @@ public class Tank extends GameObject {
         }
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
-        Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, Graphics.BLUE, Graphics.BLUE_STROKE);
+        Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, fillCol, strokeCol);
+    }
+
+    protected void setDirection(double radians) {
+        direction = (float) radians;
+    }
+
+    protected void setColor(Color fillCol, Color strokeCol) {
+        this.fillCol = fillCol;
+        this.strokeCol = strokeCol;
+    }
+
+    protected void fire() {
+        ArrayList<Integer> fireIndices = shootManager.getFireIndices();
+        if (fireIndices != null) {
+            for (int i : fireIndices) {
+                addForce(turrets[i].shoot());
+            }
+        }
+    }
+
+    protected void unload() {
+        shootManager.reset();
     }
 }

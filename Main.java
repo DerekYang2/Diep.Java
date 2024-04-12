@@ -31,7 +31,7 @@ public class Main {
         gameObjectPool = new Pool<>();
         idServer = new IdServer();
         // new TestObj();
-        player = new Tank();
+        player = new Player(new Vector2(0,0));
         for (int i = 0; i < 20; i++)
             new GameObject(new Vector2((float) (Math.random() * 300), (float) (Math.random() * 300)), 50);
         Graphics.setCameraTarget(player.pos);

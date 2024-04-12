@@ -10,7 +10,7 @@ import java.util.HashSet;
  * Spatial hashing is used to reduce the number of collision checks
  */
 public class CollisionManager {
-    final public static float sectorSize = 125;
+    final public static float sectorSize = 150;
     private static int sectorsX;
     private static float minX, minY, maxX, maxY;
     private static HashMap<Integer, ArrayList<Integer>> collisionGroups = new HashMap<>();

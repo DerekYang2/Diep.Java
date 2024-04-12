@@ -225,6 +225,10 @@ public class Graphics extends Raylib {
         return rCore.IsKeyDown(key);
     }
 
+    public static boolean isKeyReleased(int key) {
+        return rlj.core.IsKeyReleased(key);
+    }
+
     public static boolean isLeftMousePressed() {
         return rlj.core.IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
     }

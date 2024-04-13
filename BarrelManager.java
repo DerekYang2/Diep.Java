@@ -3,12 +3,14 @@ import java.util.ArrayList;
 public class BarrelManager
 {
     Barrel[] barrels;
+    BulletStats[] bulletStats;
     FireManager fireManager;
     Tank host;
 
-    public BarrelManager(Barrel[] barrels, FireManager fireManager) {
+    public BarrelManager(Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats) {
         this.barrels = barrels;
         this.fireManager = fireManager;
+        this.bulletStats = bulletStats;
     }
 
     public void setHost(Tank host) {
@@ -38,7 +40,7 @@ public class BarrelManager
     public void fire() {
         ArrayList<Integer> fireIndices = fireManager.getFireIndices();
         for (int i : fireIndices) {
-            host.addForce(barrels[i].shoot());
+            host.addForce(barrels[i].shoot(bulletStats[i]));
         }
     }
 }

@@ -9,6 +9,18 @@ public class Stats {
         }
     }
 
+    public Stats(int movementSpeed, int reload, int bulletDamage, int bulletPenetration, int bulletSpeed, int bodyDamage, int maxHealth, int healthRegen) {
+        stats = new int[8];
+        stats[MOVEMENT_SPEED] = movementSpeed;
+        stats[RELOAD] = reload;
+        stats[BULLET_DAMAGE] = bulletDamage;
+        stats[BULLET_PENETRATION] = bulletPenetration;
+        stats[BULLET_SPEED] = bulletSpeed;
+        stats[BODY_DAMAGE] = bodyDamage;
+        stats[MAX_HEALTH] = maxHealth;
+        stats[HEALTH_REGEN] = healthRegen;
+    }
+
     public void setStat(int stat, int value) {
         stats[stat] = value;
     }

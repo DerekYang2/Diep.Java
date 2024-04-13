@@ -1,24 +1,36 @@
 import com.raylib.java.core.Color;
+import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 
 public class Bullet extends GameObject {
-    protected float acceleration = 0.2f;
+    protected float acceleration;
     float direction;
     int lifeFrames = 120 * 3;
     Color fillCol;
     Color strokeCol;
 
     // The bullet trajectory will be determined based on the position where it spawns
-    public Bullet(float centerX, float centerY, float direction, float cannonLength, float diameter, float damage, float maxHealth, Color fillCol, Color strokeCol) {
-        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), 1, 1.4f);
+    public Bullet(Tank host, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
+        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
 
+        this.group = host.group;  // Set group to host group (TODO: make a collision and damage group)
+
+        // Calculate bullet stats
+        // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
+        final float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage * (25.f / 120);  // Scale down because of different fps
+        final float maxHealth = (8 + (6 * host.stats.getStat(Stats.BULLET_PENETRATION))) * bulletStats.health;
+        final float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed;  // Initial speed of 500 units per second (at 25 fps) or 20 u/tick
         super.setDamage(damage);
         super.setMaxHealth(maxHealth);
 
+        // Drawing variables
         this.fillCol = fillCol;
         this.strokeCol = strokeCol;
-        radius = diameter * 0.5f;
-        float initialSpeed = (float) ((1.0/(1-friction)) * acceleration) + 30 * (25.f/120);
+        radius = diameter * 0.5f * bulletStats.sizeRatio;  // Multiply radius by bullet stats size ratio
+
+        // Calculate acceleration to converge to max speed (https://www.desmos.com/calculator/9hakym7jxy)
+        this.acceleration = (float) ((velMax * 25./120) * (1-this.friction));
+        float initialSpeed = (float) ((velMax+30) * 25./120);
         vel = new Vector2(initialSpeed * (float) Math.cos(direction), initialSpeed * (float) Math.sin(direction));
         this.direction = direction;
     }

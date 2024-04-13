@@ -19,7 +19,7 @@ public class Barrel {
     public Rectangle srcRect;
 
     // Recoil constants, single turret should not fire in less than 8 frames for now
-    final int recoilTime = 16;
+    final int recoilTime = 25;
     final float recoilFactor = 0.1f;
     final float recoilForceFactor = 0.03f;
     Tank host;  // For color and other things that may appear in the future
@@ -115,16 +115,10 @@ public class Barrel {
      *
      * @return
      */
-    public Vector2 shoot() {
+    public Vector2 shoot(BulletStats bulletStats) {
         recoilFrames = recoilTime;  // Set to max recoil time
-        // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
-        final float mDamage = 1.0f;  // TODO: this multiplier is actually a stat in tank.json (usually 1, destroyer is 3, etc)
-        float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * mDamage * (25.f / 125);  // Scale down because of different fps
-        float mHealth = 1.0f;  // TODO: this multiplier is actually a stat in tank.json (usually 1, destroyer is 2, etc)
-        final float health = (8 + (6 * host.stats.getStat(Stats.BULLET_PENETRATION))) * mHealth;
-
-        Bullet b = new Bullet((float) (x + xAbsolute), (float) (y + yAbsolute), (float) (rotatedAngle + thetaOriginal), (turretLength * host.scale), (turretWidth * host.scale), damage, health, host.fillCol, host.strokeCol);  // swapped width with length
-        b.group = host.group;
+        System.out.println(Main.counter);
+        Bullet b = new Bullet(host, (float) (x + xAbsolute), (float) (y + yAbsolute), (float) (rotatedAngle + thetaOriginal), (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
         // Return recoil direction
 /*    Vector2 recoilDirection = new Vector2((float) (-Math.cos(rotatedAngle + thetaOriginal)), (float) (-Math.sin(rotatedAngle + thetaOriginal)));
     return Raymath.Vector2Scale(recoilDirection, recoilForceFunction(turretWidth));  // Scale the recoil direction*/

@@ -20,13 +20,17 @@ public class Tank extends GameObject {
     Color strokeCol = Graphics.RED_STROKE;
 
 
-    public Tank(Vector2 pos, Controller controller) {
+    public Tank(Vector2 pos, Controller controller, Stats stats) {
         super(pos, 50);
-        this.stats = new Stats();
+        this.stats = stats;
 
         super.setMaxHealth(50 + (2 * (level - 1)) + (20 * stats.getStat(Stats.MAX_HEALTH)));
-        super.setDamage((20 + (4 * stats.getStat(Stats.BODY_DAMAGE))) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
-        baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, stats.getStat(Stats.MOVEMENT_SPEED)) / Math.pow(1.015, level - 1));
+        super.setDamage((20 + (6 * stats.getStat(Stats.BODY_DAMAGE))) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
+        // Spike tank is * 1.5
+        // https://www.desmos.com/calculator/qre98xzg76
+        float A0 = (float)(2.55 * Math.pow(1.07, stats.getStat(Stats.MOVEMENT_SPEED)) / Math.pow(1.015, level - 1));
+        float convergeSpeed = (10 * A0) * (25.f/120);  // 10A0 is max speed, 25/120 is scaling factor for 25->120 fps
+        this.baseAcceleration = convergeSpeed * (1 - friction);  // a = Converge * (1-r)
 
         this.controller = controller;
         this.controller.setHost(this);

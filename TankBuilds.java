@@ -5,7 +5,9 @@ public class TankBuilds {
                 new Barrel(42, 95, 0, 0)
         };
         FireManager fireManager = new FireManager(new double[][]{{0, 1}});
-        return new BarrelManager(barrels, fireManager);
+        return new BarrelManager(barrels, fireManager, new BulletStats[]{
+                new BulletStats(1, 1, 1,1 , 1, 1, 1)
+        });
     }
 
     // Triplet
@@ -16,7 +18,12 @@ public class TankBuilds {
                 new Barrel(42, 95, 0, 0)
         };
         FireManager fireManager = new FireManager(new double[][]{{0.5, 1}, {0.5, 1}, {0, 1}});
-        return new BarrelManager(barrels, fireManager);
+        return new BarrelManager(barrels, fireManager,
+                new BulletStats[]{
+                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1),
+                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1),
+                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1)
+                });
     }
 
     // Pentashot
@@ -29,7 +36,14 @@ public class TankBuilds {
                 new Barrel(42, 110, 0, 0)
         };
         FireManager fireManager = new FireManager(new double[][]{{2.0/3, 1}, {2.0/3, 1}, {1.0/3, 1}, {1.0/3, 1}, {0, 1}});
-        return new BarrelManager(barrels, fireManager);
+        return new BarrelManager(barrels, fireManager,
+                new BulletStats[]{
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1)
+                });
     }
 
     // Predator
@@ -40,7 +54,12 @@ public class TankBuilds {
                 new Barrel(71.4f, 80, 0, 0)
         };
         FireManager fireManager = new FireManager(new double[][]{{0, 3}, {0.2, 3}, {0.4, 3}});
-        return new BarrelManager(barrels, fireManager);
+        return new BarrelManager(barrels, fireManager,
+                new BulletStats[]{
+                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1),
+                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1),
+                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1)
+                });
     }
 }
 

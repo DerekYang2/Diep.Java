@@ -21,7 +21,7 @@ import java.io.FileReader;
 import static com.raylib.java.core.input.Mouse.MouseButton.*;
 
 public class Graphics extends Raylib {
-    public static float strokeWidth = 7.5f;
+    public static float strokeWidth = 7f;
     public static int PERFORMANCE_MODE = 0;  // Defaults to false (high performance)
     public static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
@@ -37,7 +37,7 @@ public class Graphics extends Raylib {
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
-    public static Texture2D whiteCirc, whiteRect, whiteCircNoAA;
+    public static Texture2D whiteCirc, whiteRect, whiteCircNoAA, whiteRectRounder;
 
     // Colors
     public static Color RED = Graphics.rgb(241, 78, 84),
@@ -48,11 +48,13 @@ public class Graphics extends Raylib {
             GREY = Graphics.rgb(153, 153, 153),
             GRID = Graphics.rgb(205, 205, 205),
             GRID_STROKE = Graphics.rgba(0, 0, 0, 8),
-            BOUNDARY = Graphics.rgba(0, 0, 0, 20);
+            BOUNDARY = Graphics.rgba(0, 0, 0, 15);
 
     public static Color getColor(String hexStr) {
         return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
     }
+
+    // TODO: add performance flag to turn on raylib AA or not (nvidia fxaa works way better)
     public static void initialize(String title) {
         // Get environment setup
         setPerformanceMode();
@@ -91,9 +93,9 @@ public class Graphics extends Raylib {
     public static void initializeTextures() {
         Image img = rTextures.LoadImage("whiteCircle.png");
         whiteCirc = rTextures.LoadTextureFromImage(img);
-        rlj.textures.GenTextureMipmaps(whiteCirc);
+        //rlj.textures.GenTextureMipmaps(whiteCirc);
         rTextures.UnloadImage(img);
-        rTextures.SetTextureFilter(whiteCirc, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        //rTextures.SetTextureFilter(whiteCirc, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
 
         img = rTextures.LoadImage("whiteCircle.png");
         whiteCircNoAA = rTextures.LoadTextureFromImage(img);
@@ -101,9 +103,13 @@ public class Graphics extends Raylib {
 
         img = rTextures.LoadImage("whiteRect.png");
         whiteRect = rTextures.LoadTextureFromImage(img);
-        rlj.textures.GenTextureMipmaps(whiteRect);
+        //rlj.textures.GenTextureMipmaps(whiteRect);
         rTextures.UnloadImage(img);
-        rTextures.SetTextureFilter(whiteRect, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_TRILINEAR);
+        //rTextures.SetTextureFilter(whiteRect, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_TRILINEAR);
+
+        img = rTextures.LoadImage("whiteRect2.png");
+        whiteRectRounder = rTextures.LoadTextureFromImage(img);
+        rTextures.UnloadImage(img);
     }
 
     public static void setPerformanceMode() {
@@ -302,8 +308,9 @@ public class Graphics extends Raylib {
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)radians, strokeCol);
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
         float aspectRatio = length/height;
-        Rectangle srcRect = new Rectangle(whiteRect.width - whiteRect.height * aspectRatio, 0, whiteRect.height * aspectRatio, whiteRect.height);
-        rTextures.DrawTexturePro(whiteRect, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), Graphics.GREY_STROKE);
+        Texture2D rectTexture = (height < 75) ? whiteRectRounder : whiteRect;
+        Rectangle srcRect = new Rectangle(rectTexture.width - rectTexture.height * aspectRatio, 0, rectTexture.height * aspectRatio, rectTexture.height);
+        rTextures.DrawTexturePro(rectTexture, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), Graphics.GREY_STROKE);
         Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * Graphics.strokeWidth), new Vector2(Graphics.strokeWidth, (height - 2 * Graphics.strokeWidth)/2.f), (float)radians, color);
     }
 
@@ -316,8 +323,10 @@ public class Graphics extends Raylib {
     }
 
     public static void drawCircleTexture(float x, float y, float radius, float stroke, Color color, Color strokeColor) {
-        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius) * 2, (radius) * 2, strokeColor);
+/*        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius) * 2, (radius) * 2, strokeColor);
         Graphics.drawTextureCentered(whiteCircNoAA, new Vector2(x, y), (radius) * 2 - 2*Graphics.strokeWidth, (radius) * 2 - 2*Graphics.strokeWidth, color);
+    */
+        drawCircle(x, y, radius, stroke, color, strokeColor);
     }
 
     public static void drawCircle(float x, float y, float radius, float stroke, Color color, Color strokeColor) {

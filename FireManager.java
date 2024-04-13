@@ -27,11 +27,13 @@ public class FireManager {
 
     /**
      * Total reload frames for a turret = ceil((15 - reload stat points) * base reload)
+     * Might be outdated: new one: 15 * 0.914^(reload stat points)
+     * https://www.desmos.com/calculator/zrl5fljsxp
      * @param ti The turret index
      * @return
      */
     private int getReloadFrames(int ti) {
-        return Math.round((120.f/25) * (float)Math.ceil((15 - host.stats.getStat(Stats.RELOAD)) * getReloadFactor(ti)));  // convert 25 fps to 120 fps
+        return Math.round((120.f/25) * 15*(float)Math.pow(0.914, host.stats.getStat(Stats.RELOAD)) * getReloadFactor(ti));  // convert 25 fps to 120 fps
     }
 
     /**

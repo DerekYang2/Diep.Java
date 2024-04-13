@@ -1,9 +1,8 @@
-import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.textures.Texture2D;
 
-public class Turret {
+public class Barrel {
     double x, y;
     double xOriginal, yOriginal;
     double xAbsolute, yAbsolute;
@@ -25,7 +24,7 @@ public class Turret {
     final float recoilForceFactor = 0.03f;
     Tank host;  // For color and other things that may appear in the future
 
-    Turret(float width, float length, float offset, double radians) {  // renamed parameters
+    Barrel(float width, float length, float offset, double radians) {  // renamed parameters
         this.turretWidth = width;
         this.turretLengthOG = turretLength = length;
 

@@ -2,45 +2,43 @@ import java.util.ArrayList;
 
 public class BarrelManager
 {
-    Turret[] turrets;
-    ShootManager shootManager;
+    Barrel[] barrels;
+    FireManager fireManager;
     Tank host;
 
-    public BarrelManager(Turret[] turrets, ShootManager shootManager) {
-        this.turrets = turrets;
-        this.shootManager = shootManager;
+    public BarrelManager(Barrel[] barrels, FireManager fireManager) {
+        this.barrels = barrels;
+        this.fireManager = fireManager;
     }
 
     public void setHost(Tank host) {
         this.host = host;
-        for (Turret t : turrets) {
+        for (Barrel t : barrels) {
             t.setHost(host);
         }
-        shootManager.setHost(host);
+        fireManager.setHost(host);
     }
 
     public void update() {
-        for (Turret t : turrets) {
+        for (Barrel t : barrels) {
             t.update(host.pos.x, host.pos.y, host.direction);
         }
     }
 
     public void draw() {
-        for (Turret t : turrets) {
+        for (Barrel t : barrels) {
             t.draw();
         }
     }
 
     public void reset() {
-        shootManager.reset();
+        fireManager.reset();
     }
 
     public void fire() {
-        ArrayList<Integer> fireIndices = shootManager.getFireIndices();
-        if (fireIndices != null) {
-            for (int i : fireIndices) {
-                host.addForce(turrets[i].shoot());
-            }
+        ArrayList<Integer> fireIndices = fireManager.getFireIndices();
+        for (int i : fireIndices) {
+            host.addForce(barrels[i].shoot());
         }
     }
 }

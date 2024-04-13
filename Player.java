@@ -5,7 +5,7 @@ public class Player extends Tank {
         super(spawn, new PlayerController());
         Graphics.setZoom(1.0f, level);
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
-        setBarrels(TankBuilds.predator());
+        setBarrels(TankBuilds.triplet());
     }
 
     @Override

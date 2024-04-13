@@ -1,46 +1,46 @@
 public class TankBuilds {
     // Static creation methods
     public static BarrelManager tank() {
-        Turret[] turrets = new Turret[]{
-                new Turret(42, 95, 0, 0)
+        Barrel[] barrels = new Barrel[]{
+                new Barrel(42, 95, 0, 0)
         };
-        ShootManager shootManager = new ShootManager(new int[]{0}, new float[]{0});
-        return new BarrelManager(turrets, shootManager);
+        FireManager fireManager = new FireManager(new double[][]{{0, 1}});
+        return new BarrelManager(barrels, fireManager);
     }
 
     // Triplet
     public static BarrelManager triplet() {
-        Turret[] turrets = new Turret[]{
-                new Turret(42, 80, 26, 0),
-                new Turret(42, 80, -26, 0),
-                new Turret(42, 95, 0, 0)
+        Barrel[] barrels = new Barrel[]{
+                new Barrel(42, 80, 26, 0),
+                new Barrel(42, 80, -26, 0),
+                new Barrel(42, 95, 0, 0)
         };
-        ShootManager shootManager = new ShootManager(new int[]{1, 1, 0}, new float[]{0, 0.5f});
-        return new BarrelManager(turrets, shootManager);
+        FireManager fireManager = new FireManager(new double[][]{{0.5, 1}, {0.5, 1}, {0, 1}});
+        return new BarrelManager(barrels, fireManager);
     }
 
     // Pentashot
     public static BarrelManager pentashot() {
-        Turret[] turrets = new Turret[]{
-                new Turret(42, 80, 0, -0.7853981633974483),
-                new Turret(42, 80, 0, 0.7853981633974483),
-                new Turret(42, 95, 0, -0.39269908169872414),
-                new Turret(42, 95, 0, 0.39269908169872414),
-                new Turret(42, 110, 0, 0)
+        Barrel[] barrels = new Barrel[]{
+                new Barrel(42, 80, 0, -0.7853981633974483),
+                new Barrel(42, 80, 0, 0.7853981633974483),
+                new Barrel(42, 95, 0, -0.39269908169872414),
+                new Barrel(42, 95, 0, 0.39269908169872414),
+                new Barrel(42, 110, 0, 0)
         };
-        ShootManager shootManager = new ShootManager(new int[]{0, 0, 1, 1, 2}, new float[]{0, 0.33f, 0.66f});
-        return new BarrelManager(turrets, shootManager);
+        FireManager fireManager = new FireManager(new double[][]{{2.0/3, 1}, {2.0/3, 1}, {1.0/3, 1}, {1.0/3, 1}, {0, 1}});
+        return new BarrelManager(barrels, fireManager);
     }
 
     // Predator
     public static BarrelManager predator() {
-        Turret[] turrets = new Turret[]{
-                new Turret(42, 110, 0, 0),
-                new Turret(56.7f, 95, 0, 0),
-                new Turret(71.4f, 80, 0, 0)
+        Barrel[] barrels = new Barrel[]{
+                new Barrel(42, 110, 0, 0),
+                new Barrel(56.7f, 95, 0, 0),
+                new Barrel(71.4f, 80, 0, 0)
         };
-        ShootManager shootManager = new ShootManager(new int[]{0, 1, 2}, new float[]{0, 0.2f, 0.4f});
-        return new BarrelManager(turrets, shootManager);
+        FireManager fireManager = new FireManager(new double[][]{{0, 3}, {0.2, 3}, {0.4, 3}});
+        return new BarrelManager(barrels, fireManager);
     }
 }
 

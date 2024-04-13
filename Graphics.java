@@ -26,7 +26,7 @@ public class Graphics extends Raylib {
     public static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
-    final public static int cameraHeight = (1080 /*- TASKBAR_HEIGHT - TITLEBAR_HEIGHT*/);
+    final public static int cameraHeight = (1080 - TASKBAR_HEIGHT - TITLEBAR_HEIGHT);
     public static int screenWidth, screenHeight;
     private static float screenScale;  // Scale of render texture to screen
 

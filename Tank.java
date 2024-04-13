@@ -36,7 +36,7 @@ public class Tank extends GameObject {
         this.controller.setHost(this);
 
         scale = (float)Math.pow(1.01, (level - 1));
-        setBarrels(TankBuilds.tank());
+        setBarrels(TankBuilds.pentashot());
     }
 
     public void setBarrels(BarrelManager barrels) {

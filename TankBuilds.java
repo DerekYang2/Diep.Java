@@ -38,11 +38,11 @@ public class TankBuilds {
         FireManager fireManager = new FireManager(new double[][]{{2.0/3, 1}, {2.0/3, 1}, {1.0/3, 1}, {1.0/3, 1}, {0, 1}});
         return new BarrelManager(barrels, fireManager,
                 new BulletStats[]{
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1)
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1)
                 });
     }
 
@@ -59,6 +59,18 @@ public class TankBuilds {
                         new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1),
                         new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1),
                         new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1)
+                });
+    }
+
+    // Destroyer
+    public static BarrelManager destroyer() {
+        Barrel[] barrels = new Barrel[]{
+                new Barrel(71.4f, 95, 0, 0)
+        };
+        FireManager fireManager = new FireManager(new double[][]{{0, 4}});
+        return new BarrelManager(barrels, fireManager,
+                new BulletStats[]{
+                        new BulletStats(1, 2, 3, 0.7f, 1, 1, 0.1f)
                 });
     }
 }

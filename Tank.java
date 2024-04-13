@@ -25,7 +25,7 @@ public class Tank extends GameObject {
         this.stats = stats;
 
         super.setMaxHealth(50 + (2 * (level - 1)) + (20 * stats.getStat(Stats.MAX_HEALTH)));
-        super.setDamage((20 + (6 * stats.getStat(Stats.BODY_DAMAGE))) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
+        super.setDamage((20 + (4 * stats.getStat(Stats.BODY_DAMAGE))) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
         // Spike tank is * 1.5
         // https://www.desmos.com/calculator/qre98xzg76
         float A0 = (float)(2.55 * Math.pow(1.07, stats.getStat(Stats.MOVEMENT_SPEED)) / Math.pow(1.015, level - 1));

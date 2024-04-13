@@ -17,14 +17,14 @@ public class Bullet extends GameObject {
 
         // Calculate bullet stats
         // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
-        final float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;
-        final float maxHealth = (1.5f * host.stats.getStat(Stats.BULLET_PENETRATION) + 2) * bulletStats.health;
-        final float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed - (float)Math.random() * bulletStats.scatterRate;  // Initial speed of 500 units per second (at 25 fps) or 20 u/tick
+        final float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
+        final float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
+        final float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed - (float)Math.random() * bulletStats.scatterRate;  // src: not link above (check diepcustom repo)
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
         // Calculate direction
-        double radianOffset = (Math.PI / 180) * bulletStats.scatterRate * (Math.random() - 0.5) * 10;  // -5 to 5 degrees times scatter rate
+        double radianOffset = (Math.PI / 180) * bulletStats.scatterRate * (Math.random() - 0.5) * 12;  // -5 to 5 degrees times scatter rate
         this.direction = direction + (float) radianOffset;
 
 
@@ -59,6 +59,7 @@ public class Bullet extends GameObject {
             return;
         }
         Graphics.drawCircle((int) pos.x, (int) pos.y, radius, Graphics.strokeWidth, fillCol, strokeCol);
+        if (radius > 45) drawHealthBar();
     }
 
     @Override

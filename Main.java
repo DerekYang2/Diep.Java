@@ -11,10 +11,9 @@ public class Main {
     public final static float ARENA_PADDING = GRID_SIZE * 4;
 
     public static long counter;
-    public static Pool<Drawable> drawablePool;
+    public static DrawPool drawablePool;
     public static Pool<Updatable> updatablePool;
     public static Pool<GameObject> gameObjectPool;
-
     public static IdServer idServer;
     public static Stopwatch globalClock = new Stopwatch();
 
@@ -26,7 +25,7 @@ public class Main {
 
         // Game initialization
         globalClock.start();
-        drawablePool = new Pool<>();
+        drawablePool = new DrawPool();
         updatablePool = new Pool<>();
         gameObjectPool = new Pool<>();
         idServer = new IdServer();
@@ -34,8 +33,9 @@ public class Main {
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(1 + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();
         player = new Player(new Vector2(0,0));
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 1; i++) {
             new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController());
+        }
         Graphics.setCameraTarget(player.pos);
         counter = 0;
     }
@@ -69,6 +69,8 @@ public class Main {
         Main.drawablePool.refresh();
         Main.updatablePool.refresh();
         Main.gameObjectPool.refresh();
+        Main.idServer.refresh();
+
         updateCamera();
 
         // Update all the updatable objects
@@ -150,13 +152,8 @@ public class Main {
         drawBounds();
         //Graphics.drawCircle(xt, 100, 10, Color.RED);
         //xt += 6 * GRID_SIZE/120;
-        // Draw circle at mouse pos
-        Graphics.drawRectangle(Graphics.getVirtualMouse().x, Graphics.getVirtualMouse().y, 5, 5, Color.WHITE);
-
         // Draw all the drawable objects
-        for (Drawable drawable : Main.drawablePool.getObjects()) {
-            drawable.draw();
-        }
+        drawablePool.drawAll();
     }
 
     public static void main(String[] args) {
@@ -179,7 +176,7 @@ public class Main {
             Graphics.drawBackground(Graphics.GRID);
 
             Graphics.drawFPS(10, 10, 20, Color.BLACK);
-            Graphics.drawText("Number of objects: " + drawablePool.getObjects().size(), 10, 25, 20, Color.BLACK);
+            Graphics.drawText("Number of objects: " + updatablePool.getObjects().size(), 10, 25, 20, Color.BLACK);
             Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
 
             drawGrid();

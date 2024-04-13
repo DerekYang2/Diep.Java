@@ -7,17 +7,12 @@ import com.raylib.java.core.Color;
 public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
-    int movementSpeed = 5;  // Integer stat for upgrade
-    int healthPoints = 0;  // Integer stat for upgrade
-    int bulletDamage = 0;  // Integer stat for upgrade
-    int bulletPenetration = 9;  // Integer stat for upgrade
-    int bodyDamage = 0;  // Integer stat for upgrade
-    float baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, movementSpeed) / Math.pow(1.015, level - 1));
+    public Stats stats;
+    float baseAcceleration;
     float direction = 0;
 
     // Objects that control the tank
-    Turret[] turrets;
-    ShootManager shootManager;
+    BarrelManager barrels;
     Controller controller;
 
     // Colors
@@ -27,97 +22,24 @@ public class Tank extends GameObject {
 
     public Tank(Vector2 pos, Controller controller) {
         super(pos, 50);
-        super.setMaxHealth(50 + (2 * (level - 1)) + (20 * healthPoints));
-        super.setDamage((20 + (4 * bodyDamage)) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
+        this.stats = new Stats();
+
+        super.setMaxHealth(50 + (2 * (level - 1)) + (20 * stats.getStat(Stats.MAX_HEALTH)));
+        super.setDamage((20 + (4 * stats.getStat(Stats.BODY_DAMAGE))) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
+        baseAcceleration = (float)((25.f/125) * 0.218 * 2.55 * Math.pow(1.07, stats.getStat(Stats.MOVEMENT_SPEED)) / Math.pow(1.015, level - 1));
+
         this.controller = controller;
         this.controller.setHost(this);
 
         scale = (float)Math.pow(1.01, (level - 1));
-
-        // Set health
-
-        int reloadTime;
-        // Wait for the circle to be spawned before
-       // Triple shot
-       /*turrets = new Turret[]{
-                new Turret(42, 95, 0, -0.7853981633974483, scale),
-                new Turret(42, 95, 0, 0, scale),
-                new Turret(42, 95, 0, 0.7853981633974483, scale),
-        };
-        shootManager = new ShootManager(new int[]{0, 0, 0}, new int[]{16}, 1.0f);*/
-
-        // Twins (looks off?)
-       turrets = new Turret[]{
-                new Turret(42f, 95, -26f, 0, scale),
-                new Turret(42f, 95, 26f, 0, scale)
-        };
-       reloadTime = (int) ((1.f/2) * Math.ceil((15 - 9)*1.0f) * 120 /25);
-
-        shootManager = new ShootManager(new int[]{0, 1}, new int[]{reloadTime, reloadTime}, 1.0f);
-
-        // Triplet
-        turrets = new Turret[]{
-                new Turret(42, 80, 26, 0, scale),
-                new Turret(42, 80, -26, 0, scale),
-                new Turret(42, 95, 0, 0, scale)
-        };
-        reloadTime = (int) ((1.f/2) * Math.ceil((15 - 9)*1.0f) * 120.f /25);
-        shootManager = new ShootManager(new int[]{1, 1, 0}, new int[]{reloadTime, reloadTime}, 1.0f);
-
-        // Pentashot
-        /*turrets = new Turret[]{
-                new Turret(42, 80, 0, -0.7853981633974483, scale),
-                new Turret(42 , 80, 0, 0.7853981633974483, scale),
-                new Turret(42, 95, 0, -0.39269908169872414, scale),
-                new Turret(42, 95, 0, 0.39269908169872414, scale),
-                new Turret(42, 110, 0, 0, scale)
-        };
-        reloadTime = (int) ((1.f/3) * Math.ceil((15 - 9)*1.0f) * 120 /25);
-        shootManager = new ShootManager(new int[]{0, 0, 1, 1, 2}, new int[]{reloadTime, reloadTime, reloadTime}, 1.0f);*/
-
-        // Predator
-        /*turrets = new Turret[]{
-                new Turret(42, 110, 0, 0, scale),
-                new Turret(1.35f * 42, 95, 0, 0, scale),
-                new Turret(1.7f*42, 80, 0, 0, scale)
-        };
-        reloadTime = (int) (Math.ceil((15 - 9)*3f) * 120 /25);
-        shootManager = new ShootManager(new int[]{0, 1, 2}, new int[]{reloadTime, (int) (reloadTime * 0.1f), (int) (reloadTime * 0.1f)}, 1.0f);
-        */
-
-        // Single tank test
-
-        turrets = new Turret[]{
-                new Turret(42, 95, 0, 0, scale)
-        };
-        reloadTime = (int) (Math.ceil((15 - 9)*1) * 120 /25);
-        shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);
-
-
-/*        // Fighter
-        turrets = new Turret[]{
-                new Turret(13.5f, 28, 0, 0, scale),
-                new Turret(13.5f, 28, 0, 90, scale),
-                new Turret(13.5f, 28, 0, -90, scale),
-                new Turret(13.5f, 28,0, 150, scale),
-                new Turret(13.5f, 28, 0, -150, scale)
-        };
-        shootManager = new ShootManager(new int[]{0, 0, 0, 0, 0}, new int[]{16}, 1.0f);*/
-
-
-        // Destroyer
-        /*turrets = new Turret[]{
-                new Turret(1.7f * 42, 95, 0, 0, scale)
-        };
-        //ceil((15 - reload stat points) * base reload);
-        reloadTime = (int) ((Math.ceil((15 - 9)*4.f*120.f /25)));
-        shootManager = new ShootManager(new int[]{0}, new int[]{reloadTime}, 1.0f);*/
-
-        for (Turret t : turrets) {
-            t.setHost(this);
-        }
+        setBarrels(TankBuilds.tank());
     }
-    
+
+    public void setBarrels(BarrelManager barrels) {
+        this.barrels = barrels;
+        barrels.setHost(this);
+    }
+
     @Override
     public void update() {
         super.update();
@@ -153,16 +75,14 @@ public class Tank extends GameObject {
         }
 
         // Update all turrets
-        for (Turret t : turrets) {
-            t.update(pos.x, pos.y, direction);
-        }
+        barrels.update();
 
         // Fire
         if (controller.fire()) {
-            fire();
+            barrels.fire();
         }
         if (controller.unload()) {
-            unload();
+            barrels.reset();
         }
     }
 
@@ -173,9 +93,7 @@ public class Tank extends GameObject {
             return;
         }
         // Draw Turrets
-        for (Turret t : turrets) {
-            t.draw();
-        }
+        barrels.draw();
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
         Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, fillCol, strokeCol);
@@ -191,16 +109,15 @@ public class Tank extends GameObject {
         this.strokeCol = strokeCol;
     }
 
-    protected void fire() {
-        ArrayList<Integer> fireIndices = shootManager.getFireIndices();
-        if (fireIndices != null) {
-            for (int i : fireIndices) {
-                addForce(turrets[i].shoot());
-            }
-        }
+    @Override
+    public void addToPools() {
+        super.addToPools();
+        Main.drawablePool.addObj(this, DrawPool.MIDDLE);
     }
 
-    protected void unload() {
-        shootManager.reset();
+    @Override
+    public void delete() {
+        super.delete();
+        Main.drawablePool.deleteObj(this.getId(), DrawPool.MIDDLE);
     }
 }

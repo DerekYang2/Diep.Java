@@ -18,7 +18,7 @@ public class Bullet extends GameObject {
         this.fillCol = fillCol;
         this.strokeCol = strokeCol;
         radius = diameter * 0.5f;
-        float initialSpeed = (float) ((1.0/(1-friction)) * acceleration);
+        float initialSpeed = (float) ((1.0/(1-friction)) * acceleration) + 30 * (25.f/120);
         vel = new Vector2(initialSpeed * (float) Math.cos(direction), initialSpeed * (float) Math.sin(direction));
         this.direction = direction;
     }
@@ -42,8 +42,15 @@ public class Bullet extends GameObject {
         Graphics.drawCircle((int) pos.x, (int) pos.y, radius, Graphics.strokeWidth, fillCol, strokeCol);
     }
 
-  @Override
-  public void createId() {
-    this.id = Main.idServer.getIdFront();
-  }
+    @Override
+    public void addToPools() {
+        super.addToPools();
+        Main.drawablePool.addObj(this, DrawPool.BOTTOM);
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        Main.drawablePool.deleteObj(this.getId(), DrawPool.BOTTOM);
+    }
 }

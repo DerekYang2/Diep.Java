@@ -18,7 +18,6 @@ public class CollisionManager {
     public static int getSectorX(float x) {
         return (int) ((x - minX) / sectorSize);
     }
-
     public static int getSectorY(float y) {
         return (int) ((y - minY) / sectorSize);
     }
@@ -60,8 +59,7 @@ public class CollisionManager {
     public static void updateCollision() {
         updateSectors();
         collidedPairs.clear();
-        int minId = Main.idServer.peekFrontId();
-        int idRange = Main.idServer.peekBackId() - minId + 1;  // Maximum value of id - minimum value of id
+        int maxId = Main.idServer.maxIds();
         //HashSet<String> testPairs = new HashSet<>();
 
         for (ArrayList<Integer> group : collisionGroups.values()) {
@@ -78,7 +76,7 @@ public class CollisionManager {
 
                         GameObject obj1 = Main.gameObjectPool.getObj(idSmall), obj2 = Main.gameObjectPool.getObj(idLarge);
                         if (obj1.group != obj2.group) {  // Collision only if groups are different
-                            int objHash = (obj1.id - minId) * idRange + (obj2.id - minId);  // Unique hash for a pair of ids
+                            int objHash = obj1.id * maxId + obj2.id;  // Unique hash for a pair of ids
                             if (obj1.checkCollision(obj2) && !collidedPairs.contains(objHash)) {
                                 obj1.receiveKnockback(obj2);
                                 obj2.receiveKnockback(obj1);

@@ -1,12 +1,11 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 public class ShootManager {
     ArrayList<ArrayList<Integer>> turretGroup;  // Stores indices of turrets at group i
-    int[] delayFrames;  // Stores the delay between each group
-    float scale = 1.0f;
+    float[] delayFrames;  // Stores the delay between each group
     int frameCounter, groupCounter;
+    private Tank host;
 
     /**
      * Constructor for ShootManager
@@ -15,7 +14,7 @@ public class ShootManager {
      * @param fireOrder integer array where ith element is the order of the ith turret
      * @param delays The frame delay time for the ith order group
      */
-    public ShootManager(int[] fireOrder, int[] delays, float initialScale) {
+    public ShootManager(int[] fireOrder, float[] delays, float baseReload) {
         // Find the number of groups
         int groupAmount = 1;
         for (int i = 0; i < fireOrder.length; i++) {
@@ -35,29 +34,25 @@ public class ShootManager {
 
         assert(turretGroup.size() == delays.length);  // Make sure the number of groups is the same as the number of delays
 
-        delayFrames = new int[delays.length];
-        for (int i = 0; i < delays.length; i++) {  // Make a true clone, not just change pointer
-            delayFrames[i] = delays[i];
-        }
-
-        scale = initialScale;
-        if (scale < 1) {
-            throw new IllegalArgumentException("Scale must be greater than 1");
+        delayFrames = new float[delays.length];
+        // Base time is 15 frames, but convert to 120 fps
+        delayFrames[0] = (15 * 120.f/25) * (delays[0] + (1 - delays[delays.length-1]));  // Time before first group is sum in front + sum behind last
+        for (int i = 1; i < delays.length; i++) {  // Make a true clone, not just change pointer
+            delayFrames[i] = (15 * 120.f/25) * (delays[i] - delays[i-1]);
         }
 
         groupCounter = 0;
+    }
+
+    public void setHost(Tank host) {
+        this.host = host;
         frameCounter = getDelayFrames(0) -1;  // Preload the first fire
     }
 
-    public void setScale(float newScale) {
-        if (newScale < 1) {
-            throw new IllegalArgumentException("Scale must be greater than 1");
-        }
-        scale = newScale;
-    }
-
     private int getDelayFrames(int group) {
-        return (int)Math.round(delayFrames[group] * scale);
+        ceil((15 - reload stat points) * base reload);
+
+        return (int)Math.round(delayFrames[group] * Math.pow(0.914, host.stats.getStat(Stats.RELOAD)));  // Base reload time * 0.914^reload stat
     }
 
     public void reset() {

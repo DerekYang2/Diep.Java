@@ -55,8 +55,8 @@ public class PlayerController implements Controller {
 
         // Remove any duplicates
         if (keyQueue.size() > 1) {
-            if (keyQueue.getLast() == keyQueue.get(keyQueue.size() - 2)) {
-                keyQueue.removeLast();
+            if (keyQueue.get(keyQueue.size()-1) == keyQueue.get(keyQueue.size() - 2)) {
+                keyQueue.remove(keyQueue.size() - 1);
             }
         }
 

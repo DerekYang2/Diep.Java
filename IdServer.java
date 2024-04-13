@@ -1,36 +1,38 @@
 import java.util.Stack;
 
 public class IdServer {
-    private int rightCounter, leftCounter;
+    final int MAX_IDS = 3000;
+    Stack<Integer> pendingReturn;
+    int[] idList;
+    private int lastIdx;
 
     public IdServer() {
-        rightCounter = 1;
-        leftCounter = -1;
+        pendingReturn = new Stack<>();
+        idList = new int[3000];
+        for (int i = 0; i < idList.length; i++) {
+            idList[i] = i;
+        }
+        lastIdx = idList.length - 1;
     }
 
     public int getId() {
-        if (rightCounter == Integer.MAX_VALUE) {
-            throw new RuntimeException("IdServer has reached the maximum number of ids");
+        if (lastIdx == -1) {
+            throw new RuntimeException("IdServer has run out of ids");
         }
-        return rightCounter++;
+        return idList[lastIdx--];
     }
 
-    /**
-     * In order to get a small id to run in update loop first (e.g. draw in the front)
-     * @return
-     */
-    public int getIdFront() {
-        if (leftCounter == Integer.MIN_VALUE) {
-            throw new RuntimeException("IdServer has reached the minimum number of ids");
+    public void returnId(int id) {
+        pendingReturn.push(id);
+    }
+
+    public void refresh() {
+        while (!pendingReturn.isEmpty()) {
+            idList[++lastIdx] = pendingReturn.pop();
         }
-        return leftCounter--;
     }
 
-    public int peekFrontId() {
-        return leftCounter;
-    }
-
-    public int peekBackId() {
-        return rightCounter;
+    public int maxIds() {
+        return MAX_IDS;
     }
 }

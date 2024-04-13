@@ -156,17 +156,19 @@ public class GameObject implements Updatable, Drawable {
 
     @Override
     public void addToPools() {
-        Main.drawablePool.addObj(this);
         Main.updatablePool.addObj(this);
         Main.gameObjectPool.addObj(this);
+        //Main.drawablePool.addObj(this, DrawPool.MIDDLE);
     }
 
     @Override
     public void delete() {
         isDead = true;
+        // Return id
+        Main.idServer.returnId(this.getId());
         // All added to wait lists
-        Main.drawablePool.deleteObj(this.getId());
         Main.updatablePool.deleteObj(this.getId());
         Main.gameObjectPool.deleteObj(this.getId());
+        //Main.drawablePool.deleteObj(this.getId(), DrawPool.MIDDLE);
     }
 }

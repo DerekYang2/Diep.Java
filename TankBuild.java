@@ -30,11 +30,7 @@ public class TankBuild
     public void update() {
         for (int i = 0; i < barrels.length; i++) {
             barrels[i].update(host.pos.x, host.pos.y, host.direction);
-
-            // Calculate half time of recoil animation (15 or frame time / 2)
-            int halfTime = Math.min(15, fireManager.getReloadFrames(i)/2);
-            if (barrels[i].recoilFrames == halfTime) {
-                System.out.println("halfTime: " + halfTime);
+            if (barrels[i].recoilFrames == barrels[i].recoilTime/2) {
                 host.addForce(pendingRecoil[i]);
             }
         }

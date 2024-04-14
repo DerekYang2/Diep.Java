@@ -3,6 +3,14 @@ import com.raylib.java.core.input.Keyboard;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
 
 public class Main {
     final public static float GRID_SIZE = 50;
@@ -19,15 +27,16 @@ public class Main {
     static Tank player;
 
     // Called in GamePanel.java to initialize game
+
     public static void initialize() {
         Graphics.initialize("DiepJava");
-
+        TankBuild.loadTankDefinitions();  // Load tank definitions from TankDefinitions.json
         // Game initialization
         globalClock.start();
         drawablePool = new DrawPool();
         gameObjectPool = new HashPool<>();
         idServer = new IdServer();
-        int spawn = 0;
+        int spawn = 30;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();

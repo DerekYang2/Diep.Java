@@ -1,6 +1,13 @@
 import com.raylib.java.raymath.Vector2;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TankBuild
 {
@@ -53,8 +60,62 @@ public class TankBuild
         }
     }
 
-    // TEMP: builds
     // Static creation methods
+    public static HashMap<String, JSONObject> tankDefinitions;
+
+    public static void loadTankDefinitions() {
+        tankDefinitions = new HashMap<>();
+        try {
+            JSONArray jsonArray = new JSONArray(TankBuild.readFile("TankDefinitions.json", Charset.defaultCharset()));
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                tankDefinitions.put(jsonObject.getString("name").trim().toLowerCase(), jsonObject);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading TankDefinitions.json: " + e.getMessage());
+        }
+    }
+    private static String readFile(String path, Charset encoding) throws IOException
+    {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
+
+    /**
+     * Create a TankBuild object from a tank definition in TankDefinitions.json
+     * Hierrachy: Tank -> Barrels -> Bullet
+     * @param name Name of the tank definition
+     * @return TankBuild object
+     */
+    public static TankBuild createTankBuild(String name) {
+        name = name.trim().toLowerCase();
+        JSONObject jsonTank = tankDefinitions.get(name);
+
+        JSONArray jsonBarrels = jsonTank.getJSONArray("barrels");
+
+        Barrel[] barrels = new Barrel[jsonBarrels.length()];
+        BulletStats[] bulletStats = new BulletStats[jsonBarrels.length()];
+        double[][] reloadData = new double[jsonBarrels.length()][2];  // array of {delay percent, reload percent}
+
+        for (int i = 0; i < jsonBarrels.length(); i++) {  // Loop through each barrel object
+            JSONObject jsonBarrel = jsonBarrels.getJSONObject(i);
+            barrels[i] = new Barrel(jsonBarrel.getFloat("width"), jsonBarrel.getFloat("size"), jsonBarrel.getFloat("offset"), jsonBarrel.getDouble("angle"));
+
+            reloadData[i] = new double[] {jsonBarrel.getDouble("delay"), jsonBarrel.getDouble("reload")};
+
+            JSONObject jsonBullet = jsonBarrel.getJSONObject("bullet");
+            bulletStats[i] = new BulletStats(jsonBullet.getFloat("sizeRatio"), jsonBullet.getFloat("health"), jsonBullet.getFloat("damage"), jsonBullet.getFloat("speed"), jsonBullet.getFloat("scatterRate"), jsonBullet.getFloat("lifeLength"), jsonBullet.getFloat("absorbtionFactor"), jsonBarrel.getFloat("recoil"));
+        }
+
+        FireManager fireManager = new FireManager(reloadData);
+        float fieldFactor = jsonTank.getFloat("fieldFactor");
+
+        return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
+    }
+
+
+
+ /*   // Static creation methods
     public static TankBuild tank() {
         Barrel[] barrels = new Barrel[]{
                 new Barrel(42, 95, 0, 0)
@@ -154,5 +215,25 @@ public class TankBuild
                         new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1)
                 }, 1);
     }
+
+    // Booster
+    public static TankBuild booster() {
+        Barrel[] barrels = new Barrel[]{
+                new Barrel(42, 95, 0, 0),
+                new Barrel(42, 70, 0, 3.9269908169872414),
+                new Barrel(42, 70, 0, 2.356194490192345),
+                new Barrel(42, 80, 0, 3.665191429188092),
+                new Barrel(42, 80, 0, 2.6179938779914944),
+        };
+        FireManager fireManager = new FireManager(new double[][]{{0, 1}, {2.f / 3, 1}, {2.f / 3, 1}, {1.f / 3, 1}, {1.f / 3, 1}});
+        return new TankBuild(barrels, fireManager,
+                new BulletStats[]{
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 0.2f),
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 0.2f),
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 0.2f),
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 2.5f),
+                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 2.5f)
+                }, 1);
+    }*/
 }
 

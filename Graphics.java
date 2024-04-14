@@ -14,15 +14,13 @@ import com.raylib.java.textures.Texture2D;
 import com.raylib.java.textures.rTextures;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 
 import static com.raylib.java.core.input.Mouse.MouseButton.*;
 
 public class Graphics extends Raylib {
+    public static int ANTIALIASING = 1, PERFORMANCE_MODE = 0;  // Constant environment variables
     public static float strokeWidth = 7f;
-    public static int PERFORMANCE_MODE = 0;  // Defaults to false (high performance)
     public static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
@@ -54,10 +52,10 @@ public class Graphics extends Raylib {
         return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
     }
 
-    // TODO: add performance flag to turn on raylib AA or not (nvidia fxaa works way better)
     public static void initialize(String title) {
-        // Get environment setup
-        setPerformanceMode();
+        // First get environment setup
+        getEnvironmentVariables();
+
         FPS = 60 * (2 - PERFORMANCE_MODE);
 
         // Screen dimensions (actual monitor pixels)
@@ -68,6 +66,7 @@ public class Graphics extends Raylib {
         // Raylib window
         rlj = new Raylib();
         rCore.SetConfigFlags(Config.ConfigFlag.FLAG_MSAA_4X_HINT | Config.ConfigFlag.FLAG_WINDOW_RESIZABLE | Config.ConfigFlag.FLAG_WINDOW_MAXIMIZED);
+
         rlj.core.InitWindow(screenWidth, screenHeight, title);
         rlj.core.MaximizeWindow();
         rlj.core.SetWindowMinSize(320, 240);
@@ -91,28 +90,31 @@ public class Graphics extends Raylib {
     }
 
     public static void initializeTextures() {
-        Image img = rTextures.LoadImage("whiteCircle.png");
-        whiteCirc = rTextures.LoadTextureFromImage(img);
-        //rlj.textures.GenTextureMipmaps(whiteCirc);
-        rTextures.UnloadImage(img);
-        //rTextures.SetTextureFilter(whiteCirc, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        whiteCirc = loadTexture("whiteCircle.png");
+        whiteCircNoAA = loadTexture("whiteCircle.png");
+        whiteRect = loadTexture("whiteRect.png");
+        whiteRectRounder = loadTexture("whiteRect2.png");
 
-        img = rTextures.LoadImage("whiteCircle.png");
-        whiteCircNoAA = rTextures.LoadTextureFromImage(img);
-        rTextures.UnloadImage(img);
-
-        img = rTextures.LoadImage("whiteRect.png");
-        whiteRect = rTextures.LoadTextureFromImage(img);
-        //rlj.textures.GenTextureMipmaps(whiteRect);
-        rTextures.UnloadImage(img);
-        //rTextures.SetTextureFilter(whiteRect, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_TRILINEAR);
-
-        img = rTextures.LoadImage("whiteRect2.png");
-        whiteRectRounder = rTextures.LoadTextureFromImage(img);
-        rTextures.UnloadImage(img);
+        if (ANTIALIASING == 1) {
+            setTextureAntiAliasing(whiteCirc);
+            setTextureAntiAliasing(whiteRect);
+            setTextureAntiAliasing(whiteRectRounder);
+        }
     }
 
-    public static void setPerformanceMode() {
+    private static Texture2D loadTexture(String path) {
+        Image img = rTextures.LoadImage(path);
+        Texture2D texture = rTextures.LoadTextureFromImage(img);
+        rTextures.UnloadImage(img);
+        return texture;
+    }
+
+    private static void setTextureAntiAliasing(Texture2D texture) {
+        rlj.textures.GenTextureMipmaps(texture);
+        rTextures.SetTextureFilter(texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+    }
+
+    public static void getEnvironmentVariables() {
         try {
             File file = new File(".env");
 
@@ -120,17 +122,16 @@ public class Graphics extends Raylib {
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 while (reader.ready()) {
                     String line = reader.readLine();
-                    System.out.println(
-                            line
-                    );
                     if (line.contains("PERFORMANCE_MODE")) {  // Read performance mode from file if it exists
                         PERFORMANCE_MODE = Integer.parseInt(line.split("=")[1].trim());
-                        break;
+                    }
+                    if (line.contains("ANTIALIASING")) {  // Read performance mode from file if it exists
+                        ANTIALIASING = Integer.parseInt(line.split("=")[1].trim());
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("Error reading from .env file: " + e.getMessage());
         }
     }
 
@@ -323,10 +324,12 @@ public class Graphics extends Raylib {
     }
 
     public static void drawCircleTexture(float x, float y, float radius, float stroke, Color color, Color strokeColor) {
-/*        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius) * 2, (radius) * 2, strokeColor);
-        Graphics.drawTextureCentered(whiteCircNoAA, new Vector2(x, y), (radius) * 2 - 2*Graphics.strokeWidth, (radius) * 2 - 2*Graphics.strokeWidth, color);
-    */
-        drawCircle(x, y, radius, stroke, color, strokeColor);
+        if (ANTIALIASING == 1) {
+            Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius) * 2, (radius) * 2, strokeColor);
+            Graphics.drawTextureCentered(whiteCircNoAA, new Vector2(x, y), (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, color);
+        } else {
+            drawCircle(x, y, radius, stroke, color, strokeColor);
+        }
     }
 
     public static void drawCircle(float x, float y, float radius, float stroke, Color color, Color strokeColor) {
@@ -341,11 +344,10 @@ public class Graphics extends Raylib {
         rlj.text.DrawText(text, x, y, fontSize, color);
     }
 
-    private static Vector2 ClampValue(Vector2 value, Vector2 min, Vector2 max) {
+    private static void ClampValue(Vector2 value, Vector2 min, Vector2 max) {
         value.x = Math.min(value.x, max.x);
         value.x = Math.max(value.x, min.x);
         value.y = Math.min(value.y, max.y);
         value.y = Math.max(value.y, min.y);
-        return value;
     }
 }

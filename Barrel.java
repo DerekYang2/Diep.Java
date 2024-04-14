@@ -50,9 +50,6 @@ public class Barrel {
 
     public void draw() {
         drawRect((int) (x + xAbsolute), (int) (y + yAbsolute), (int) (turretLength * host.scale), (int) (turretWidth * host.scale), rotatedAngle + thetaOriginal);
-/*    // Debug? TODO: what is this draw underneath
-    g.setColor(Color.GREEN);
-    g.fillOval((int) (x + xAbsolute) - 4, (int) (y + yAbsolute) - 4, 8, 8);*/
     }
 
     private void drawRect(int xleft, int ycenter, int length, int width, double radians) {  // renamed parameters

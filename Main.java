@@ -29,11 +29,12 @@ public class Main {
         updatablePool = new Pool<>();
         gameObjectPool = new Pool<>();
         idServer = new IdServer();
+        int spawn = 0;
         // Set arena size
-        arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(0 + 1/*number of players*/)) * GRID_SIZE * 2);
+        arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();
         player = new Player(new Vector2(0,0));
-        for (int i = 0; i < 0; i++) {
+        for (int i = 0; i < spawn; i++) {
             new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController(), new Stats(0, 7, 7, 7, 7, 0, 0, 0));
         }
         Graphics.setCameraTarget(player.pos);

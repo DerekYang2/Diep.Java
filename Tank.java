@@ -1,7 +1,5 @@
 import com.raylib.java.raymath.Vector2;
 
-import java.util.ArrayList;
-
 import com.raylib.java.core.Color;
 
 public class Tank extends GameObject {
@@ -12,7 +10,7 @@ public class Tank extends GameObject {
     float direction = 0;
 
     // Objects that control the tank
-    BarrelManager barrels;
+    TankBuild tankBuild;
     Controller controller;
 
     // Colors
@@ -20,12 +18,13 @@ public class Tank extends GameObject {
     Color strokeCol = Graphics.RED_STROKE;
 
 
+    // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats) {
         super(pos, 50);
         this.stats = stats;
 
         super.setMaxHealth(50 + (2 * (level - 1)) + (20 * stats.getStat(Stats.MAX_HEALTH)));
-        super.setDamage((20 + (4 * stats.getStat(Stats.BODY_DAMAGE))) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
+        super.setDamage((20 + 6 * stats.getStat(Stats.BODY_DAMAGE)) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
         // Spike tank is * 1.5
         // https://www.desmos.com/calculator/qre98xzg76
         float A0 = (float)(2.55 * Math.pow(1.07, stats.getStat(Stats.MOVEMENT_SPEED)) / Math.pow(1.015, level - 1));
@@ -36,12 +35,12 @@ public class Tank extends GameObject {
         this.controller.setHost(this);
 
         scale = (float)Math.pow(1.01, (level - 1));
-        setBarrels(TankBuilds.pentashot());
+        setTankBuild(TankBuild.destroyer());
     }
 
-    public void setBarrels(BarrelManager barrels) {
-        this.barrels = barrels;
-        barrels.setHost(this);
+    public void setTankBuild(TankBuild tankBuild) {
+        this.tankBuild = tankBuild;
+        tankBuild.setHost(this);
     }
 
     @Override
@@ -79,14 +78,14 @@ public class Tank extends GameObject {
         }
 
         // Update all turrets
-        barrels.update();
+        tankBuild.update();
 
         // Fire
         if (controller.fire()) {
-            barrels.fire();
+            tankBuild.fire();
         }
         if (controller.unload()) {
-            barrels.reset();
+            tankBuild.reset();
         }
     }
 
@@ -97,7 +96,7 @@ public class Tank extends GameObject {
             return;
         }
         // Draw Turrets
-        barrels.draw();
+        tankBuild.draw();
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
         Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, fillCol, strokeCol);

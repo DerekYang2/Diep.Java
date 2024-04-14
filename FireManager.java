@@ -32,7 +32,7 @@ public class FireManager {
      * @param ti The turret index
      * @return
      */
-    private int getReloadFrames(int ti) {
+    public int getReloadFrames(int ti) {
         return Math.round((120.f/25) * 15*(float)Math.pow(0.914, host.stats.getStat(Stats.RELOAD)) * getReloadFactor(ti));  // convert 25 fps to 120 fps
     }
 

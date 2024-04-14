@@ -12,8 +12,7 @@ public class Main {
 
     public static long counter;
     public static DrawPool drawablePool;
-    public static Pool<Updatable> updatablePool;
-    public static Pool<GameObject> gameObjectPool;
+    public static HashPool<GameObject> gameObjectPool;
     public static IdServer idServer;
     public static Stopwatch globalClock = new Stopwatch();
 
@@ -26,8 +25,7 @@ public class Main {
         // Game initialization
         globalClock.start();
         drawablePool = new DrawPool();
-        updatablePool = new Pool<>();
-        gameObjectPool = new Pool<>();
+        gameObjectPool = new HashPool<>();
         idServer = new IdServer();
         int spawn = 0;
         // Set arena size
@@ -68,15 +66,14 @@ public class Main {
 
         // Handle the pending operations
         Main.drawablePool.refresh();
-        Main.updatablePool.refresh();
         Main.gameObjectPool.refresh();
         Main.idServer.refresh();
 
         updateCamera();
 
-        // Update all the updatable objects
-        for (Updatable updatable : Main.updatablePool.getObjects()) {
-            updatable.update();
+        // Update all the game objects
+        for (Updatable gameObject : gameObjectPool.getObjects()) {
+            gameObject.update();
         }
 
         // Collide all the game objects
@@ -177,7 +174,7 @@ public class Main {
             Graphics.drawBackground(Graphics.GRID);
 
             Graphics.drawFPS(10, 10, 20, Color.BLACK);
-            Graphics.drawText("Number of objects: " + updatablePool.getObjects().size(), 10, 25, 20, Color.BLACK);
+            // Graphics.drawText("Number of objects: " + gameObjectPool.getObjects().size(), 10, 25, 20, Color.BLACK);
             Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
 
             drawGrid();

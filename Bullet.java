@@ -23,9 +23,8 @@ public class Bullet extends GameObject {
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
-        // Calculate direction
-        double radianOffset = (Math.PI / 180) * bulletStats.scatterRate * (Math.random() - 0.5) * 12;  // -5 to 5 degrees times scatter rate
-        this.direction = direction + (float) radianOffset;
+        // Calculate direction (scatter angle already applied by Barrel.java)
+        this.direction = direction;
 
 
         // Calculate acceleration to converge to max speed (https://www.desmos.com/calculator/9hakym7jxy)

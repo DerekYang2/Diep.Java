@@ -344,6 +344,7 @@ public class Graphics extends Raylib {
         rlj.text.DrawText(text, x, y, fontSize, color);
     }
 
+    // Math -------------------------------------------------------------------------------------------
     private static void ClampValue(Vector2 value, Vector2 min, Vector2 max) {
         value.x = Math.min(value.x, max.x);
         value.x = Math.max(value.x, min.x);

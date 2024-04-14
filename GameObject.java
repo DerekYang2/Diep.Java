@@ -7,7 +7,7 @@ public class GameObject implements Updatable, Drawable {
     // Create a group integer where collision is ignored if group is the same
     int group;
     protected Vector2 pos, vel;
-    float friction = 0.9782890432f;  // 0.9^(25/120)
+    final float friction = 0.9782890432f;  // 0.9^(25/120)
     protected int id;
     float scale = 1.0f;
     float radius;  // For collision detection and sometimes drawing (if circle)
@@ -52,6 +52,7 @@ public class GameObject implements Updatable, Drawable {
 
     }
 
+    // TODO: Healthbar drawable class probably
     public void drawHealthBar() {
         // Draw health bar
         if (health < maxHealth) {
@@ -71,9 +72,9 @@ public class GameObject implements Updatable, Drawable {
             delete();  // TODO: delete animation
         }
 
-        vel = Raymath.Vector2Scale(vel, friction);
-
+        // DO NOT FLIP THE ORDER, first add velocity, then apply friction
         pos = Raymath.Vector2Add(pos, vel);
+        vel = Raymath.Vector2Scale(vel, friction);
 
         /*
         // Max speed limiting
@@ -113,6 +114,7 @@ public class GameObject implements Updatable, Drawable {
     }
 
     public void receiveKnockback(GameObject other) {
+        // https://www.desmos.com/calculator/bqqjyewkrs
         float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.046f;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
         float knockbackAngle = (float) Math.atan2(diffY, diffX);
@@ -156,7 +158,6 @@ public class GameObject implements Updatable, Drawable {
 
     @Override
     public void addToPools() {
-        Main.updatablePool.addObj(this);
         Main.gameObjectPool.addObj(this);
         //Main.drawablePool.addObj(this, DrawPool.MIDDLE);
     }
@@ -167,7 +168,6 @@ public class GameObject implements Updatable, Drawable {
         // Return id
         Main.idServer.returnId(this.getId());
         // All added to wait lists
-        Main.updatablePool.deleteObj(this.getId());
         Main.gameObjectPool.deleteObj(this.getId());
         //Main.drawablePool.deleteObj(this.getId(), DrawPool.MIDDLE);
     }

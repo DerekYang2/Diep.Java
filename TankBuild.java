@@ -1,3 +1,5 @@
+import com.raylib.java.raymath.Vector2;
+
 import java.util.ArrayList;
 
 public class TankBuild
@@ -7,12 +9,14 @@ public class TankBuild
     FireManager fireManager;
     float fieldFactor;
     Tank host;
+    Vector2[] pendingRecoil;  // Recoil to be applied after fire
 
     public TankBuild(Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats, float fieldFactor) {
         this.barrels = barrels;
         this.fireManager = fireManager;
         this.bulletStats = bulletStats;
         this.fieldFactor = fieldFactor;
+        pendingRecoil = new Vector2[barrels.length];
     }
 
     public void setHost(Tank host) {
@@ -24,8 +28,15 @@ public class TankBuild
     }
 
     public void update() {
-        for (Barrel t : barrels) {
-            t.update(host.pos.x, host.pos.y, host.direction);
+        for (int i = 0; i < barrels.length; i++) {
+            barrels[i].update(host.pos.x, host.pos.y, host.direction);
+
+            // Calculate half time of recoil animation (15 or frame time / 2)
+            int halfTime = Math.min(15, fireManager.getReloadFrames(i)/2);
+            if (barrels[i].recoilFrames == halfTime) {
+                System.out.println("halfTime: " + halfTime);
+                host.addForce(pendingRecoil[i]);
+            }
         }
     }
 
@@ -42,7 +53,7 @@ public class TankBuild
     public void fire() {
         ArrayList<Integer> fireIndices = fireManager.getFireIndices();
         for (int i : fireIndices) {
-            host.addForce(barrels[i].shoot(bulletStats[i]));
+            pendingRecoil[i] = barrels[i].shoot(bulletStats[i]);
         }
     }
 
@@ -54,7 +65,7 @@ public class TankBuild
         };
         FireManager fireManager = new FireManager(new double[][]{{0, 1}});
         return new TankBuild(barrels, fireManager, new BulletStats[]{
-                new BulletStats(1, 1, 1,1 , 1, 1, 1)
+                new BulletStats(1, 1, 1,1 , 1, 1, 1, 1)
         }, 1);
     }
 
@@ -68,14 +79,14 @@ public class TankBuild
         FireManager fireManager = new FireManager(new double[][]{{0.5, 1}, {0.5, 1}, {0, 1}});
         return new TankBuild(barrels, fireManager,
                 new BulletStats[]{
-                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1),
-                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1),
-                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1)
+                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1, 0.5f),
+                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1, 0.5f),
+                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1, 0.5f)
                 }, 1);
     }
 
     // Pentashot
-    public static TankBuild pentashot() {
+    public static TankBuild pentaShot() {
         Barrel[] barrels = new Barrel[]{
                 new Barrel(42, 80, 0, -0.7853981633974483),
                 new Barrel(42, 80, 0, 0.7853981633974483),
@@ -86,11 +97,11 @@ public class TankBuild
         FireManager fireManager = new FireManager(new double[][]{{2.0/3, 1}, {2.0/3, 1}, {1.0/3, 1}, {1.0/3, 1}, {0, 1}});
         return new TankBuild(barrels, fireManager,
                 new BulletStats[]{
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1)
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f),
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f),
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f),
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f),
+                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f)
                 }, 1);
     }
 
@@ -104,9 +115,9 @@ public class TankBuild
         FireManager fireManager = new FireManager(new double[][]{{0, 3}, {0.2, 3}, {0.4, 3}});
         return new TankBuild(barrels, fireManager,
                 new BulletStats[]{
-                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1),
-                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1),
-                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1)
+                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1, 0.3f),
+                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1, 0.3f),
+                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1, 0.3f)
                 }, 0.85f);
     }
 
@@ -118,7 +129,33 @@ public class TankBuild
         FireManager fireManager = new FireManager(new double[][]{{0, 4}});
         return new TankBuild(barrels, fireManager,
                 new BulletStats[]{
-                        new BulletStats(1, 2, 3, 0.7f, 1, 1, 0.1f)
+                        new BulletStats(1, 2, 3, 0.7f, 1, 1, 0.1f, 15)
+                }, 1);
+    }
+
+    // OctoTank
+    public static TankBuild octoTank() {
+        Barrel[] barrels = new Barrel[]{
+                new Barrel(42, 95, 0, -0.7853981633974483),
+                new Barrel(42, 95, 0, 0.7853981633974483),
+                new Barrel(42, 95, 0, -2.356194490192345),
+                new Barrel(42, 95, 0, 2.356194490192345),
+                new Barrel(42, 95, 0, 3.141592653589793),
+                new Barrel(42, 95, 0, -1.5707963267948966),
+                new Barrel(42, 95, 0, 1.5707963267948966),
+                new Barrel(42, 95, 0, 0)
+        };
+        FireManager fireManager = new FireManager(new double[][]{{0.5, 1}, {0.5, 1}, {0.5, 1}, {0.5, 1}, {0, 1}, {0, 1}, {0, 1}, {0, 1}});
+        return new TankBuild(barrels, fireManager,
+                new BulletStats[]{
+                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
+                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1)
                 }, 1);
     }
 }

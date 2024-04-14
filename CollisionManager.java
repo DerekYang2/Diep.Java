@@ -61,7 +61,7 @@ public class CollisionManager {
         collidedPairs.clear();
         int maxId = Main.idServer.maxIds();
         //HashSet<String> testPairs = new HashSet<>();
-        // TODO: potential optimization, if all same group skip
+
         for (ArrayList<Integer> group : collisionGroups.values()) {
             if (group.size() <= 1) continue;
             for (int i = 0; i < group.size(); i++) {

@@ -1,13 +1,11 @@
+import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
-import com.raylib.java.shapes.Rectangle;
-import com.raylib.java.textures.Texture2D;
-
 public class Barrel {
     double x, y;
     double xOriginal, yOriginal;
     double xAbsolute, yAbsolute;
-    double thetaOriginal;
-    double rotatedAngle;
+    double angleRelative;
+    double angleAbsolute;
     int id;
 
     int recoilFrames = 0;
@@ -15,13 +13,9 @@ public class Barrel {
     float turretWidth, turretLengthOG;  // renamed variables
     float turretLength;
 
-    public Texture2D testRect;
-    public Rectangle srcRect;
-
-    // Recoil constants, single turret should not fire in less than 8 frames for now
-    final int recoilTime = 30;  // TODO: do something about this, seems right for penta but some turrets has less frame time than 30
-    final float recoilFactor = 0.1f;
-    final float recoilForceFactor = 0.03f;
+    // Recoil animation constants
+    final int recoilTime = 30;  // Time in frames for recoil animation
+    final float recoilLengthFactor = 0.1f;  // Percent of turret width to reduce in recoil animation
     Tank host;  // For color and other things that may appear in the future
 
     Barrel(float width, float length, float offset, double radians) {  // renamed parameters
@@ -30,7 +24,7 @@ public class Barrel {
 
         this.xOriginal = 0;
         this.yOriginal = offset;
-        thetaOriginal = radians;
+        angleRelative = radians;
 
         // prevAngle = -Math.PI / 2; // spawn pointing upward
 /*    testRect = rTextures.LoadTexture("whiteRect.png");
@@ -49,7 +43,7 @@ public class Barrel {
     }
 
     public void draw() {
-        drawRect((int) (x + xAbsolute), (int) (y + yAbsolute), (int) (turretLength * host.scale), (int) (turretWidth * host.scale), rotatedAngle + thetaOriginal);
+        drawRect((int) (x + xAbsolute), (int) (y + yAbsolute), (int) (turretLength * host.scale), (int) (turretWidth * host.scale), angleAbsolute + angleRelative);
     }
 
     private void drawRect(int xleft, int ycenter, int length, int width, double radians) {  // renamed parameters
@@ -62,15 +56,9 @@ public class Barrel {
         Graphics.drawRoundedRect(xleft, ycenter, length, width, radians, Graphics.strokeWidth, Graphics.GREY, Graphics.GREY_STROKE);
     }
 
-    // https://www.desmos.com/calculator/ikwpyuj8ny
+    // https://www.desmos.com/calculator/uddosuwdt4
     private float lengthShift(int frame) {
-/*    float dist = recoilFactor * (turretWidth * scale);  // Even though its length shift, base on width because more width = stronger turret
-    if (0 <= frame && frame < retCoeff * recoilTime) {
-      return -Math.abs(dist/(retCoeff * recoilTime)) * frame;
-    } else {
-      return -Math.abs(dist/((1-retCoeff) * recoilTime)) * (frame - retCoeff * recoilTime) + dist;
-    }*/
-        float dist = recoilFactor * (turretWidth * host.scale);  // Even though its length shift, base on width because more width = stronger turret
+        float dist = recoilLengthFactor * (turretWidth * host.scale);  // Even though its length shift, base on width because more width = stronger turret
         return (float) (-Math.abs(dist) * Math.cos((Math.PI / recoilTime) * (frame - recoilTime * 0.5f)));
     }
 
@@ -85,10 +73,10 @@ public class Barrel {
         // Redraw Turret in new position
         xAbsolute = xAbs;
         yAbsolute = yAbs;
-        rotatedAngle = tankAngle;
+        angleAbsolute = tankAngle;
         // Calculate new position by rotating xOriginal and yOriginal around 0, 0
-        x = (xOriginal * host.scale) * Math.cos(rotatedAngle) - (yOriginal * host.scale) * Math.sin(rotatedAngle);
-        y = (xOriginal * host.scale) * Math.sin(rotatedAngle) + (yOriginal * host.scale) * Math.cos(rotatedAngle);
+        x = (xOriginal * host.scale) * Math.cos(angleAbsolute) - (yOriginal * host.scale) * Math.sin(angleAbsolute);
+        y = (xOriginal * host.scale) * Math.sin(angleAbsolute) + (yOriginal * host.scale) * Math.cos(angleAbsolute);
 
         recoilFrames--;
         if (recoilFrames < 0) {
@@ -97,27 +85,20 @@ public class Barrel {
     }
 
     /**
-     * TODO: attack or boost type turret shoudl have different factor
-     *
-     * @param turretWidth
-     * @return
-     */
-    private float recoilForceFunction(float turretWidth) {
-        float width = turretWidth * host.scale;
-        return recoilForceFactor * ((width - 21) * (width - 21));
-    }
-
-    /**
      * returns recoil direction vector
-     *
+     * recoil magnitude is just 2 * bullet recoil (see tankdef.json)
      * @return
      */
     public Vector2 shoot(BulletStats bulletStats) {
         recoilFrames = recoilTime;  // Set to max recoil time
-        Bullet b = new Bullet(host, (float) (x + xAbsolute), (float) (y + yAbsolute), (float) (rotatedAngle + thetaOriginal), (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
-        // Return recoil direction
-/*    Vector2 recoilDirection = new Vector2((float) (-Math.cos(rotatedAngle + thetaOriginal)), (float) (-Math.sin(rotatedAngle + thetaOriginal)));
-    return Raymath.Vector2Scale(recoilDirection, recoilForceFunction(turretWidth));  // Scale the recoil direction*/
-        return new Vector2(0, 0);
+
+        double scatterAngle = Math.toRadians(bulletStats.scatterRate * (Math.random() - 0.5) * 10);  // -5 to 5 degrees times scatter rate
+        float bulletAngle = (float) (angleAbsolute + angleRelative + scatterAngle);  // Apply scatter angle to bullet angle
+
+        Bullet b = new Bullet(host, (float) (x + xAbsolute), (float) (y + yAbsolute), bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+
+        float recoilMagnitude = 2 * bulletStats.recoil * (1-host.friction) * 10;  // (1-host.friction)/(1-0.9) = 10 * (1-host.friction), conversion from 25 fps to 120 fps
+        Vector2 recoilDirection = new Vector2((float) (-Math.cos(bulletAngle)), (float) (-Math.sin(bulletAngle))); // Return recoil direction, opposite of bullet direction
+        return Raymath.Vector2Scale(recoilDirection, recoilMagnitude);  // Scale the recoil direction
     }
 }

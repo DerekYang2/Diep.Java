@@ -11,15 +11,16 @@ public class Bullet extends GameObject {
 
     // The bullet trajectory will be determined based on the position where it spawns
     public Bullet(Tank host, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
-        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
+        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + 0.5f * host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
 
         this.group = host.group;  // Set group to host group (TODO: make a collision and damage group)
 
         // Calculate bullet stats
         // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
-        final float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
-        final float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
-        final float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed - (float)Math.random() * bulletStats.scatterRate;  // src: not link above (check diepcustom repo)
+        float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
+        float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
+        float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed - (float)Math.random() * bulletStats.scatterRate;  // src: not link above (check diepcustom repo)
+
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
@@ -28,8 +29,9 @@ public class Bullet extends GameObject {
 
 
         // Calculate acceleration to converge to max speed (https://www.desmos.com/calculator/9hakym7jxy)
-        this.acceleration = (float) ((velMax * 25./120) * (1-this.friction));
-        float initialSpeed = (float) ((velMax+30) * 25./120);
+        this.acceleration = (velMax * 25.f/120) * (1-friction);
+        //System.out.println(velMax + " " + acceleration + " " + friction);
+        float initialSpeed = (float) ((velMax) * 25./120) + 30 * (1-friction)/(1-0.9f);
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 
         // Life length
@@ -49,6 +51,9 @@ public class Bullet extends GameObject {
         if (lifeFrames <= 0) {
             delete();
         }
+/*        if (Main.counter % 60 == 0) {
+            System.out.println(Math.sqrt(vel.x * vel.x + vel.y * vel.y));
+        }*/
     }
 
     @Override

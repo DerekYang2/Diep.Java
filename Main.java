@@ -36,7 +36,7 @@ public class Main {
         drawablePool = new DrawPool();
         gameObjectPool = new HashPool<>();
         idServer = new IdServer();
-        int spawn = 30;
+        int spawn = 1;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();
@@ -50,7 +50,7 @@ public class Main {
 
     private static void updateCamera() {
         Vector2 difference = Raymath.Vector2Subtract(player.pos, Graphics.getCameraTarget());
-        Graphics.shiftCameraTarget(Raymath.Vector2Scale(difference, 0.055f));
+        Graphics.shiftCameraTarget(Raymath.Vector2Scale(difference, 0.05f));
         if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
             Graphics.setCameraZoom(Graphics.getCameraZoom() - 0.005f);
         }

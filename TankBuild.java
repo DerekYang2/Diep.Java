@@ -83,7 +83,7 @@ public class TankBuild
 
     /**
      * Create a TankBuild object from a tank definition in TankDefinitions.json
-     * Hierrachy: Tank -> Barrels -> Bullet
+     * Hierarchy: Tank -> Barrels -> Bullet
      * @param name Name of the tank definition
      * @return TankBuild object
      */

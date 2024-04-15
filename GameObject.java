@@ -7,7 +7,7 @@ public class GameObject implements Updatable, Drawable {
     // Create a group integer where collision is ignored if group is the same
     int group;
     protected Vector2 pos, vel;
-    final float friction = 0.9782890432f;  // 0.9^(25/120)
+    float friction = 0.989f;  // default: 0.9^(25/120)
     protected int id;
     float scale = 1.0f;
     float radius;  // For collision detection and sometimes drawing (if circle)
@@ -115,7 +115,7 @@ public class GameObject implements Updatable, Drawable {
 
     public void receiveKnockback(GameObject other) {
         // https://www.desmos.com/calculator/bqqjyewkrs
-        float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.046f;
+        float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.024f;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
         float knockbackAngle = (float) Math.atan2(diffY, diffX);
         addForce(knockbackMagnitude, knockbackAngle);

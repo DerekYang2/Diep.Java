@@ -24,7 +24,7 @@ public class Graphics extends Raylib {
     public static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
-    final public static int cameraHeight = (1080 - TASKBAR_HEIGHT - TITLEBAR_HEIGHT);
+    final public static int cameraHeight = 1080;
     public static int screenWidth, screenHeight;
     private static float screenScale;  // Scale of render texture to screen
 
@@ -55,13 +55,16 @@ public class Graphics extends Raylib {
     public static void initialize(String title) {
         // First get environment setup
         getEnvironmentVariables();
+        DisplayMode monitor = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+
+        if (monitor.getRefreshRate() < 120) {
+            PERFORMANCE_MODE = 1;
+        }
 
         FPS = 60 * (2 - PERFORMANCE_MODE);
-
         // Screen dimensions (actual monitor pixels)
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        screenWidth = (int) screenSize.getWidth();
-        screenHeight = (int) screenSize.getHeight() - TASKBAR_HEIGHT - TITLEBAR_HEIGHT;
+        screenWidth = monitor.getWidth();
+        screenHeight = monitor.getHeight() - TASKBAR_HEIGHT - TITLEBAR_HEIGHT;
 
         // Raylib window
         rlj = new Raylib();

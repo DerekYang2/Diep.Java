@@ -35,7 +35,7 @@ public class Tank extends GameObject {
         this.controller.setHost(this);
 
         scale = (float)Math.pow(1.01, (level - 1));
-        setTankBuild(TankBuild.createTankBuild("annihilator"));
+        setTankBuild(TankBuild.RandEnemy());
     }
 
     public void setTankBuild(TankBuild tankBuild) {

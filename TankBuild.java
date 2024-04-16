@@ -113,8 +113,53 @@ public class TankBuild
         return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
     }
 
+    public static float getRand(float maxV) {
+        return (float)Math.random() * maxV;
+    }
 
+    public static TankBuild william() {
+        int barrelAmount = (int)(Math.random() * 20);
 
+        Barrel[] barrels = new Barrel[barrelAmount];
+        BulletStats[] bulletStats = new BulletStats[barrelAmount];
+        double[][] reloadData = new double[barrelAmount][2];  // array of {delay percent, reload percent}
+
+        for (int i = 0; i < barrelAmount; i++) {  // Loop through each barrel object
+            
+            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)));
+
+            reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
+
+            bulletStats[i] = new BulletStats(getRand(1)+0.5f, 1, 1, getRand(3.f), getRand(10), getRand(2), 1, getRand(15));
+        }
+
+        FireManager fireManager = new FireManager(reloadData);
+        float fieldFactor = 1f;
+
+        return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
+    }
+    
+    public static TankBuild RandEnemy() {
+        int barrelAmount = (int)(Math.random() * 10);
+
+        Barrel[] barrels = new Barrel[barrelAmount];
+        BulletStats[] bulletStats = new BulletStats[barrelAmount];
+        double[][] reloadData = new double[barrelAmount][2];  // array of {delay percent, reload percent}
+
+        for (int i = 0; i < barrelAmount; i++) {  // Loop through each barrel object
+            
+            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)));
+
+            reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
+
+            bulletStats[i] = new BulletStats(getRand(1)+0.5f, 1, 1, getRand(3.f), getRand(10), getRand(2), 1, getRand(15));
+        }
+
+        FireManager fireManager = new FireManager(reloadData);
+        float fieldFactor = 1f;
+
+        return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
+    }
  /*   // Static creation methods
     public static TankBuild tank() {
         Barrel[] barrels = new Barrel[]{

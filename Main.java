@@ -36,13 +36,15 @@ public class Main {
         drawablePool = new DrawPool();
         gameObjectPool = new HashPool<>();
         idServer = new IdServer();
-        int spawn = 0;
+        int spawn = 20;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();
         player = new Player(new Vector2(0,0));
+
         for (int i = 0; i < spawn; i++) {
-            new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController(), new Stats(0, 7, 7, 7, 7, 0, 0, 0));
+            Tank t = new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController(), new Stats(7, 7, 7, 7, 7, 0, 7, 7));
+            t.group = -1;
         }
         Graphics.setCameraTarget(player.pos);
         counter = 0;

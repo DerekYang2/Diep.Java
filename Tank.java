@@ -79,14 +79,7 @@ public class Tank extends GameObject {
 
         // Update all turrets
         tankBuild.update();
-
-        // Fire
-        if (controller.fire()) {
-            tankBuild.fire();
-        }
-        if (controller.unload()) {
-            tankBuild.reset();
-        }
+        tankBuild.updateFire(controller.fire());
     }
 
     @Override

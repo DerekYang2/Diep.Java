@@ -43,20 +43,17 @@ public class TankBuild
         }
     }
 
-    public void draw() {
-        for (Barrel t : barrels) {
-            t.draw();
+    public void updateFire(boolean isFiring) {
+        fireManager.setFiring(isFiring);
+
+        for (int i : fireManager.getFireIndices()) {
+            pendingRecoil[i] = barrels[i].shoot(bulletStats[i]);
         }
     }
 
-    public void reset() {
-        fireManager.reset();
-    }
-
-    public void fire() {
-        ArrayList<Integer> fireIndices = fireManager.getFireIndices();
-        for (int i : fireIndices) {
-            pendingRecoil[i] = barrels[i].shoot(bulletStats[i]);
+    public void draw() {
+        for (Barrel t : barrels) {
+            t.draw();
         }
     }
 

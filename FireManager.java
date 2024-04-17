@@ -5,6 +5,8 @@ public class FireManager {
     private ArrayList<float[]> turretData;  // {delay, reload} for ith turret
     private int[] frameCounter;  // Current frame for ith turret
     private Tank host;
+    private boolean paused = false;
+    private boolean isFiring = false;
 
     /**
      * Constructor for FireManager
@@ -22,7 +24,9 @@ public class FireManager {
     public void setHost(Tank host) {
         this.host = host;
         // Initialize frame counter
-        reset();
+        for (int i = 0; i < turretCount; i++) {
+            frameCounter[i] = getDelayFrames(i);
+        }
     }
 
     /**
@@ -53,25 +57,30 @@ public class FireManager {
         return turretData.get(turretIndex)[1];
     }
 
-
-    /**
-     * When the user stops firing, reset all the turrets to initial delay
-     */
-    public void reset() {
-        for (int i = 0; i < turretCount; i++) {
-            frameCounter[i] = getDelayFrames(i);
-        }
+    public void setFiring(boolean isFiring) {
+        this.isFiring = isFiring;
+        if (isFiring)  // When firing, set paused to false
+            paused = false;
     }
 
     public ArrayList<Integer> getFireIndices() {
         ArrayList<Integer> retList = new ArrayList<>();
-        for (int i = 0; i < turretCount; i++) {  // For each turret
-            if (frameCounter[i] <= 0) {
-                retList.add(i);
-                frameCounter[i] = getReloadFrames(i);
+
+        if (!paused) {
+            for (int i = 0; i < turretCount; i++) {  // For each turret
+                if (frameCounter[i] == 0) {
+                    if (isFiring) {  // Fire this turret
+                        retList.add(i);
+                        frameCounter[i] = getReloadFrames(i);
+                    } else {  // Put fire on hold
+                        paused = true;  // Pause everything starting from next frame
+                    }
+                } else {
+                    frameCounter[i]--;
+                }
             }
-            frameCounter[i]--;
         }
+
         return retList;
     }
 

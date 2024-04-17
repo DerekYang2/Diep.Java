@@ -114,7 +114,7 @@ public class GameObject implements Updatable, Drawable {
     }
 
     public void receiveKnockback(GameObject other) {
-        // https://www.desmos.com/calculator/bqqjyewkrs
+        // https://www.desmos.com/calculator/p9tyewb18m
         float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.024f;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
         float knockbackAngle = (float) Math.atan2(diffY, diffX);

@@ -1,14 +1,14 @@
 import java.util.Stack;
 
 public class IdServer {
-    final int MAX_IDS = 3000;
+    final int MAX_IDS = 10000;
     Stack<Integer> pendingReturn;
     int[] idList;
     private int lastIdx;
 
     public IdServer() {
         pendingReturn = new Stack<>();
-        idList = new int[3000];
+        idList = new int[MAX_IDS];
         for (int i = 0; i < idList.length; i++) {
             idList[i] = i;
         }

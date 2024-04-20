@@ -209,8 +209,7 @@ public abstract class GameObject implements Updatable, Drawable {
 
     public void triggerDelete() {
         isDead = true;  // Begin deletion animation
-        // Delete health bar
-        healthBar.delete();
+        healthBar.setHidden(true);
     }
 
     @Override
@@ -219,5 +218,7 @@ public abstract class GameObject implements Updatable, Drawable {
         Main.idServer.returnId(this.getId());
         // All added to wait lists
         Main.gameObjectPool.deleteObj(this.getId());
+        // Delete health bar
+        healthBar.delete();
     }
 }

@@ -75,6 +75,7 @@ public class Bar implements Drawable {
 
     @Override
     public void delete() {
+        Main.idServer.returnId(this.getId());
         Main.drawablePool.deleteObj(this.getId(), DrawPool.TOP);
     }
 }

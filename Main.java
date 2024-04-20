@@ -28,7 +28,7 @@ public class Main {
         drawablePool = new DrawPool();
         gameObjectPool = new HashPool<>();
         idServer = new IdServer();
-        int spawn = 1;
+        int spawn = 30;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();

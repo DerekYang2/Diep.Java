@@ -7,7 +7,7 @@ public class GameObject implements Updatable, Drawable {
     // Create a group integer where collision is ignored if group is the same
     int group;
     protected Vector2 pos, vel;
-    float friction = 0.989f;  // default: 0.9^(25/120)
+    float friction = 0.988f;  // default: 0.9^(25/120)
     protected int id;
     float scale = 1.0f;
     float radius;  // For collision detection and sometimes drawing (if circle)
@@ -121,28 +121,28 @@ public class GameObject implements Updatable, Drawable {
         addForce(knockbackMagnitude, knockbackAngle);
     }
 
+    public void receiveDamage(float damage) {
+        health -= damage;
+        if (health <= 1e-6) {
+            delete();
+        }
+    }
+
     public static void receiveDamage(GameObject a, GameObject b) {
         if (a.isDead || b.isDead) {
             return;
         }
         if (a.damage > b.health) {  // Overkill
             float scaleDown = b.health / a.damage;  // Scale down damage so that b just dies
-            b.health -= scaleDown * a.damage;
-            a.health -= scaleDown * b.damage;
+            b.receiveDamage(scaleDown * a.damage);
+            a.receiveDamage(scaleDown * b.damage);
         } else if (b.damage > a.health) {
             float scaleDown = a.health / b.damage;  // Scale down damage so that a just dies
-            a.health -= scaleDown * b.damage;
-            b.health -= scaleDown * a.damage;
+            a.receiveDamage(scaleDown * b.damage);
+            b.receiveDamage(scaleDown * a.damage);
         } else {
-            a.health -= b.damage;
-            b.health -= a.damage;
-        }
-        // Update if dead
-        if (a.health <= 0) {
-            a.delete();
-        }
-        if (b.health <= 0) {
-            b.delete();
+            a.receiveDamage(b.damage);
+            b.receiveDamage(a.damage);
         }
     }
 

@@ -41,6 +41,7 @@ public class BotController implements Controller {
             yComp = -Math.abs(yComp);
         }
         moveDir = (float) Math.atan2(yComp, xComp);
+        //moveDir = -1;
         return moveDir;
     }
 
@@ -49,6 +50,7 @@ public class BotController implements Controller {
         if (Math.random() < 1) {
             shouldFire = true;
         }
+        //shouldFire = false;
         return shouldFire;
     }
 

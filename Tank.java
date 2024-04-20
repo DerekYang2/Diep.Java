@@ -6,8 +6,12 @@ public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
     public Stats stats;
-    float baseAcceleration;
     float direction = 0;
+
+    // Stat variables
+    float baseAcceleration;
+    float regenPerFrame;
+    long lastDamageFrame = -30 * 120;
 
     // Objects that control the tank
     TankBuild tankBuild;
@@ -26,16 +30,21 @@ public class Tank extends GameObject {
         super.setMaxHealth(50 + (2 * (level - 1)) + (20 * stats.getStat(Stats.MAX_HEALTH)));
         super.setDamage((20 + 6 * stats.getStat(Stats.BODY_DAMAGE)) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE
         // Spike tank is * 1.5
-        // https://www.desmos.com/calculator/qre98xzg76
+
+
+        // ACCELERATION: https://www.desmos.com/calculator/qre98xzg76
         float A0 = (float)(2.55 * Math.pow(1.07, stats.getStat(Stats.MOVEMENT_SPEED)) / Math.pow(1.015, level - 1));
         float convergeSpeed = (10 * A0) * (25.f/120);  // 10A0 is max speed, 25/120 is scaling factor for 25->120 fps
         this.baseAcceleration = convergeSpeed * (1 - friction);  // a = Converge * (1-r)
 
+        // Regen (regen per SECOND is 0.1 + (0.4 * P) percent of max health)
+        this.regenPerFrame = (maxHealth + 4 * maxHealth * stats.getStat(Stats.HEALTH_REGEN)) / (120 * 1000);  // 120 fps
+        System.out.println(regenPerFrame + " , " + maxHealth);
         this.controller = controller;
         this.controller.setHost(this);
 
         scale = (float)Math.pow(1.01, (level - 1));
-        setTankBuild(TankBuild.RandEnemy());
+        setTankBuild(TankBuild.createTankBuild("booster"));
     }
 
     public void setTankBuild(TankBuild tankBuild) {
@@ -43,9 +52,26 @@ public class Tank extends GameObject {
         tankBuild.setHost(this);
     }
 
+    protected void setDirection(double radians) {
+        direction = (float) radians;
+    }
+
+    protected void setColor(Color fillCol, Color strokeCol) {
+        this.fillCol = fillCol;
+        this.strokeCol = strokeCol;
+    }
+
     @Override
     public void update() {
         super.update();
+        // Health updates
+        if (Main.counter - lastDamageFrame > 30 * 120) {  // After 30 seconds, hyper-regen
+            health += maxHealth / (120 * 10);  // 10 percent HP per second
+        } else {  // Normal regen
+            health += regenPerFrame;
+        }
+        health = Math.min(health, maxHealth);  // Cap health at maxHealth
+
         // Update the direction barrel is facing
         setDirection(controller.barrelDirection());
 
@@ -96,13 +122,10 @@ public class Tank extends GameObject {
         drawHealthBar();  // TODO: all draw orders need to be redone
     }
 
-    protected void setDirection(double radians) {
-        direction = (float) radians;
-    }
-
-    protected void setColor(Color fillCol, Color strokeCol) {
-        this.fillCol = fillCol;
-        this.strokeCol = strokeCol;
+    @Override
+    public void receiveDamage(float damage) {
+        super.receiveDamage(damage);
+        lastDamageFrame = Main.counter;
     }
 
     @Override

@@ -1,5 +1,4 @@
 import com.raylib.java.core.Color;
-import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 
 public class Bullet extends GameObject {

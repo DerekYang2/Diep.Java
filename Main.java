@@ -43,7 +43,7 @@ public class Main {
         player = new Player(new Vector2(0,0));
 
         for (int i = 0; i < spawn; i++) {
-            Tank t = new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController(), new Stats(7, 7, 7, 7, 7, 0, 7, 7));
+            Tank t = new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController(), new Stats(0, 7, 7, 7, 7, 0, 3, 0));
             t.group = -1;
         }
         Graphics.setCameraTarget(player.pos);

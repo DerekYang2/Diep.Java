@@ -12,6 +12,9 @@ public class Bullet extends GameObject {
     public Bullet(Tank host, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
         super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
 
+        this.showHealthBar = false;
+        healthBar.setHidden(true);
+
         this.group = host.group;  // Set group to host group (TODO: make a collision and damage group)
 
         // Calculate bullet stats
@@ -57,7 +60,6 @@ public class Bullet extends GameObject {
 
     @Override
     public void draw() {
-        super.draw();
         if (pos.x + radius < Main.cameraBox.x || pos.x - radius > Main.cameraBox.x + Main.cameraBox.width || pos.y + radius < Main.cameraBox.y || pos.y - radius > Main.cameraBox.y + Main.cameraBox.height) {
             return;
         }

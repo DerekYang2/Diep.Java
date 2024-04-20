@@ -38,15 +38,17 @@ public class Graphics extends Raylib {
     public static Texture2D whiteCirc, whiteRect, whiteCircNoAA, whiteRectRounder;
 
     // Colors
-    public static Color RED = Graphics.rgb(241, 78, 84),
-            RED_STROKE = Graphics.rgb(180, 58, 63),
-            BLUE = Graphics.rgb(0, 178, 225),
-            BLUE_STROKE = Graphics.rgb(0, 133, 168),
-            GREY_STROKE = Graphics.rgb(114, 114, 114),
-            GREY = Graphics.rgb(153, 153, 153),
-            GRID = Graphics.rgb(205, 205, 205),
-            GRID_STROKE = Graphics.rgba(0, 0, 0, 8),
-            BOUNDARY = Graphics.rgba(0, 0, 0, 15);
+    public static Color RED = rgb(241, 78, 84),
+            RED_STROKE = rgb(180, 58, 63),
+            BLUE = rgb(0, 178, 225),
+            BLUE_STROKE = rgb(0, 133, 168),
+            GREY_STROKE = rgb(114, 114, 114),
+            GREY = rgb(153, 153, 153),
+            GRID = rgb(205, 205, 205),
+            GRID_STROKE = rgba(0, 0, 0, 8),
+            BOUNDARY = rgba(0, 0, 0, 15),
+            HEALTH_BAR = rgb(133, 227, 125),
+            HEALTH_BAR_STROKE = rgb(85, 85, 85);
 
     public static Color getColor(String hexStr) {
         return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
@@ -308,7 +310,11 @@ public class Graphics extends Raylib {
         rShapes.DrawRectanglePro(rectangle, origin, radians * 180.f / (float) Math.PI, color);
     }
 
-    public static void drawRoundedRect(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol) {
+    public static void drawRectangleRounded(float x, float y, float width, float height, float roundness, Color color) {
+        rlj.shapes.DrawRectangleRounded(new Rectangle(x, y, width, height), roundness, 5, color);
+    }
+
+    public static void drawTurret(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol) {
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)radians, strokeCol);
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
         float aspectRatio = length/height;

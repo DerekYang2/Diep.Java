@@ -3,7 +3,7 @@ import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
-public class GameObject implements Updatable, Drawable {
+public abstract class GameObject implements Updatable, Drawable {
     // Create a group integer where collision is ignored if group is the same
     int group;
     protected Vector2 pos, vel;
@@ -17,6 +17,12 @@ public class GameObject implements Updatable, Drawable {
     float damage = 0;
     boolean isDead = false;
 
+    // Health bar variables
+    Bar healthBar;
+    boolean showHealthBar = true;
+    final float HEALTH_BAR_HEIGHT = 15;
+    final float HEALTH_BAR_STROKE = 3;
+
     // Collision
     float absorptionFactor = 1, pushFactor = 8;  // Default
     public GameObject(Vector2 pos, int radius) {
@@ -26,6 +32,9 @@ public class GameObject implements Updatable, Drawable {
         createId();
         addToPools();
         group = id;
+
+        // Health bar
+        healthBar = new Bar(radius * scale * 2, HEALTH_BAR_HEIGHT, HEALTH_BAR_STROKE, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE);
     }
     public GameObject(Vector2 pos, int radius, float absorptionFactor, float pushFactor) {
         this.pos = pos;
@@ -36,6 +45,9 @@ public class GameObject implements Updatable, Drawable {
         createId();
         addToPools();
         group = id;
+
+        // Health bar
+        healthBar = new Bar(radius * scale * 2, 15, 3, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE);
     }
 
     public void setMaxHealth(float maxHealth) {
@@ -48,21 +60,19 @@ public class GameObject implements Updatable, Drawable {
     }
 
     @Override
-    public void draw() {
+    public abstract void draw();
 
-    }
-
-    // TODO: Healthbar drawable class probably
     public void drawHealthBar() {
         // Draw health bar
         if (health < maxHealth) {
-            float healthBarWidth = radius*scale * 2;
-            float healthBarHeight = 10;
+            float healthBarWidth = radius*scale*2;
+            float healthBarHeight = 15;
             float healthBarX = pos.x - healthBarWidth / 2;
-            float healthBarY = pos.y - radius*scale - 1.5f * healthBarHeight;
+            float healthBarY = pos.y + radius*scale + 40 - healthBarHeight;
             float healthBarFill = health / maxHealth;
-            Graphics.drawRectangle((int) healthBarX, (int) healthBarY, (int) healthBarWidth, (int) healthBarHeight, Color.BLACK);
-            Graphics.drawRectangle((int) healthBarX + 1, (int) healthBarY+1, (int) (healthBarWidth * healthBarFill) - 2, (int) healthBarHeight - 2, Color.GREEN);
+            final int strokeWidth = 3;
+            Graphics.drawRectangleRounded(healthBarX, healthBarY, healthBarWidth, healthBarHeight, 1, Graphics.HEALTH_BAR_STROKE);
+            Graphics.drawRectangleRounded(healthBarX + strokeWidth, healthBarY + strokeWidth, (healthBarWidth * healthBarFill) - 2 * strokeWidth, healthBarHeight - 2 * strokeWidth, 1, Graphics.HEALTH_BAR);
         }
     }
 
@@ -70,6 +80,15 @@ public class GameObject implements Updatable, Drawable {
     public void update() {
         if (health <= 0) {
             delete();  // TODO: delete animation
+        }
+
+        // Update health bar
+        healthBar.setHidden(health >= maxHealth || !showHealthBar);
+        if (!healthBar.isHidden()) {
+            float healthBarWidth = radius * scale * 2;
+            float healthBarX = pos.x - healthBarWidth / 2;
+            float healthBarY = pos.y + radius * scale + 40 - HEALTH_BAR_HEIGHT;
+            healthBar.update(new Vector2(healthBarX, healthBarY), health / maxHealth);
         }
 
         // DO NOT FLIP THE ORDER, first add velocity, then apply friction
@@ -170,5 +189,8 @@ public class GameObject implements Updatable, Drawable {
         // All added to wait lists
         Main.gameObjectPool.deleteObj(this.getId());
         //Main.drawablePool.deleteObj(this.getId(), DrawPool.MIDDLE);
+
+        // Delete health bar
+        healthBar.delete();
     }
 }

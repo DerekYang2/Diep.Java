@@ -3,5 +3,4 @@ public interface Controller {
     public float barrelDirection();
     public float moveDirection();
     public boolean fire();
-    public boolean unload();
 }

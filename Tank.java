@@ -2,6 +2,11 @@ import com.raylib.java.raymath.Vector2;
 
 import com.raylib.java.core.Color;
 
+/**
+ * NOTES:
+ * this.cameraEntity.cameraData.respawnLevel = Math.min(Math.max(this.cameraEntity.cameraData.values.level - 1, 1), Math.floor(Math.sqrt(this.cameraEntity.cameraData.values.level) * 3.2796));
+ */
+
 public class Tank extends GameObject {
     int level = 45;
     // 54.7766480515
@@ -71,21 +76,10 @@ public class Tank extends GameObject {
     @Override
     public void update() {
         super.update();
-        // Health updates
-        if (Main.counter - lastDamageFrame > 30 * 120) {  // After 30 seconds, hyper-regen
-            health += maxHealth / (120 * 10);  // 10 percent HP per second
-        } else {  // Normal regen
-            health += regenPerFrame;
-        }
-        health = Math.min(health, maxHealth);  // Cap health at maxHealth
 
-        // Update the direction barrel is facing
-        setDirection(controller.barrelDirection());
-
-        // Update input movement
-        float moveDirection = controller.moveDirection();
-        if (moveDirection != -1) {  // If valid direction
-            addForce(baseAcceleration, moveDirection);
+        if (isDead) {
+            tankBuild.update();  // Still update after death so turret positions are updated
+            return;
         }
 
         // Keep tank within the arena
@@ -110,9 +104,28 @@ public class Tank extends GameObject {
             vel.y = -Math.abs(vel.y * absorptionFactor * 0);
         }
 
+        // Health updates
+        if (Main.counter - lastDamageFrame > 30 * 120) {  // After 30 seconds, hyper-regen
+            health += maxHealth / (120 * 10);  // 10 percent HP per second
+        } else {  // Normal regen
+            health += regenPerFrame;
+        }
+        health = Math.min(health, maxHealth);  // Cap health at maxHealth
+
+
+        // Update the direction barrel is facing
+        setDirection(controller.barrelDirection());
+
+        // Update input movement
+        float moveDirection = controller.moveDirection();
+        if (moveDirection != -1) {  // If valid direction
+            addForce(baseAcceleration, moveDirection);
+        }
+
         // Update all turrets
         tankBuild.update();
         tankBuild.updateFire(controller.fire());
+
     }
 
     @Override
@@ -125,7 +138,7 @@ public class Tank extends GameObject {
         tankBuild.draw();
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
-        Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, fillCol, strokeCol);
+        Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, fillCol, strokeCol, opacity);
     }
 
     @Override

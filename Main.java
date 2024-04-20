@@ -3,14 +3,6 @@ import com.raylib.java.core.input.Keyboard;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
 
 public class Main {
     final public static float GRID_SIZE = 50;
@@ -159,7 +151,7 @@ public class Main {
     //static float xt = 0;
     private static void draw() {
         drawBounds();
-        //Graphics.drawCircle(xt, 100, 10, Color.RED);
+        //Graphics.drawCircle(xt, 100, 10, Color.RED);360
         //xt += 6 * GRID_SIZE/120;
         // Draw all the drawable objects
         drawablePool.drawAll();
@@ -190,7 +182,9 @@ public class Main {
 
             drawGrid();
             Graphics.beginCameraMode();
+
             draw();  // Main draw function
+
             Graphics.endCameraMode();
             Graphics.endDrawMode();
         }

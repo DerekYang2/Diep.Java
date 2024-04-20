@@ -282,6 +282,22 @@ public class Graphics extends Raylib {
     public static Color rgba(int r, int g, int b, int a) {
         return new Color(r, g, b, a);
     }
+    // Get color with brightness correction, brightness factor goes from -1.0f to 1.0f
+    public static Color lerpColor(Color color1, Color color2, float factor) {
+        return new Color((int) (color1.r + (color2.r - color1.r) * factor),
+                (int) (color1.g + (color2.g - color1.g) * factor),
+                (int) (color1.b + (color2.b - color1.b) * factor),
+                (int) (color1.a + (color2.a - color1.a) * factor));
+    }
+
+    public static Color colAlpha(Color color, float opacity) {
+        //return lerpColor(color, GRID, 1-opacity);
+        return rTextures.Fade(color, opacity);
+    }
+
+    public static Color lerpColorGrid(Color color, float opacity) {
+        return lerpColor(color, GRID, 1-opacity);
+    }
 
     public static void drawFPS(int x, int y, int fontSize, Color color) {
         rlj.text.DrawText(rCore.GetFPS() + " FPS", x, y, fontSize, color);
@@ -314,37 +330,43 @@ public class Graphics extends Raylib {
         rlj.shapes.DrawRectangleRounded(new Rectangle(x, y, width, height), roundness, 5, color);
     }
 
-    public static void drawTurret(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol) {
+    public static void drawTurret(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity) {
+        // Set opacity of colors
+        color = lerpColorGrid(color, opacity);
+        strokeCol = lerpColorGrid(strokeCol, opacity);
+
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)radians, strokeCol);
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
+
         float aspectRatio = length/height;
         Texture2D rectTexture = (height < 75) ? whiteRectRounder : whiteRect;
         Rectangle srcRect = new Rectangle(rectTexture.width - rectTexture.height * aspectRatio, 0, rectTexture.height * aspectRatio, rectTexture.height);
-        rTextures.DrawTexturePro(rectTexture, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), Graphics.GREY_STROKE);
-        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * Graphics.strokeWidth), new Vector2(Graphics.strokeWidth, (height - 2 * Graphics.strokeWidth)/2.f), (float)radians, color);
+        rTextures.DrawTexturePro(rectTexture, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), strokeCol);
+        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
     }
 
     public static void drawRectangleLines(Rectangle rect, float stroke, Color color) {
         rlj.shapes.DrawRectangleLinesEx(rect, stroke, color);
     }
 
-    public static void drawCircle(float x, float y, float radius, Color color) {
-        rlj.shapes.DrawCircle((int) x, (int) y, radius, color);
+    public static void drawCircle(float x, float y, float radius, Color color, float opacity) {
+        rlj.shapes.DrawCircle((int) x, (int) y, radius, colAlpha(color, opacity));
     }
 
-    public static void drawCircleTexture(float x, float y, float radius, float stroke, Color color, Color strokeColor) {
+    public static void drawCircleTexture(float x, float y, float radius, float stroke, Color color, Color strokeColor, float opacity) {
         if (ANTIALIASING == 1) {
-            Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius) * 2, (radius) * 2, strokeColor);
-            Graphics.drawTextureCentered(whiteCircNoAA, new Vector2(x, y), (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, color);
+            Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius) * 2, (radius) * 2, lerpColorGrid(strokeColor, opacity));
+            Graphics.drawTextureCentered(whiteCircNoAA, new Vector2(x, y), (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, lerpColorGrid(color, opacity));
         } else {
-            drawCircle(x, y, radius, stroke, color, strokeColor);
+            drawCircle(x, y, radius, stroke, lerpColorGrid(color, opacity), lerpColorGrid(strokeColor, opacity), 1);
         }
     }
 
-    public static void drawCircle(float x, float y, float radius, float stroke, Color color, Color strokeColor) {
-        drawCircle(x, y, radius, strokeColor);
-        drawCircle(x, y, radius - stroke, color);
+    public static void drawCircle(float x, float y, float radius, float stroke, Color color, Color strokeColor, float opacity) {
+        drawCircle(x, y, radius, strokeColor, opacity);
+        drawCircle(x, y, radius - stroke, color, opacity);
     }
+
     public static void drawLine(float x1, float y1, float x2, float y2, float stroke, Color color) {
         rlj.shapes.DrawLineEx(new Vector2(x1, y1), new Vector2(x2, y2), stroke, color);
     }

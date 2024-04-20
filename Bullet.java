@@ -48,11 +48,15 @@ public class Bullet extends GameObject {
     @Override
     public void update() {
         super.update();
+
+        if (isDead) return;
+
         addForce(acceleration, direction);
         lifeFrames--;
         if (lifeFrames <= 0) {
-            delete();
+            triggerDelete();
         }
+
 /*        if (Main.counter % 60 == 0) {
             System.out.println(Math.sqrt(vel.x * vel.x + vel.y * vel.y));
         }*/
@@ -60,11 +64,11 @@ public class Bullet extends GameObject {
 
     @Override
     public void draw() {
-        if (pos.x + radius < Main.cameraBox.x || pos.x - radius > Main.cameraBox.x + Main.cameraBox.width || pos.y + radius < Main.cameraBox.y || pos.y - radius > Main.cameraBox.y + Main.cameraBox.height) {
+        final float scaledRadius = radius * scale;  // scale is always 1 until death animation
+        if (pos.x + scaledRadius < Main.cameraBox.x || pos.x - scaledRadius > Main.cameraBox.x + Main.cameraBox.width || pos.y + scaledRadius < Main.cameraBox.y || pos.y - scaledRadius > Main.cameraBox.y + Main.cameraBox.height) {
             return;
         }
-        Graphics.drawCircle((int) pos.x, (int) pos.y, radius, Graphics.strokeWidth, fillCol, strokeCol);
-        if (radius > 45) drawHealthBar();
+        Graphics.drawCircle((int) pos.x, (int) pos.y, scaledRadius, Graphics.strokeWidth, fillCol, strokeCol, opacity);
     }
 
     @Override

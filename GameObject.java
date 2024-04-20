@@ -16,6 +16,8 @@ public abstract class GameObject implements Updatable, Drawable {
     float maxHealth = 0, health = 0;
     float damage = 0;
     boolean isDead = false;
+    int deathAnimationFrames = 120/5;  // A fifth of a second
+    float opacity = 1;
 
     // Health bar variables
     Bar healthBar;
@@ -79,7 +81,22 @@ public abstract class GameObject implements Updatable, Drawable {
     @Override
     public void update() {
         if (health <= 0) {
-            delete();  // TODO: delete animation
+            triggerDelete();  // TODO: delete animation
+        }
+
+        // DO NOT FLIP THE ORDER, first add velocity, then apply friction
+        pos = Raymath.Vector2Add(pos, vel);
+        vel = Raymath.Vector2Scale(vel, friction);
+
+        // Deletion animation
+        if (isDead) {
+            deathAnimationFrames--;
+            scale *= 1.02f;
+            opacity = deathAnimationFrames/24.f;
+            if (deathAnimationFrames <= 0) {
+                delete();
+            }
+            return;
         }
 
         // Update health bar
@@ -91,9 +108,6 @@ public abstract class GameObject implements Updatable, Drawable {
             healthBar.update(new Vector2(healthBarX, healthBarY), health / maxHealth);
         }
 
-        // DO NOT FLIP THE ORDER, first add velocity, then apply friction
-        pos = Raymath.Vector2Add(pos, vel);
-        vel = Raymath.Vector2Scale(vel, friction);
 
         /*
         // Max speed limiting
@@ -123,6 +137,7 @@ public abstract class GameObject implements Updatable, Drawable {
         force = Raymath.Vector2Scale(force, forceMagnitude);
         addForce(force);
     }
+
     public Rectangle boundingBox() {
         return new Rectangle(pos.x - radius*scale, pos.y - radius*scale, radius*scale*2, radius*scale*2);
     }
@@ -133,6 +148,9 @@ public abstract class GameObject implements Updatable, Drawable {
     }
 
     public void receiveKnockback(GameObject other) {
+        if (isDead || other.isDead) {
+            return;
+        }
         // https://www.desmos.com/calculator/p9tyewb18m
         float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.024f;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
@@ -141,9 +159,13 @@ public abstract class GameObject implements Updatable, Drawable {
     }
 
     public void receiveDamage(float damage) {
+        if (isDead) {
+            return;
+        }
+
         health -= damage;
         if (health <= 1e-6) {
-            delete();
+            triggerDelete();
         }
     }
 
@@ -178,19 +200,19 @@ public abstract class GameObject implements Updatable, Drawable {
     @Override
     public void addToPools() {
         Main.gameObjectPool.addObj(this);
-        //Main.drawablePool.addObj(this, DrawPool.MIDDLE);
+    }
+
+    public void triggerDelete() {
+        isDead = true;  // Begin deletion animation
+        // Delete health bar
+        healthBar.delete();
     }
 
     @Override
     public void delete() {
-        isDead = true;
         // Return id
         Main.idServer.returnId(this.getId());
         // All added to wait lists
         Main.gameObjectPool.deleteObj(this.getId());
-        //Main.drawablePool.deleteObj(this.getId(), DrawPool.MIDDLE);
-
-        // Delete health bar
-        healthBar.delete();
     }
 }

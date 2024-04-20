@@ -53,13 +53,4 @@ public class BotController implements Controller {
         //shouldFire = false;
         return shouldFire;
     }
-
-    @Override
-    public boolean unload() {
-        if (Math.random() < 0) {
-            shouldFire = false;
-            return true;
-        }
-        return false;
-    }
 }

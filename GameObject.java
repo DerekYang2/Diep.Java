@@ -16,7 +16,8 @@ public abstract class GameObject implements Updatable, Drawable {
     float maxHealth = 0, health = 0;
     float damage = 0;
     boolean isDead = false;
-    int deathAnimationFrames = 120/5;  // A fifth of a second
+    final int DEATH_ANIMATION_FRAMES = 120/5;
+    int deathAnimationFrames = DEATH_ANIMATION_FRAMES;  // A fifth of a second
     float opacity = 1;
 
     // Health bar variables
@@ -92,7 +93,11 @@ public abstract class GameObject implements Updatable, Drawable {
         if (isDead) {
             deathAnimationFrames--;
             scale *= 1.02f;
-            opacity = deathAnimationFrames/24.f;
+
+            // https://www.desmos.com/calculator/o4j6oqlaop
+            opacity = (float)deathAnimationFrames/(DEATH_ANIMATION_FRAMES);
+            opacity *= opacity;  // Square for a steeper curve (x^2)
+
             if (deathAnimationFrames <= 0) {
                 delete();
             }

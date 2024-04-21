@@ -65,20 +65,6 @@ public abstract class GameObject implements Updatable, Drawable {
     @Override
     public abstract void draw();
 
-    public void drawHealthBar() {
-        // Draw health bar
-        if (health < maxHealth) {
-            float healthBarWidth = radius*scale*2;
-            float healthBarHeight = 15;
-            float healthBarX = pos.x - healthBarWidth / 2;
-            float healthBarY = pos.y + radius*scale + 40 - healthBarHeight;
-            float healthBarFill = health / maxHealth;
-            final int strokeWidth = 3;
-            Graphics.drawRectangleRounded(healthBarX, healthBarY, healthBarWidth, healthBarHeight, 1, Graphics.HEALTH_BAR_STROKE);
-            Graphics.drawRectangleRounded(healthBarX + strokeWidth, healthBarY + strokeWidth, (healthBarWidth * healthBarFill) - 2 * strokeWidth, healthBarHeight - 2 * strokeWidth, 1, Graphics.HEALTH_BAR);
-        }
-    }
-
     @Override
     public void update() {
         if (health <= 0) {
@@ -96,7 +82,6 @@ public abstract class GameObject implements Updatable, Drawable {
 
             // https://www.desmos.com/calculator/o4j6oqlaop
             opacity = (float)deathAnimationFrames/(DEATH_ANIMATION_FRAMES);
-            opacity *= opacity;  // Square for a steeper curve (x^2)
 
             if (deathAnimationFrames <= 0) {
                 delete();

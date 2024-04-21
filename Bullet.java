@@ -68,7 +68,7 @@ public class Bullet extends GameObject {
         if (pos.x + scaledRadius < Main.cameraBox.x || pos.x - scaledRadius > Main.cameraBox.x + Main.cameraBox.width || pos.y + scaledRadius < Main.cameraBox.y || pos.y - scaledRadius > Main.cameraBox.y + Main.cameraBox.height) {
             return;
         }
-        Graphics.drawCircle((int) pos.x, (int) pos.y, scaledRadius, Graphics.strokeWidth, fillCol, strokeCol, opacity);
+        Graphics.drawCircle((int) pos.x, (int) pos.y, scaledRadius, Graphics.strokeWidth, fillCol, strokeCol, opacity * opacity);  // Square opacity for a steeper curve (x^2)
     }
 
     @Override

@@ -35,7 +35,7 @@ public class Tank extends GameObject {
 
         updateStats();  // Update tank based on level and stats
         this.controller.setHost(this);  // Set the controller's host to this tank
-        setTankBuild(TankBuild.createTankBuild("penta shot"));  // Default tank build
+        setTankBuild(TankBuild.createTankBuild("triplet"));  // Default tank build
     }
 
     public void setTankBuild(TankBuild tankBuild) {

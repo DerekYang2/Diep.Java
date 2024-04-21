@@ -52,6 +52,7 @@ public abstract class GameObject implements Updatable, Drawable {
      */
     public void initHealthBar() {
         healthBar = new Bar(radius * scale * 2, HEALTH_BAR_HEIGHT, HEALTH_BAR_STROKE, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE);
+        healthBar.forceHidden(true);
     }
 
     public void setMaxHealth(float maxHealth) {
@@ -92,7 +93,7 @@ public abstract class GameObject implements Updatable, Drawable {
 
         // Update health bar
         if (healthBar != null) {
-            healthBar.setHidden(health >= maxHealth);
+            healthBar.triggerHidden(health >= maxHealth);
             if (!healthBar.isHidden()) {
                 float healthBarWidth = radius * scale * 2;
                 float healthBarX = pos.x - healthBarWidth / 2;
@@ -205,7 +206,7 @@ public abstract class GameObject implements Updatable, Drawable {
     public void triggerDelete() {
         isDead = true;  // Begin deletion animation
         if (healthBar != null)
-            healthBar.setHidden(true);
+            healthBar.forceHidden(true);
     }
 
     @Override

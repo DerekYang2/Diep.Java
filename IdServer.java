@@ -1,7 +1,7 @@
 import java.util.Stack;
 
 public class IdServer {
-    final int MAX_IDS = 10000;
+    final int MAX_IDS = 5000;
     Stack<Integer> pendingReturn;
     int[] idList;
     private int lastIdx;
@@ -27,6 +27,11 @@ public class IdServer {
     }
 
     public void refresh() {
+        /*
+        if (Main.counter % 120 == 0) {
+            System.out.println("Used IDS: " + (MAX_IDS - lastIdx));
+        }
+        */
         while (!pendingReturn.isEmpty()) {
             idList[++lastIdx] = pendingReturn.pop();
         }

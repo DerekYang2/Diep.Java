@@ -75,21 +75,30 @@ public class CollisionManager {
                         }
 
                         GameObject obj1 = Main.gameObjectPool.getObj(idSmall), obj2 = Main.gameObjectPool.getObj(idLarge);
-                        if (obj1.group != obj2.group) {  // Collision only if groups are different
+
+                        if (obj1.group != obj2.group) { // Collision if groups are different, knockback and damage
                             int objHash = obj1.id * maxId + obj2.id;  // Unique hash for a pair of ids
                             if (obj1.checkCollision(obj2) && !collidedPairs.contains(objHash)) {
-                                obj1.receiveKnockback(obj2);
-                                obj2.receiveKnockback(obj1);
+                                GameObject.receiveKnockback(obj1, obj2);
                                 GameObject.receiveDamage(obj1, obj2);
                                 collidedPairs.add(objHash);
-
-                                /*
-                                String collideStr = obj1.id + " " + obj2.id;
-                                assert(!testPairs.contains(collideStr)); // Make sure no duplicate pairs
-                                testPairs.add(collideStr);
-                                */
+                            }
+                        } else if (!obj1.noInternalCollision && !obj2.noInternalCollision) {  // Same group, but neither have no collision flag
+                            int objHash = obj1.id * maxId + obj2.id;  // Unique hash for a pair of ids
+                            if (obj1.checkCollision(obj2) && !collidedPairs.contains(objHash)) {
+                                GameObject.receiveKnockback(obj1, obj2);  // Only knockback, no damage
+                                collidedPairs.add(objHash);
                             }
                         }
+
+
+                        /*
+                        Tests for duplicate pairs:
+                        String collideStr = obj1.id + " " + obj2.id;
+                        assert(!testPairs.contains(collideStr)); // Make sure no duplicate pairs
+                        testPairs.add(collideStr);
+                        */
+
                     }
                 }
             }

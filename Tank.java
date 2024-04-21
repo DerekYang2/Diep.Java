@@ -37,7 +37,7 @@ public class Tank extends GameObject {
 
         updateStats();  // Update tank based on level and stats
         this.controller.setHost(this);  // Set the controller's host to this tank
-        setTankBuild(TankBuild.createTankBuild("triplet"));  // Default tank build
+        setTankBuild(TankBuild.createTankBuild("octo tank"));  // Default tank build
     }
 
     public void setTankBuild(TankBuild tankBuild) {
@@ -47,6 +47,7 @@ public class Tank extends GameObject {
 
     /**
      * Call whenever level or stats change
+     * Should be callable multiple times without issue
      */
     public void updateStats() {
         // Max health

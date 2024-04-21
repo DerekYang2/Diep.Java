@@ -2,10 +2,10 @@ import com.raylib.java.raymath.Vector2;
 
 public class Player extends Tank {
     public Player(Vector2 spawn) {
-        super(spawn, new PlayerController(), new Stats(7, 7 , 7, 7, 0, 0, 3, 0));
+        super(spawn, new PlayerController(), new Stats(7, 7 , 0, 0, 0, 7, 7, 7));
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
-        setTankBuild(TankBuild.createTankBuild("annihilator"));
-        Graphics.setZoom(this.tankBuild.fieldFactor, level);  // TODO: this needs to be updated when player is updated (level, etc)
+        setTankBuild(TankBuild.createTankBuild("booster"));
+        Graphics.setZoom(this.tankBuild.fieldFactor, level);  // Set zoom level, remember to call on level and tank build change
     }
 
     // For timing speed

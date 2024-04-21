@@ -1,11 +1,12 @@
-import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 public abstract class GameObject implements Updatable, Drawable {
-    // Create a group integer where collision is ignored if group is the same
-    int group;
+    // Objects always collide each other regardless of group (unless noInternalCollision is true)
+    int group;  // Objects in different groups damage each other
+    boolean noInternalCollision = false;  // Object does not collide with objects only in the same group (applies to bullets for now)
+
     protected Vector2 pos, vel;
     float friction = 0.988f;  // default: 0.9^(25/120)
     protected int id;
@@ -68,7 +69,7 @@ public abstract class GameObject implements Updatable, Drawable {
     @Override
     public void update() {
         if (health <= 0) {
-            triggerDelete();  // TODO: delete animation
+            triggerDelete();
         }
 
         // DO NOT FLIP THE ORDER, first add velocity, then apply friction
@@ -147,6 +148,14 @@ public abstract class GameObject implements Updatable, Drawable {
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
         float knockbackAngle = (float) Math.atan2(diffY, diffX);
         addForce(knockbackMagnitude, knockbackAngle);
+    }
+
+    public static void receiveKnockback(GameObject a, GameObject b) {
+        if (a.isDead || b.isDead) {
+            return;
+        }
+        a.receiveKnockback(b);
+        b.receiveKnockback(a);
     }
 
     public void receiveDamage(float damage) {

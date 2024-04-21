@@ -21,8 +21,7 @@ public abstract class GameObject implements Updatable, Drawable {
     float opacity = 1;
 
     // Health bar variables
-    Bar healthBar;
-    boolean showHealthBar = true;
+    Bar healthBar;  // Null if not initialized
     final float HEALTH_BAR_HEIGHT = 15;
     final float HEALTH_BAR_STROKE = 3;
 
@@ -35,9 +34,6 @@ public abstract class GameObject implements Updatable, Drawable {
         createId();
         addToPools();
         group = id;
-
-        // Health bar
-        healthBar = new Bar(radius * scale * 2, HEALTH_BAR_HEIGHT, HEALTH_BAR_STROKE, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE);
     }
     public GameObject(Vector2 pos, int radius, float absorptionFactor, float pushFactor) {
         this.pos = pos;
@@ -48,9 +44,13 @@ public abstract class GameObject implements Updatable, Drawable {
         createId();
         addToPools();
         group = id;
+    }
 
-        // Health bar
-        healthBar = new Bar(radius * scale * 2, 15, 3, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE);
+    /**
+     * Dependencies: radius, scale must be set
+     */
+    public void initHealthBar() {
+        healthBar = new Bar(radius * scale * 2, HEALTH_BAR_HEIGHT, HEALTH_BAR_STROKE, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE);
     }
 
     public void setMaxHealth(float maxHealth) {
@@ -90,14 +90,15 @@ public abstract class GameObject implements Updatable, Drawable {
         }
 
         // Update health bar
-        healthBar.setHidden(health >= maxHealth || !showHealthBar);
-        if (!healthBar.isHidden()) {
-            float healthBarWidth = radius * scale * 2;
-            float healthBarX = pos.x - healthBarWidth / 2;
-            float healthBarY = pos.y + radius * scale + 40 - HEALTH_BAR_HEIGHT;
-            healthBar.update(new Vector2(healthBarX, healthBarY), health / maxHealth);
+        if (healthBar != null) {
+            healthBar.setHidden(health >= maxHealth);
+            if (!healthBar.isHidden()) {
+                float healthBarWidth = radius * scale * 2;
+                float healthBarX = pos.x - healthBarWidth / 2;
+                float healthBarY = pos.y + radius * scale + 40 - HEALTH_BAR_HEIGHT;
+                healthBar.update(new Vector2(healthBarX, healthBarY), health / maxHealth);
+            }
         }
-
 
         /*
         // Max speed limiting
@@ -194,7 +195,8 @@ public abstract class GameObject implements Updatable, Drawable {
 
     public void triggerDelete() {
         isDead = true;  // Begin deletion animation
-        healthBar.setHidden(true);
+        if (healthBar != null)
+            healthBar.setHidden(true);
     }
 
     @Override
@@ -204,6 +206,7 @@ public abstract class GameObject implements Updatable, Drawable {
         // All added to wait lists
         Main.gameObjectPool.deleteObj(this.getId());
         // Delete health bar
-        healthBar.delete();
+        if (healthBar != null)
+            healthBar.delete();
     }
 }

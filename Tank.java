@@ -30,6 +30,8 @@ public class Tank extends GameObject {
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats) {
         super(pos, 50);
+        initHealthBar();  // Initialize health bar object
+
         this.stats = stats;
         this.controller = controller;
 

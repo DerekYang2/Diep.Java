@@ -383,4 +383,10 @@ public class Graphics extends Raylib {
         value.y = Math.min(value.y, max.y);
         value.y = Math.max(value.y, min.y);
     }
+
+    public static Vector2 rotatePoint(Vector2 point, Vector2 origin, double radians) {
+        float cosTheta = (float) Math.cos(radians);
+        float sinTheta = (float) Math.sin(radians);
+        return new Vector2(cosTheta * (point.x - origin.x) - sinTheta * (point.y - origin.y) + origin.x, sinTheta * (point.x - origin.x) + cosTheta * (point.y - origin.y) + origin.y);
+    }
 }

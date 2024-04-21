@@ -1,12 +1,12 @@
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 public class Barrel {
-    double x, y;
-    double xOriginal, yOriginal;
-    double xAbsolute, yAbsolute;
+    Vector2 pos;
+    Vector2 posOriginal;
+
+    float xAbsolute, yAbsolute;
     double angleRelative;
     double angleAbsolute;
-    int id;
 
     int recoilFrames = 0;
 
@@ -22,8 +22,9 @@ public class Barrel {
         this.turretWidth = width;
         this.turretLengthOG = turretLength = length;
 
-        this.xOriginal = 0;
-        this.yOriginal = offset;
+        // Rotate (0, offset) by radians around 0, 0
+        posOriginal = Graphics.rotatePoint(new Vector2(0, offset), new Vector2(0, 0), radians);
+
         angleRelative = radians;
 
         // prevAngle = -Math.PI / 2; // spawn pointing upward
@@ -38,12 +39,11 @@ public class Barrel {
     public void setHost(Tank host) {
         this.host = host;
         // Default spawn point, along the x axis with an offset from the origin (0, 0)
-        x = xOriginal * host.scale;
-        y = yOriginal * host.scale;
+        pos = Raymath.Vector2Scale(posOriginal, host.scale);
     }
 
     public void draw() {
-        drawRect((int) (x + xAbsolute), (int) (y + yAbsolute), (int) (turretLength * host.scale), (int) (turretWidth * host.scale), angleAbsolute + angleRelative);
+        drawRect((int) (pos.x + xAbsolute), (int) (pos.y + yAbsolute), (int) (turretLength * host.scale), (int) (turretWidth * host.scale), angleAbsolute + angleRelative);
     }
 
     private void drawRect(int xleft, int ycenter, int length, int width, double radians) {  // renamed parameters
@@ -62,7 +62,7 @@ public class Barrel {
         return (float) (-Math.abs(dist) * Math.cos((Math.PI / recoilTime) * (frame - recoilTime * 0.5f)));
     }
 
-    public void update(double xAbs, double yAbs, double tankAngle) {
+    public void update(float xAbs, float yAbs, double tankAngle) {
         // Calculate turret length
         if (recoilFrames > 0) {
             turretLength = turretLengthOG + lengthShift(recoilFrames);
@@ -74,9 +74,9 @@ public class Barrel {
         xAbsolute = xAbs;
         yAbsolute = yAbs;
         angleAbsolute = tankAngle;
-        // Calculate new position by rotating xOriginal and yOriginal around 0, 0
-        x = (xOriginal * host.scale) * Math.cos(angleAbsolute) - (yOriginal * host.scale) * Math.sin(angleAbsolute);
-        y = (xOriginal * host.scale) * Math.sin(angleAbsolute) + (yOriginal * host.scale) * Math.cos(angleAbsolute);
+
+        // Calculate new RELATIVE position by rotating xOriginal and yOriginal (scaled) around 0, 0
+        pos = Graphics.rotatePoint(Raymath.Vector2Scale(posOriginal, host.scale), new Vector2(0, 0), angleAbsolute);
 
         recoilFrames--;
         if (recoilFrames < 0) {
@@ -95,7 +95,7 @@ public class Barrel {
         double scatterAngle = Math.toRadians(bulletStats.scatterRate * (Math.random() - 0.5) * 10);  // -5 to 5 degrees times scatter rate
         float bulletAngle = (float) (angleAbsolute + angleRelative + scatterAngle);  // Apply scatter angle to bullet angle
 
-        Bullet b = new Bullet(host, (float) (x + xAbsolute), (float) (y + yAbsolute), bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+        Bullet b = new Bullet(host, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
 
         float recoilMagnitude = 2 * bulletStats.recoil * (1-host.friction) * 10;  // (1-host.friction)/(1-0.9) = 10 * (1-host.friction), conversion from 25 fps to 120 fps
         Vector2 recoilDirection = new Vector2((float) (-Math.cos(bulletAngle)), (float) (-Math.sin(bulletAngle))); // Return recoil direction, opposite of bullet direction

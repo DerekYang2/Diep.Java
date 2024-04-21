@@ -41,7 +41,7 @@ public class BotController implements Controller {
             yComp = -Math.abs(yComp);
         }
         moveDir = (float) Math.atan2(yComp, xComp);
-        //moveDir = -1;
+        moveDir = -1;
         return moveDir;
     }
 

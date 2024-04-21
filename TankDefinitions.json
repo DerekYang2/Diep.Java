@@ -117,7 +117,7 @@
         "barrels": [
             {
                 "angle": 0,
-                "offset": -26,
+                "offset": -24,
                 "size": 95,
                 "width": 42,
                 "delay": 0,
@@ -139,7 +139,7 @@
             },
             {
                 "angle": 0,
-                "offset": 26,
+                "offset": 24,
                 "size": 95,
                 "width": 42,
                 "delay": 0.5,
@@ -2229,7 +2229,7 @@
         "barrels": [
             {
                 "angle": 0,
-                "offset": -26,
+                "offset": -24,
                 "size": 95,
                 "width": 42,
                 "delay": 0,
@@ -2251,7 +2251,7 @@
             },
             {
                 "angle": 0,
-                "offset": 26,
+                "offset": 24,
                 "size": 95,
                 "width": 42,
                 "delay": 0.5,
@@ -2273,7 +2273,7 @@
             },
             {
                 "angle": 2.0943951023931953,
-                "offset": -26,
+                "offset": -24,
                 "size": 95,
                 "width": 42,
                 "delay": 0,
@@ -2295,7 +2295,7 @@
             },
             {
                 "angle": 2.0943951023931953,
-                "offset": 26,
+                "offset": 24,
                 "size": 95,
                 "width": 42,
                 "delay": 0.5,
@@ -2317,7 +2317,7 @@
             },
             {
                 "angle": -2.0943951023931953,
-                "offset": -26,
+                "offset": -24,
                 "size": 95,
                 "width": 42,
                 "delay": 0,
@@ -2339,7 +2339,7 @@
             },
             {
                 "angle": -2.0943951023931953,
-                "offset": 26,
+                "offset": 24,
                 "size": 95,
                 "width": 42,
                 "delay": 0.5,

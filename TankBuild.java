@@ -106,6 +106,11 @@ public class TankBuild
             reloadData[i] = new double[] {jsonBarrel.getDouble("delay"), jsonBarrel.getDouble("reload")};
 
             JSONObject jsonBullet = jsonBarrel.getJSONObject("bullet");
+
+            if (!jsonBullet.getString("type").equals("bullet")) {  // Temporary until more bullet types are added, TODO: REMOVE WHEN DONE
+                return null;
+            }
+
             bulletStats[i] = new BulletStats(jsonBullet.getFloat("sizeRatio"), jsonBullet.getFloat("health"), jsonBullet.getFloat("damage"), jsonBullet.getFloat("speed"), jsonBullet.getFloat("scatterRate"), jsonBullet.getFloat("lifeLength"), jsonBullet.getFloat("absorbtionFactor"), jsonBarrel.getFloat("recoil"));
         }
 
@@ -122,8 +127,13 @@ public class TankBuild
     public static TankBuild createRandomBuild() {
         Set<String> keys = tankDefinitions.keySet();
         ArrayList<String> keyList = new ArrayList<>(keys);
-        String randomKey = keyList.get((int)(Math.random() * keyList.size()));
-        return createTankBuild(randomKey);
+        // Generate a random build until a valid one is found
+        TankBuild randBuild;
+        do {
+            String randomKey = keyList.get((int)(Math.random() * keyList.size()));
+            randBuild = createTankBuild(randomKey);
+        } while (randBuild == null);
+        return randBuild;
     }
 
     public static float getRand(float maxV) {

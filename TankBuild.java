@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 public class TankBuild
 {
@@ -86,6 +88,10 @@ public class TankBuild
     public static TankBuild createTankBuild(String name) {
         name = name.trim().toLowerCase();
         JSONObject jsonTank = tankDefinitions.get(name);
+        if (jsonTank == null) {
+            System.out.println("Tank definition not found: " + name);
+            jsonTank = tankDefinitions.get("tank");  // Default to tank
+        }
 
         JSONArray jsonBarrels = jsonTank.getJSONArray("barrels");
 
@@ -107,6 +113,17 @@ public class TankBuild
         float fieldFactor = jsonTank.getFloat("fieldFactor");
 
         return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
+    }
+
+    /**
+     * Create a TankBuild object from a random tank definition in TankDefinitions.json
+     * @return
+     */
+    public static TankBuild createRandomBuild() {
+        Set<String> keys = tankDefinitions.keySet();
+        ArrayList<String> keyList = new ArrayList<>(keys);
+        String randomKey = keyList.get((int)(Math.random() * keyList.size()));
+        return createTankBuild(randomKey);
     }
 
     public static float getRand(float maxV) {
@@ -135,7 +152,7 @@ public class TankBuild
         return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
     }
     
-    public static TankBuild RandEnemy() {
+    public static TankBuild createNewRandomBuild() {
         int barrelAmount = (int)(Math.random() * 10);
 
         Barrel[] barrels = new Barrel[barrelAmount];
@@ -156,6 +173,7 @@ public class TankBuild
 
         return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
     }
+
  /*   // Static creation methods
     public static TankBuild tank() {
         Barrel[] barrels = new Barrel[]{

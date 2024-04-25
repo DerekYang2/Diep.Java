@@ -35,7 +35,7 @@ public class Graphics extends Raylib {
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
-    public static Texture2D whiteCirc, whiteRect, whiteCircNoAA, whiteRectRounder;
+    public static Texture2D whiteCirc, whiteRect, whiteCircNoAA, whiteRectRounder, whiteTrapezoid;
 
     // Colors
     public static Color RED = rgb(241, 78, 84),
@@ -99,11 +99,13 @@ public class Graphics extends Raylib {
         whiteCircNoAA = loadTexture("whiteCircle.png");
         whiteRect = loadTexture("whiteRect.png");
         whiteRectRounder = loadTexture("whiteRect2.png");
+        whiteTrapezoid = loadTexture("trapezoid.png");
 
         if (ANTIALIASING == 1) {
             setTextureAntiAliasing(whiteCirc);
             setTextureAntiAliasing(whiteRect);
             setTextureAntiAliasing(whiteRectRounder);
+            setTextureAntiAliasing(whiteTrapezoid);
         }
     }
 
@@ -343,6 +345,23 @@ public class Graphics extends Raylib {
         Rectangle srcRect = new Rectangle(rectTexture.width - rectTexture.height * aspectRatio, 0, rectTexture.height * aspectRatio, rectTexture.height);
         rTextures.DrawTexturePro(rectTexture, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), strokeCol);
         Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
+    }
+
+    public static void drawTurretTrapezoid(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity) {
+        color = colAlpha(color, opacity);
+        strokeCol = colAlpha(strokeCol, opacity);
+
+        boolean isFlipped = false;
+
+        stroke *= (ANTIALIASING == 1 ? 0.9f: 1);
+
+        height *= 1.14f;
+        float textureWidth = whiteTrapezoid.getWidth();
+        float textureHeight = whiteTrapezoid.getHeight();
+
+        height *= 2.57f/1.68f;
+        rTextures.DrawTexturePro(whiteTrapezoid, new Rectangle(0, 0, (isFlipped?-1:1)*textureWidth, textureHeight), new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), strokeCol);
+        rTextures.DrawTexturePro(whiteTrapezoid, new Rectangle(0, 0, (isFlipped?-1:1)*textureWidth, textureHeight), new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)(radians * 180/Math.PI), color);
     }
 
     public static void drawRectangleLines(Rectangle rect, float stroke, Color color) {

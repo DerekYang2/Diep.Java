@@ -101,14 +101,14 @@ public class TankBuild
 
         for (int i = 0; i < jsonBarrels.length(); i++) {  // Loop through each barrel object
             JSONObject jsonBarrel = jsonBarrels.getJSONObject(i);
-            barrels[i] = new Barrel(jsonBarrel.getFloat("width"), jsonBarrel.getFloat("size"), jsonBarrel.getFloat("offset"), jsonBarrel.getDouble("angle"), jsonBarrel.getBoolean("isTrapezoid"));
+            barrels[i] = new Barrel(jsonBarrel.getFloat("width"), jsonBarrel.getFloat("size"), jsonBarrel.getFloat("offset"), jsonBarrel.getDouble("angle"), jsonBarrel.getBoolean("isTrapezoid"), jsonBarrel.getDouble("trapezoidDirection") != 0);
 
             reloadData[i] = new double[] {jsonBarrel.getDouble("delay"), jsonBarrel.getDouble("reload")};
 
             JSONObject jsonBullet = jsonBarrel.getJSONObject("bullet");
 
             if (!jsonBullet.getString("type").equals("bullet")) {  // Temporary until more bullet types are added, TODO: REMOVE WHEN DONE
-                return null;
+                //return null;
             }
 
             bulletStats[i] = new BulletStats(jsonBullet.getFloat("sizeRatio"), jsonBullet.getFloat("health"), jsonBullet.getFloat("damage"), jsonBullet.getFloat("speed"), jsonBullet.getFloat("scatterRate"), jsonBullet.getFloat("lifeLength"), jsonBullet.getFloat("absorbtionFactor"), jsonBarrel.getFloat("recoil"));
@@ -149,7 +149,7 @@ public class TankBuild
 
         for (int i = 0; i < barrelAmount; i++) {  // Loop through each barrel object
             
-            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false);
+            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false, false);
 
             reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
 
@@ -171,7 +171,7 @@ public class TankBuild
 
         for (int i = 0; i < barrelAmount; i++) {  // Loop through each barrel object
             
-            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false);
+            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false, false);
 
             reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
 

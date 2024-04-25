@@ -13,17 +13,18 @@ public class Barrel {
     float turretWidth, turretLengthOG;  // renamed variables
     float turretLength;
 
-    boolean isTrapezoid;
+    boolean isTrapezoid, flippedTrapezoid;  // Flipped trapezoid has smaller end at the end of barrel
 
     // Recoil animation constants
     final int recoilTime = 30;  // Time in frames for recoil animation
     final float recoilLengthFactor = 0.1f;  // Percent of turret width to reduce in recoil animation
     Tank host;  // For color and other things that may appear in the future
 
-    Barrel(float width, float length, float offset, double radians, boolean isTrapezoid) {  // renamed parameters
+    Barrel(float width, float length, float offset, double radians, boolean isTrapezoid, boolean flippedTrapezoid) {  // renamed parameters
         this.turretWidth = width;
         this.turretLengthOG = turretLength = length;
         this.isTrapezoid = isTrapezoid;
+        this.flippedTrapezoid = flippedTrapezoid;
 
         // Rotate (0, offset) by radians around 0, 0
         posOriginal = Graphics.rotatePoint(new Vector2(0, offset), new Vector2(0, 0), radians);
@@ -57,7 +58,7 @@ public class Barrel {
         //rTextures.DrawTexturePro(testRect, srcRect, new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)(theta * 180/Math.PI), Main.strokeCol);
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * Graphics.strokeWidth), new Vector2(Graphics.strokeWidth, (width - 2 * Graphics.strokeWidth)/2.f), (float)theta, color);
         if (isTrapezoid) {
-            Graphics.drawTurretTrapezoid(xleft, ycenter, length, width, radians, Graphics.strokeWidth, Graphics.GREY, Graphics.GREY_STROKE, (float)Math.pow(host.opacity,3));
+            Graphics.drawTurretTrapezoid(xleft, ycenter, length, width, radians, Graphics.strokeWidth, Graphics.GREY, Graphics.GREY_STROKE, (float)Math.pow(host.opacity,3), flippedTrapezoid);
         } else {
             Graphics.drawTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, Graphics.GREY, Graphics.GREY_STROKE, (float) Math.pow(host.opacity, 3));  // Square host.opacity for a steeper curve (x^3)
         }

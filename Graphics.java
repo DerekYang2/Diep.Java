@@ -22,7 +22,6 @@ public class Graphics extends Raylib {
     public static int ANTIALIASING = 1, PERFORMANCE_MODE = 0;  // Constant environment variables
     public static float strokeWidth = 7f;
     public static int FPS = 60 * (2 - PERFORMANCE_MODE);
-    final static int TASKBAR_HEIGHT = 48, TITLEBAR_HEIGHT = 32;
     final public static int cameraWidth = 1920;
     final public static int cameraHeight = 1080;
     public static int screenWidth, screenHeight;
@@ -57,7 +56,11 @@ public class Graphics extends Raylib {
     public static void initialize(String title) {
         // First get environment setup
         getEnvironmentVariables();
-        DisplayMode monitor = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        DisplayMode monitor = gd.getDisplayMode();
+        GraphicsConfiguration gc = gd.getDefaultConfiguration();
+        Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
 
         if (monitor.getRefreshRate() < 120) {
             PERFORMANCE_MODE = 1;
@@ -65,8 +68,8 @@ public class Graphics extends Raylib {
 
         FPS = 60 * (2 - PERFORMANCE_MODE);
         // Screen dimensions (actual monitor pixels)
-        screenWidth = monitor.getWidth();
-        screenHeight = monitor.getHeight() - TASKBAR_HEIGHT - TITLEBAR_HEIGHT;
+        screenWidth = monitor.getWidth() - insets.left - insets.right;
+        screenHeight = monitor.getHeight() - insets.top - insets.bottom;
 
         // Raylib window
         rlj = new Raylib();
@@ -75,7 +78,7 @@ public class Graphics extends Raylib {
         rlj.core.InitWindow(screenWidth, screenHeight, title);
         rlj.core.MaximizeWindow();
         rlj.core.SetWindowMinSize(320, 240);
-        rlj.core.SetWindowPosition(0, TITLEBAR_HEIGHT);
+        // rlj.core.SetWindowPosition(0, 0);
 
         // Render texture
         target = rlj.textures.LoadRenderTexture(cameraWidth, cameraHeight);
@@ -347,11 +350,9 @@ public class Graphics extends Raylib {
         Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
     }
 
-    public static void drawTurretTrapezoid(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity) {
+    public static void drawTurretTrapezoid(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity, boolean isFlipped) {
         color = colAlpha(color, opacity);
         strokeCol = colAlpha(strokeCol, opacity);
-
-        boolean isFlipped = false;
 
         stroke *= (ANTIALIASING == 1 ? 0.9f: 1);
 

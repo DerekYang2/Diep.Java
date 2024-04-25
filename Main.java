@@ -45,13 +45,15 @@ public class Main {
     private static void updateCamera() {
         Vector2 difference = Raymath.Vector2Subtract(player.pos, Graphics.getCameraTarget());
         Graphics.shiftCameraTarget(Raymath.Vector2Scale(difference, 0.05f));
+        float delta = Graphics.getCameraZoom()/100;
         if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() - 0.005f);
+            Graphics.setCameraZoom(Graphics.getCameraZoom() - delta);
         }
         if (Graphics.isKeyDown(Keyboard.KEY_UP)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() + 0.005f);
+            Graphics.setCameraZoom(Graphics.getCameraZoom() + delta);
         }
-
+        // Cap the zoom level
+        Graphics.setCameraZoom(Math.max(0.1f, Math.min(10f, Graphics.getCameraZoom())));
     }
 
     // TEMP: Debugging/analysis

@@ -85,28 +85,6 @@ public class Tank extends GameObject {
             return;
         }
 
-        // Keep tank within the arena
-        if (pos.x < 0) {
-            pos.x = 0;
-            // A bit of bounce right
-            vel.x = Math.abs(vel.x * absorptionFactor * 0);
-        }
-        if (pos.x > Main.arenaWidth) {
-            pos.x = Main.arenaWidth;
-            // A bit of bounce left
-            vel.x = -Math.abs(vel.x * absorptionFactor * 0);
-        }
-        if (pos.y < 0) {
-            pos.y = 0;
-            // A bit of bounce down
-            vel.y = Math.abs(vel.y * absorptionFactor * 0);
-        }
-        if (pos.y > Main.arenaHeight) {
-            pos.y = Main.arenaHeight;
-            // A bit of bounce up
-            vel.y = -Math.abs(vel.y * absorptionFactor * 0);
-        }
-
         // Health updates
         if (Main.counter - lastDamageFrame > 30 * 120) {  // After 30 seconds, hyper-regen
             health += maxHealth / (120 * 10);  // 10 percent HP per second

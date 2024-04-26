@@ -34,7 +34,7 @@ public class Graphics extends Raylib {
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
-    public static Texture2D whiteCirc, whiteRect, whiteCircNoAA, whiteRectRounder, whiteTrapezoid;
+    public static Texture2D whiteCirc, whiteRect, whiteCircNoAA, whiteRectRounder, whiteTrapezoid, whiteTriangleRounded, whiteTriangleSharp;
 
     // Colors
     public static Color RED = rgb(241, 78, 84),
@@ -103,12 +103,16 @@ public class Graphics extends Raylib {
         whiteRect = loadTexture("whiteRect.png");
         whiteRectRounder = loadTexture("whiteRect2.png");
         whiteTrapezoid = loadTexture("trapezoid.png");
+        whiteTriangleRounded = loadTexture("RoundedTriangle.png");
+        whiteTriangleSharp = loadTexture("SharpTriangle.png");
 
         if (ANTIALIASING == 1) {
             setTextureAntiAliasing(whiteCirc);
             setTextureAntiAliasing(whiteRect);
             setTextureAntiAliasing(whiteRectRounder);
             setTextureAntiAliasing(whiteTrapezoid);
+            setTextureAntiAliasing(whiteTriangleRounded);
+            setTextureAntiAliasing(whiteTriangleSharp);
         }
     }
 
@@ -333,6 +337,15 @@ public class Graphics extends Raylib {
 
     public static void drawRectangleRounded(float x, float y, float width, float height, float roundness, Color color) {
         rlj.shapes.DrawRectangleRounded(new Rectangle(x, y, width, height), roundness, 5, color);
+    }
+
+    public static void drawTriangleRounded(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {
+        // Height of triangle is 3/2 * diameter or 3 * radius
+        float height = 3 * radius;  // Height of the triangle
+        float sideLen = (float) (2.0/Math.sqrt(3) * height);  // Width of the triangle
+        // Note on texture, texture height is sideLen and texture width is height (since sideways is 0 radians)
+        rTextures.DrawTexturePro(whiteTriangleRounded, new Rectangle(0, 0, whiteTriangleRounded.width, whiteTriangleRounded.height), new Rectangle(centerPos.x, centerPos.y, height, sideLen), new Vector2(height/3, sideLen/2.f), (float)(radians * 180/Math.PI), strokeCol);
+        rTextures.DrawTexturePro(whiteTriangleSharp, new Rectangle(0, 0, whiteTriangleSharp.width, whiteTriangleSharp.height), new Rectangle(centerPos.x, centerPos.y, height - 2 * strokeWidth, sideLen - 2 * strokeWidth), new Vector2(height/3 - strokeWidth, (sideLen - 2*strokeWidth) * 0.5f), (float)(radians * 180/Math.PI), color);
     }
 
     public static void drawTurret(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity) {

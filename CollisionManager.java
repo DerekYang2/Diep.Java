@@ -75,6 +75,7 @@ public class CollisionManager {
                         }
 
                         GameObject obj1 = Main.gameObjectPool.getObj(idSmall), obj2 = Main.gameObjectPool.getObj(idLarge);
+                        boolean areDrones = obj1 instanceof Drone && obj2 instanceof Drone;
 
                         if (obj1.group != obj2.group) { // Collision if groups are different, knockback and damage
                             int objHash = obj1.id * maxId + obj2.id;  // Unique hash for a pair of ids
@@ -83,7 +84,7 @@ public class CollisionManager {
                                 GameObject.receiveDamage(obj1, obj2);
                                 collidedPairs.add(objHash);
                             }
-                        } else if (!obj1.noInternalCollision && !obj2.noInternalCollision) {  // Same group, but neither have no collision flag
+                        } else if ((!obj1.noInternalCollision && !obj2.noInternalCollision) || areDrones) {  // Same group, but neither have no collision flag
                             int objHash = obj1.id * maxId + obj2.id;  // Unique hash for a pair of ids
                             if (obj1.checkCollision(obj2) && !collidedPairs.contains(objHash)) {
                                 GameObject.receiveKnockback(obj1, obj2);  // Only knockback, no damage

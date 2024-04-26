@@ -6,6 +6,8 @@ public abstract class GameObject implements Updatable, Drawable {
     // Objects always collide each other regardless of group (unless noInternalCollision is true)
     int group;  // Objects in different groups damage each other
     boolean noInternalCollision = false;  // Object does not collide with objects only in the same group (applies to bullets for now)
+    boolean keepInArena = true;  // Object does not go out of the arena
+
     protected Vector2 pos, vel;
     float friction = 0.988f;  // default: 0.9^(25/120)
     protected int id;
@@ -79,6 +81,10 @@ public abstract class GameObject implements Updatable, Drawable {
         pos = Raymath.Vector2Add(pos, vel);
         vel = Raymath.Vector2Scale(vel, friction);
 
+        if (keepInArena) {
+            restrictPosition();
+        }
+
         // Deletion animation
         if (isDead) {
             deathAnimationFrames--;
@@ -133,6 +139,30 @@ public abstract class GameObject implements Updatable, Drawable {
         addForce(force);
     }
 
+    private void restrictPosition() {
+        // Keep object within the arena
+        if (pos.x < 0) {
+            pos.x = 0;
+            // A bit of bounce right
+            vel.x = Math.abs(vel.x * absorptionFactor * 0);
+        }
+        if (pos.x > Main.arenaWidth) {
+            pos.x = Main.arenaWidth;
+            // A bit of bounce left
+            vel.x = -Math.abs(vel.x * absorptionFactor * 0);
+        }
+        if (pos.y < 0) {
+            pos.y = 0;
+            // A bit of bounce down
+            vel.y = Math.abs(vel.y * absorptionFactor * 0);
+        }
+        if (pos.y > Main.arenaHeight) {
+            pos.y = Main.arenaHeight;
+            // A bit of bounce up
+            vel.y = -Math.abs(vel.y * absorptionFactor * 0);
+        }
+    }
+
     public Rectangle boundingBox() {
         return new Rectangle(pos.x - radius*scale, pos.y - radius*scale, radius*scale*2, radius*scale*2);
     }
@@ -147,7 +177,7 @@ public abstract class GameObject implements Updatable, Drawable {
             return;
         }
         // https://www.desmos.com/calculator/p9tyewb18m
-        float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.024f;
+        float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.0245f;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
         float knockbackAngle = (float) Math.atan2(diffY, diffX);
         addForce(knockbackMagnitude, knockbackAngle);

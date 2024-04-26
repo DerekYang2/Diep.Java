@@ -13,7 +13,13 @@ public class Barrel {
     float turretWidth, turretLengthOG;  // renamed variables
     float turretLength;
 
-    boolean isTrapezoid, flippedTrapezoid;  // Flipped trapezoid has smaller end at the end of barrel
+    // Custom to trapezoid rendered turrets
+    boolean isTrapezoid = false, flippedTrapezoid = false;  // Flipped trapezoid has smaller end at the end of barrel
+
+    // Custom to drone controlling turrets
+    int maxDrones;  // Maximum number of drones that can be spawned
+    boolean canControlDrones;
+    int droneCount = 0;  // Number of drones currently spawned
 
     // Recoil animation constants
     final int recoilTime = 30;  // Time in frames for recoil animation
@@ -23,6 +29,8 @@ public class Barrel {
     Barrel(float width, float length, float offset, double radians, boolean isTrapezoid, boolean flippedTrapezoid) {  // renamed parameters
         this.turretWidth = width;
         this.turretLengthOG = turretLength = length;
+
+        // Trapezoid turrets
         this.isTrapezoid = isTrapezoid;
         this.flippedTrapezoid = flippedTrapezoid;
 
@@ -32,12 +40,18 @@ public class Barrel {
         angleRelative = radians;
 
         // prevAngle = -Math.PI / 2; // spawn pointing upward
-/*    testRect = rTextures.LoadTexture("whiteRect.png");
-    Graphics.rlj.textures.GenTextureMipmaps(testRect);
-    rTextures.SetTextureFilter(testRect, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
-    float aspectRatio = length/width;
-    System.out.println("Aspect Ratio: " + aspectRatio);
-    srcRect = new Rectangle(testRect.width - testRect.height * aspectRatio, 0, testRect.height * aspectRatio, testRect.height);*/
+    /*    testRect = rTextures.LoadTexture("whiteRect.png");
+        Graphics.rlj.textures.GenTextureMipmaps(testRect);
+        rTextures.SetTextureFilter(testRect, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        float aspectRatio = length/width;
+        System.out.println("Aspect Ratio: " + aspectRatio);
+        srcRect = new Rectangle(testRect.width - testRect.height * aspectRatio, 0, testRect.height * aspectRatio, testRect.height);*/
+    }
+
+    public void initializeDrones(int maxDrones, boolean canControlDrones) {
+        this.maxDrones = maxDrones;
+        this.canControlDrones = canControlDrones;
+        droneCount = 0;
     }
 
     public void setHost(Tank host) {
@@ -98,18 +112,31 @@ public class Barrel {
      * @return
      */
     public Vector2 shoot(BulletStats bulletStats) {
-        recoilFrames = recoilTime;  // Set to max recoil time
 
         double scatterAngle = Math.toRadians(bulletStats.scatterRate * (Math.random() - 0.5) * 10);  // -5 to 5 degrees times scatter rate
         float bulletAngle = (float) (angleAbsolute + angleRelative + scatterAngle);  // Apply scatter angle to bullet angle
 
         if (bulletStats.type.equals("bullet")) {
-            new Bullet(host, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+            new Bullet(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
         } else if (bulletStats.type.equals("drone")) {
-            new Drone(host, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+            if (droneCount == maxDrones) {
+                return new Vector2(0, 0);  // Return no recoil if max drones are spawned
+            }
+            new Drone(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale * (0.74f)), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+            incrementDroneCount();  // Increment drone count
         }
+
+        recoilFrames = recoilTime;  // Set to max recoil time (animation)
+
         float recoilMagnitude = 2 * bulletStats.recoil * (1-host.friction) * 10;  // (1-host.friction)/(1-0.9) = 10 * (1-host.friction), conversion from 25 fps to 120 fps
         Vector2 recoilDirection = new Vector2((float) (-Math.cos(bulletAngle)), (float) (-Math.sin(bulletAngle))); // Return recoil direction, opposite of bullet direction
         return Raymath.Vector2Scale(recoilDirection, recoilMagnitude);  // Scale the recoil direction
+    }
+
+    public void incrementDroneCount() {
+        droneCount++;
+    }
+    public void decrementDroneCount() {
+        droneCount--;
     }
 }

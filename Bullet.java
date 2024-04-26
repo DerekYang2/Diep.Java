@@ -7,12 +7,15 @@ public class Bullet extends GameObject {
     int lifeFrames;
     Color fillCol;
     Color strokeCol;
+    Tank host;
 
     // The bullet trajectory will be determined based on the position where it spawns
-    public Bullet(Tank host, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
-        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor, 1f);
+    public Bullet(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
+        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + hostBarrel.host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor, 1f);
         this.noInternalCollision = true;  // No internal collision for bullets
+        this.keepInArena = false;
 
+        this.host = hostBarrel.host;
         this.group = host.group;  // Set group to host group (TODO: make a collision and damage group)
 
         // Calculate bullet stats
@@ -48,6 +51,11 @@ public class Bullet extends GameObject {
         super.update();
 
         if (isDead) return;
+
+        if (host.isDead) {
+            triggerDelete();
+            return;
+        }
 
         addForce(acceleration, direction);
         lifeFrames--;

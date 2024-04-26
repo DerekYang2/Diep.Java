@@ -108,6 +108,11 @@ public class TankBuild
             JSONObject jsonBullet = jsonBarrel.getJSONObject("bullet");
 
             bulletStats[i] = new BulletStats(jsonBullet.getString("type"), jsonBullet.getFloat("sizeRatio"), jsonBullet.getFloat("health"), jsonBullet.getFloat("damage"), jsonBullet.getFloat("speed"), jsonBullet.getFloat("scatterRate"), jsonBullet.getFloat("lifeLength"), jsonBullet.getFloat("absorbtionFactor"), jsonBarrel.getFloat("recoil"));
+
+            // If drone
+            if (bulletStats[i].type.equals("drone")) {
+                barrels[i].initializeDrones(jsonBarrel.getInt("droneCount"), jsonBarrel.getBoolean("canControlDrones"));
+            }
         }
 
         FireManager fireManager = new FireManager(reloadData);

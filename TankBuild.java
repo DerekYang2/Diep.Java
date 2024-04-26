@@ -107,11 +107,7 @@ public class TankBuild
 
             JSONObject jsonBullet = jsonBarrel.getJSONObject("bullet");
 
-            if (!jsonBullet.getString("type").equals("bullet")) {  // Temporary until more bullet types are added, TODO: REMOVE WHEN DONE
-                //return null;
-            }
-
-            bulletStats[i] = new BulletStats(jsonBullet.getFloat("sizeRatio"), jsonBullet.getFloat("health"), jsonBullet.getFloat("damage"), jsonBullet.getFloat("speed"), jsonBullet.getFloat("scatterRate"), jsonBullet.getFloat("lifeLength"), jsonBullet.getFloat("absorbtionFactor"), jsonBarrel.getFloat("recoil"));
+            bulletStats[i] = new BulletStats(jsonBullet.getString("type"), jsonBullet.getFloat("sizeRatio"), jsonBullet.getFloat("health"), jsonBullet.getFloat("damage"), jsonBullet.getFloat("speed"), jsonBullet.getFloat("scatterRate"), jsonBullet.getFloat("lifeLength"), jsonBullet.getFloat("absorbtionFactor"), jsonBarrel.getFloat("recoil"));
         }
 
         FireManager fireManager = new FireManager(reloadData);
@@ -153,7 +149,7 @@ public class TankBuild
 
             reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
 
-            bulletStats[i] = new BulletStats(getRand(1)+0.5f, 1, 1, getRand(3.f), getRand(10), getRand(2), 1, getRand(15));
+            bulletStats[i] = new BulletStats("bullet", getRand(1)+0.5f, 1, 1, getRand(3.f), getRand(10), getRand(2), 1, getRand(15));
         }
 
         FireManager fireManager = new FireManager(reloadData);
@@ -175,7 +171,7 @@ public class TankBuild
 
             reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
 
-            bulletStats[i] = new BulletStats(getRand(1)+0.5f, 1, 1, getRand(3.f), getRand(10), getRand(2), 1, getRand(15));
+            bulletStats[i] = new BulletStats("bullet", getRand(1)+0.5f, 1, 1, getRand(3.f), getRand(10), getRand(2), 1, getRand(15));
         }
 
         FireManager fireManager = new FireManager(reloadData);

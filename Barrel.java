@@ -103,8 +103,11 @@ public class Barrel {
         double scatterAngle = Math.toRadians(bulletStats.scatterRate * (Math.random() - 0.5) * 10);  // -5 to 5 degrees times scatter rate
         float bulletAngle = (float) (angleAbsolute + angleRelative + scatterAngle);  // Apply scatter angle to bullet angle
 
-        Bullet b = new Bullet(host, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
-
+        if (bulletStats.type.equals("bullet")) {
+            new Bullet(host, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+        } else if (bulletStats.type.equals("drone")) {
+            new Drone(host, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+        }
         float recoilMagnitude = 2 * bulletStats.recoil * (1-host.friction) * 10;  // (1-host.friction)/(1-0.9) = 10 * (1-host.friction), conversion from 25 fps to 120 fps
         Vector2 recoilDirection = new Vector2((float) (-Math.cos(bulletAngle)), (float) (-Math.sin(bulletAngle))); // Return recoil direction, opposite of bullet direction
         return Raymath.Vector2Scale(recoilDirection, recoilMagnitude);  // Scale the recoil direction

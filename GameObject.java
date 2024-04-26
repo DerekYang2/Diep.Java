@@ -6,7 +6,6 @@ public abstract class GameObject implements Updatable, Drawable {
     // Objects always collide each other regardless of group (unless noInternalCollision is true)
     int group;  // Objects in different groups damage each other
     boolean noInternalCollision = false;  // Object does not collide with objects only in the same group (applies to bullets for now)
-
     protected Vector2 pos, vel;
     float friction = 0.988f;  // default: 0.9^(25/120)
     protected int id;
@@ -16,6 +15,7 @@ public abstract class GameObject implements Updatable, Drawable {
     // Health
     float maxHealth = 0, health = 0;
     float damage = 0;
+    float damageFactor = 1;
     boolean isDead = false;
     final int DEATH_ANIMATION_FRAMES = 120/5;
     int deathAnimationFrames = DEATH_ANIMATION_FRAMES;  // A fifth of a second
@@ -28,20 +28,22 @@ public abstract class GameObject implements Updatable, Drawable {
 
     // Collision
     float absorptionFactor = 1, pushFactor = 8;  // Default
-    public GameObject(Vector2 pos, int radius) {
+    public GameObject(Vector2 pos, int radius, float damageFactor) {
         this.pos = pos;
         this.vel = new Vector2(0, 0);
         this.radius = radius;
+        this.damageFactor = damageFactor;
         createId();
         addToPools();
         group = id;
     }
-    public GameObject(Vector2 pos, int radius, float absorptionFactor, float pushFactor) {
+    public GameObject(Vector2 pos, int radius, float absorptionFactor, float pushFactor, float damageFactor) {
         this.pos = pos;
         this.vel = new Vector2(0, 0);
         this.radius = radius;
         this.absorptionFactor = absorptionFactor;
         this.pushFactor = pushFactor;
+        this.damageFactor = damageFactor;
         createId();
         addToPools();
         group = id;
@@ -174,17 +176,26 @@ public abstract class GameObject implements Updatable, Drawable {
         if (a.isDead || b.isDead) {
             return;
         }
-        if (a.damage > b.health) {  // Overkill
-            float scaleDown = b.health / a.damage;  // Scale down damage so that b just dies
-            b.receiveDamage(scaleDown * a.damage);
-            a.receiveDamage(scaleDown * b.damage);
-        } else if (b.damage > a.health) {
-            float scaleDown = a.health / b.damage;  // Scale down damage so that a just dies
-            a.receiveDamage(scaleDown * b.damage);
-            b.receiveDamage(scaleDown * a.damage);
+        float aDamage = a.damage * b.damageFactor;
+        float bDamage = b.damage * a.damageFactor;
+
+        // If both are tanks
+        if (a instanceof Tank && b instanceof Tank) {
+            aDamage *= 1.5f;
+            bDamage *= 1.5f;
+        }
+
+        if (aDamage > b.health) {  // Overkill
+            float scaleDown = b.health / aDamage;  // Scale down damage so that b just dies
+            b.receiveDamage(scaleDown * aDamage);
+            a.receiveDamage(scaleDown * bDamage);
+        } else if (bDamage > a.health) {
+            float scaleDown = a.health / bDamage;  // Scale down damage so that a just dies
+            a.receiveDamage(scaleDown * bDamage);
+            b.receiveDamage(scaleDown * aDamage);
         } else {
-            a.receiveDamage(b.damage);
-            b.receiveDamage(a.damage);
+            a.receiveDamage(bDamage);
+            b.receiveDamage(aDamage);
         }
     }
 

@@ -24,6 +24,11 @@ public class BotController implements Controller {
     }
 
     @Override
+    public Vector2 getTarget() {
+        return Main.player.pos;
+    }
+
+    @Override
     public float moveDirection() {
         // Bot will bounce around the arena
         float xComp = (float) Math.cos(moveDir);

@@ -1,7 +1,9 @@
 public class BulletStats
 {
+    public String type;
     public float sizeRatio, health, damage, speed, scatterRate, lifeLength, absorbtionFactor, recoil;
-    public BulletStats(float sizeRatio, float health, float damage, float speed, float scatterRate, float lifeLength, float absorbtionFactor, float recoil) {
+    public BulletStats(String type, float sizeRatio, float health, float damage, float speed, float scatterRate, float lifeLength, float absorbtionFactor, float recoil) {
+        this.type = type;
         this.sizeRatio = sizeRatio;
         this.health = health;
         this.damage = damage;

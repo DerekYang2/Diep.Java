@@ -1,3 +1,5 @@
+import com.raylib.java.raymath.Vector2;
+
 import java.util.ArrayList;
 
 import static com.raylib.java.core.input.Keyboard.*;
@@ -18,6 +20,11 @@ public class PlayerController implements Controller {
     @Override
     public float barrelDirection() {
         return (float) Math.atan2(Graphics.getVirtualMouse().y - host.pos.y, Graphics.getVirtualMouse().x - host.pos.x);
+    }
+
+    @Override
+    public Vector2 getTarget() {
+        return Graphics.getVirtualMouse();
     }
 
     /**

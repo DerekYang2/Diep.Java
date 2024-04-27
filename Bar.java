@@ -1,15 +1,15 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 
-// TODO: Animation for health bar
-
 public class Bar implements Drawable {
     protected int id;
     protected Vector2 pos;  // CORNER position of the bar, not center
     protected int width, height, strokeWidth;
     protected Color fillCol, strokeCol;
+    protected float targetPercentage;
     protected float percentage;
     float opacity;
+    float lerpFactor = 0.1f;
     boolean isHiding;
 
     public Bar(float width, float height, float strokeWidth, Color fillCol, Color strokeCol) {
@@ -19,7 +19,7 @@ public class Bar implements Drawable {
         this.strokeWidth = Math.round(strokeWidth);
         this.fillCol = fillCol;
         this.strokeCol = strokeCol;
-        percentage = 1.f;
+        this.targetPercentage = this.percentage = 1.f;
         isHiding = false;
         opacity = 1;
         createId();
@@ -33,7 +33,10 @@ public class Bar implements Drawable {
      */
     public void update(Vector2 pos, float percentage) {
         this.pos = pos;
-        this.percentage = percentage;
+        this.targetPercentage = percentage;
+
+        // Animate the bar (LERP)
+        this.percentage += (this.targetPercentage - this.percentage) * lerpFactor;
 
         if (isHiding) {
             opacity -= 1.f/12;

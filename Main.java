@@ -45,7 +45,7 @@ public class Main {
         player = new Player(new Vector2(0,0), "overlord");
 
         for (int i = 0; i < spawn; i++) {
-            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), "overseer");
+            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), "gunner");
             t.group = -1;
         }
         Graphics.setCameraTarget(player.pos);

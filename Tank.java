@@ -30,6 +30,11 @@ public class Tank extends GameObject {
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats) {
         super(pos, 50, 1.f);
+
+        super.noInternalCollision = false;
+        super.keepInArena = true;
+        super.isProjectile = false;
+
         initHealthBar();  // Initialize health bar object
 
         this.stats = stats;
@@ -37,7 +42,7 @@ public class Tank extends GameObject {
 
         updateStats();  // Update tank based on level and stats
         this.controller.setHost(this);  // Set the controller's host to this tank
-        setTankBuild(TankBuild.createTankBuild("smasher"));  // Default tank build
+        setTankBuild(TankBuild.createTankBuild("triplet"));  // Default tank build
     }
 
     public void setTankBuild(TankBuild tankBuild) {
@@ -53,7 +58,7 @@ public class Tank extends GameObject {
         // Max health
         super.setMaxHealth(50 + (2 * (level - 1)) + (20 * stats.getStat(Stats.MAX_HEALTH)));
         // Body Damage
-        super.setDamage((20 + 6 * stats.getStat(Stats.BODY_DAMAGE)) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE (or maybe not in diepcustom repo, spike is mutliplied though)
+        super.setDamage(1.1f * (20 + 6 * stats.getStat(Stats.BODY_DAMAGE)) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE (or maybe not in diepcustom repo, spike is mutliplied though)
         // ACCELERATION: https://www.desmos.com/calculator/qre98xzg76
         float A0 = (float)(2.55 * Math.pow(1.07, stats.getStat(Stats.MOVEMENT_SPEED)) / Math.pow(1.015, level - 1));
         float convergeSpeed = (10 * A0) * (25.f/120);  // 10A0 is max speed, 25/120 is scaling factor for 25->120 fps
@@ -119,7 +124,12 @@ public class Tank extends GameObject {
         tankBuild.draw();
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
-        Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, fillCol, strokeCol, opacity);
+
+        Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
+    }
+
+    public boolean specialControl() {
+        return controller.special();
     }
 
     @Override

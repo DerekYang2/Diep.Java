@@ -3,6 +3,7 @@ import com.raylib.java.raymath.Vector2;
 
 public class Drone extends GameObject {
     protected float acceleration;
+    float targetDirection;
     float direction;
     Vector2 target;
     Color fillCol;
@@ -10,9 +11,12 @@ public class Drone extends GameObject {
     Barrel hostBarrel;
 
     public Drone(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
-        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + hostBarrel.host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor, 1f);
-        this.noInternalCollision = true;  // No internal collision for bullets, TODO: collide with each other
-        this.keepInArena = true;
+        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f);
+
+        // Flags
+        super.noInternalCollision = true;  // Does not collide with bullets from same group, exception: collides with drones of same group
+        super.keepInArena = true;
+        super.isProjectile = true;
 
         this.hostBarrel = hostBarrel;  // Set the host barrel object
         Tank host = hostBarrel.host;  // Get the tank of the host barrel
@@ -25,10 +29,10 @@ public class Drone extends GameObject {
         float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
         float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed - (float)Math.random() * bulletStats.scatterRate;  // src: not link above (check diepcustom repo)
 
-        super.setDamage(damage * (25.f / 120) * 0.85f);  // Scale down because different fps
+        super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
-        this.direction = direction;
+        this.targetDirection = this.direction = (float) Graphics.normalizeAngle(direction);  // Set direction to normalized angle
 
         // Calculate acceleration to converge to max speed (https://www.desmos.com/calculator/9hakym7jxy)
         this.acceleration = (velMax * 25.f/120) * (1-friction);
@@ -44,11 +48,11 @@ public class Drone extends GameObject {
 
     @Override
     public void draw() {
-        final float scaledRadius = radius * scale;  // scale is always 1 until death animation
+        final float scaledRadius = radius * scale * 0.74f;  // scale is always 1 until death animation
         if (pos.x + scaledRadius < Main.cameraBox.x || pos.x - scaledRadius > Main.cameraBox.x + Main.cameraBox.width || pos.y + scaledRadius < Main.cameraBox.y || pos.y - scaledRadius > Main.cameraBox.y + Main.cameraBox.height) {
             return;
         }
-        Graphics.drawTriangleRounded(pos, scaledRadius, direction, Graphics.strokeWidth, Graphics.colAlpha(fillCol, opacity), Graphics.colAlpha(strokeCol, opacity));
+        Graphics.drawTriangleRounded(pos, scaledRadius, direction, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(fillCol), opacity), Graphics.colAlpha(getDamageLerpColor(strokeCol), opacity));
     }
 
     @Override
@@ -62,11 +66,17 @@ public class Drone extends GameObject {
         }
 
         target = hostBarrel.host.getTarget();
-        direction = (float) Math.atan2(target.y - pos.y, target.x - pos.x);
+        targetDirection = (float) Math.atan2(target.y - pos.y, target.x - pos.x);
+
+        // Repel
+        if (hostBarrel.host.specialControl()) {
+            targetDirection += (float) Math.PI;  // Reverse direction of target
+        }
+
+        direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.18f);
 
         addForce(acceleration, direction);
     }
-
     @Override
     public void triggerDelete() {
         super.triggerDelete();

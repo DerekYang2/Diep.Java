@@ -1,3 +1,4 @@
+import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
@@ -5,8 +6,11 @@ import com.raylib.java.shapes.Rectangle;
 public abstract class GameObject implements Updatable, Drawable {
     // Objects always collide each other regardless of group (unless noInternalCollision is true)
     int group;  // Objects in different groups damage each other
+
+    // Special flags
     boolean noInternalCollision = false;  // Object does not collide with objects only in the same group (applies to bullets for now)
     boolean keepInArena = true;  // Object does not go out of the arena
+    boolean isProjectile;  // If object is projectile, used for collision cases
 
     protected Vector2 pos, vel;
     float friction = 0.988f;  // default: 0.9^(25/120)
@@ -19,9 +23,11 @@ public abstract class GameObject implements Updatable, Drawable {
     float damage = 0;
     float damageFactor = 1;
     boolean isDead = false;
-    final int DEATH_ANIMATION_FRAMES = 120/5;
+    final int DEATH_ANIMATION_FRAMES = 10;
     int deathAnimationFrames = DEATH_ANIMATION_FRAMES;  // A fifth of a second
     float opacity = 1;
+    final int DAMAGE_ANIMATION_FRAMES = 5;
+    int damageAnimationFrames = 0;
 
     // Health bar variables
     Bar healthBar;  // Null if not initialized
@@ -69,9 +75,6 @@ public abstract class GameObject implements Updatable, Drawable {
     }
 
     @Override
-    public abstract void draw();
-
-    @Override
     public void update() {
         if (health <= 0) {
             triggerDelete();
@@ -97,6 +100,11 @@ public abstract class GameObject implements Updatable, Drawable {
                 delete();
             }
             return;
+        }
+
+        // Damage animation
+        if (damageAnimationFrames > 0) {
+            damageAnimationFrames--;
         }
 
         // Update health bar
@@ -127,6 +135,18 @@ public abstract class GameObject implements Updatable, Drawable {
          *         this.positionData.x += this.velocity.x;
          *         this.positionData.y += this.velocity.y;
          */
+    }
+
+    @Override
+    public abstract void draw();
+
+    /**
+     * Returns a color that is a lerp between col and red based on damageAnimationFrames
+     * @param col
+     * @return
+     */
+    public Color getDamageLerpColor(Color col) {
+        return Graphics.lerpColor(col, Color.RED, 0.4f*damageAnimationFrames/DAMAGE_ANIMATION_FRAMES);
     }
 
     public void addForce(Vector2 force) {
@@ -197,7 +217,9 @@ public abstract class GameObject implements Updatable, Drawable {
         }
 
         health -= damage;
-        if (health <= 1e-6) {
+        damageAnimationFrames = DAMAGE_ANIMATION_FRAMES;  // Start damage animation
+
+        if (health <= 1e-6) {  // Close enough to 0
             triggerDelete();
         }
     }
@@ -206,14 +228,17 @@ public abstract class GameObject implements Updatable, Drawable {
         if (a.isDead || b.isDead) {
             return;
         }
+
         float aDamage = a.damage * b.damageFactor;
         float bDamage = b.damage * a.damageFactor;
 
+/*
         // If both are tanks
         if (a instanceof Tank && b instanceof Tank) {
             aDamage *= 1.5f;
             bDamage *= 1.5f;
         }
+*/
 
         if (aDamage > b.health) {  // Overkill
             float scaleDown = b.health / aDamage;  // Scale down damage so that b just dies
@@ -226,6 +251,44 @@ public abstract class GameObject implements Updatable, Drawable {
         } else {
             a.receiveDamage(bDamage);
             b.receiveDamage(aDamage);
+        }
+    }
+
+
+    /**
+     * Applies damage instantly, happens between drones and other projectiles (drone-drone, drone-bullet)
+     * @param a First game object
+     * @param b Second game object
+     */
+    public static void receiveDamageInstant(GameObject a, GameObject b) {
+        if (a.isDead || b.isDead) {
+            return;
+        }
+        float aDamage = a.damage * b.damageFactor;
+        float bDamage = b.damage * a.damageFactor;
+
+        // Calculate ticks until A dies, a.health - ticks * bDamage = 0, solve for ticks
+        int ticksA = (int)Math.ceil(a.health / bDamage);
+        int ticksB = (int)Math.ceil(b.health / aDamage);
+
+        int ticks = Math.min(ticksA, ticksB);
+        // Apply ticks-1 full damage to both
+        if (ticks >= 1) {
+            a.receiveDamage((ticks-1) * bDamage);
+            b.receiveDamage((ticks-1) * aDamage);
+        }
+
+        assert !a.isDead && !b.isDead;  // Should not happen
+
+        // Apply the last tick
+        if (aDamage > b.health) {  // Overkill
+            float scaleDown = b.health / aDamage;  // Scale down damage so that b just dies
+            b.receiveDamage(scaleDown * aDamage);
+            a.receiveDamage(scaleDown * bDamage);
+        } else if (bDamage > a.health) {
+            float scaleDown = a.health / bDamage;  // Scale down damage so that a just dies
+            a.receiveDamage(scaleDown * bDamage);
+            b.receiveDamage(scaleDown * aDamage);
         }
     }
 

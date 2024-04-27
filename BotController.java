@@ -58,4 +58,9 @@ public class BotController implements Controller {
         //shouldFire = false;
         return shouldFire;
     }
+
+    @Override
+    public boolean special() {
+        return false;
+    }
 }

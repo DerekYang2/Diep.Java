@@ -44,7 +44,7 @@ public class Graphics extends Raylib {
             GREY_STROKE = rgb(114, 114, 114),
             GREY = rgb(153, 153, 153),
             GRID = rgb(205, 205, 205),
-            GRID_STROKE = rgba(0, 0, 0, 8),
+            GRID_STROKE = rgba(0, 0, 0, 6),
             BOUNDARY = rgba(0, 0, 0, 15),
             HEALTH_BAR = rgb(133, 227, 125),
             HEALTH_BAR_STROKE = rgb(85, 85, 85);
@@ -420,5 +420,62 @@ public class Graphics extends Raylib {
         float cosTheta = (float) Math.cos(radians);
         float sinTheta = (float) Math.sin(radians);
         return new Vector2(cosTheta * (point.x - origin.x) - sinTheta * (point.y - origin.y) + origin.x, sinTheta * (point.x - origin.x) + cosTheta * (point.y - origin.y) + origin.y);
+    }
+
+    /**
+     * Is the rotation clockwise from fromRadians to toRadians
+     * @param fromRadians The starting angle
+     * @param toRadians The ending angle
+     * @return True if the rotation is clockwise, false otherwise
+     */
+    public static boolean isClockwise(double fromRadians, double toRadians)
+    {
+        // normalize from and to
+        fromRadians = normalizeAngle(fromRadians);
+        toRadians = normalizeAngle(toRadians);
+
+        if (fromRadians < toRadians) {
+            return toRadians - fromRadians >= Math.PI;
+        } else {
+            return fromRadians - toRadians < Math.PI;
+        }
+    }
+
+    /**
+     * Normalize the angle to be between 0 and 2PI
+     * @param angle The angle to normalize
+     * @return The normalized angle between 0 and 2PI
+     */
+    public static double normalizeAngle(double angle)
+    {
+        if (angle < 0)
+            angle += 2 * Math.PI;
+        if (angle > 2 * Math.PI)
+            angle -= 2 * Math.PI;
+        return angle;
+    }
+
+    /**
+     * Linearly interpolate between two angles
+     * @param fromRadians The starting angle
+     * @param toRadians The ending angle
+     * @param percentage The percentage to interpolate
+     * @return The interpolated angle
+     */
+    public static double angle_lerp(double fromRadians, double toRadians, double percentage) {
+        // Normalize from and to
+        fromRadians = normalizeAngle(fromRadians);
+        toRadians = normalizeAngle(toRadians);
+
+        if (isClockwise(fromRadians, toRadians)) {
+            if (fromRadians < toRadians)
+                toRadians -= 2 * Math.PI;
+        } else {
+            if (fromRadians > toRadians)
+                toRadians += 2 * Math.PI;
+        }
+
+        // Return normalized angle
+        return normalizeAngle(fromRadians + (toRadians - fromRadians) * percentage);
     }
 }

@@ -1,14 +1,20 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class DrawPool
 {
-    final public static int BOTTOM = 0, MIDDLE = 1, TOP = 2;
+    final public static int BOTTOM = 0, MIDDLE = 1, TOP_PROJECTILE = 2, TOP_OBJECT = 3, TOP_UI = 4;
     private ArrayList<Pool<Drawable>> drawPools;
 
     public DrawPool() {
         drawPools = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
+            drawPools.add(new Pool<>());
+        }
+    }
+
+    public void clear() {
+         drawPools.clear();
+        for (int i = 0; i < 4; i++) {
             drawPools.add(new Pool<>());
         }
     }

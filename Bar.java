@@ -95,12 +95,12 @@ public class Bar implements Drawable {
 
     @Override
     public void addToPools() {
-        Main.drawablePool.addObj(this, DrawPool.TOP);
+        Main.drawablePool.addObj(this, DrawPool.TOP_UI);
     }
 
     @Override
     public void delete() {
         Main.idServer.returnId(this.getId());
-        Main.drawablePool.deleteObj(this.getId(), DrawPool.TOP);
+        Main.drawablePool.deleteObj(this.getId(), DrawPool.TOP_UI);
     }
 }

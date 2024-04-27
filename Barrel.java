@@ -122,7 +122,7 @@ public class Barrel {
             if (droneCount == maxDrones) {
                 return new Vector2(0, 0);  // Return no recoil if max drones are spawned
             }
-            new Drone(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale * (0.74f)), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+            new Drone(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
             incrementDroneCount();  // Increment drone count
         }
 

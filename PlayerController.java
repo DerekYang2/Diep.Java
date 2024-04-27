@@ -109,4 +109,9 @@ public class PlayerController implements Controller {
     public boolean fire() {
         return Graphics.isLeftMouseDown();
     }
+
+    @Override
+    public boolean special() {
+        return Graphics.isRightMouseDown();
+    }
 }

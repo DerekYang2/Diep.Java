@@ -9,10 +9,10 @@ public class Bar implements Drawable {
     protected float targetPercentage;
     protected float percentage;
     float opacity;
-    float lerpFactor = 0.1f;
+    float lerpFactor;
     boolean isHiding;
 
-    public Bar(float width, float height, float strokeWidth, Color fillCol, Color strokeCol) {
+    public Bar(float width, float height, float strokeWidth, Color fillCol, Color strokeCol, float lerpFactor) {
         this.pos = new Vector2(0, 0);
         this.width = (int)Math.ceil(width);
         this.height = Math.round(height);
@@ -20,6 +20,7 @@ public class Bar implements Drawable {
         this.fillCol = fillCol;
         this.strokeCol = strokeCol;
         this.targetPercentage = this.percentage = 1.f;
+        this.lerpFactor = lerpFactor;
         isHiding = false;
         opacity = 1;
         createId();
@@ -70,7 +71,7 @@ public class Bar implements Drawable {
             int xInt = Math.round(pos.x);
             int yInt = Math.round(pos.y);
             Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, Graphics.colAlpha(strokeCol, opacity));
-            Graphics.drawRectangleRounded(xInt + strokeWidth, yInt + strokeWidth, width * percentage - 2 * strokeWidth, height - 2 * strokeWidth, 1f, Graphics.colAlpha(fillCol, opacity));
+            Graphics.drawRectangleRounded(xInt + strokeWidth + 1, yInt + strokeWidth, width * percentage - 2 * (strokeWidth + 1), height - 2 * strokeWidth, 1f, Graphics.colAlpha(fillCol, opacity));
         }
     }
 

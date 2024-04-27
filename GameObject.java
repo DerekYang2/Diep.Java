@@ -61,7 +61,7 @@ public abstract class GameObject implements Updatable, Drawable {
      * Dependencies: radius, scale must be set
      */
     public void initHealthBar() {
-        healthBar = new Bar(radius * scale * 2, HEALTH_BAR_HEIGHT, HEALTH_BAR_STROKE, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE);
+        healthBar = new Bar(radius * scale * 2, HEALTH_BAR_HEIGHT, HEALTH_BAR_STROKE, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE, .15f);
         healthBar.forceHidden(true);
     }
 

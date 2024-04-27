@@ -73,7 +73,7 @@ public class Bullet extends GameObject {
     public void draw() {
         final float scaledRadius = radius * scale;  // scale is always 1 until death animation
         if (Main.onScreen(pos, scaledRadius)) {
-            Graphics.drawCircle((int) pos.x, (int) pos.y, scaledRadius, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity * opacity);  // Square opacity for a steeper curve (x^2)
+            Graphics.drawCircle((int) pos.x, (int) pos.y, scaledRadius, Graphics.strokeWidth, fillCol, strokeCol, opacity * opacity);  // Square opacity for a steeper curve (x^2)
         }
     }
 

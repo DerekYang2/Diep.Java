@@ -336,7 +336,7 @@ public class Graphics extends Raylib {
     }
 
     public static void drawRectangleRounded(float x, float y, float width, float height, float roundness, Color color) {
-        rlj.shapes.DrawRectangleRounded(new Rectangle(x, y, width, height), roundness, 5, color);
+        rlj.shapes.DrawRectangleRounded(new Rectangle(x, y, width, height), roundness, 7, color);
     }
 
     public static void drawTriangleRounded(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {

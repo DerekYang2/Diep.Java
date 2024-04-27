@@ -70,7 +70,7 @@ public class Drone extends GameObject {
         }
 
         // Update AI on from host tank
-        aiOn = hostBarrel.host.getAutoFire();
+        aiOn = hostBarrel.host.getAutoFire() || !hostBarrel.canControlDrones;  // If host tank has autofire or cannot control drones, turn on AI
 
         if (aiOn) {
             Integer closestTarget = getClosestTarget();

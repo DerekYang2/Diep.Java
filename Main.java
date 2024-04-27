@@ -28,7 +28,7 @@ public class Main {
         drawablePool = new DrawPool();
         gameObjectPool = new HashPool<>();
         idServer = new IdServer();
-        int spawn = 1;
+        int spawn = 30;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();
@@ -75,6 +75,7 @@ public class Main {
         Main.idServer.refresh();
 
         updateCamera();
+        CollisionManager.updateCollision();
 
         // Update all the game objects
         for (Updatable gameObject : gameObjectPool.getObjects()) {
@@ -93,7 +94,6 @@ public class Main {
         }*/
 
 
-        CollisionManager.updateCollision();
 
         if (Main.counter % 120 == 0) {
             percentage = 100 * (float) stopwatch.ms() / (1000.f/120);  // Time taken / max time allowed

@@ -25,12 +25,19 @@ public class TankBuild
         this.bulletStats = bulletStats;
         this.fieldFactor = fieldFactor;
         pendingRecoil = new Vector2[barrels.length];
+
+        // Set whether barrels are drone barrels
+        for (int idx = 0; idx < barrels.length; idx++) {
+            if (barrels[idx].getMaxDrones() > 0) {
+                fireManager.setDroneBarrel(idx);
+            }
+        }
     }
 
     public void setHost(Tank host) {
         this.host = host;
-        for (Barrel t : barrels) {
-            t.setHost(host);
+        for (Barrel b : barrels) {
+            b.setHost(host);
         }
         fireManager.setHost(host);
     }

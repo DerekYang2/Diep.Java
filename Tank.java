@@ -22,6 +22,8 @@ public class Tank extends GameObject {
     TankBuild tankBuild;
     Controller controller;
 
+    boolean autoFire = false;
+
     // Colors
     Color fillCol = Graphics.RED;
     Color strokeCol = Graphics.RED_STROKE;
@@ -42,7 +44,7 @@ public class Tank extends GameObject {
 
         updateStats();  // Update tank based on level and stats
         this.controller.setHost(this);  // Set the controller's host to this tank
-        setTankBuild(TankBuild.createTankBuild("overlord"));  // Default tank build
+        setTankBuild(TankBuild.createTankBuild("smasher"));  // Default tank build
     }
 
     public void setTankBuild(TankBuild tankBuild) {
@@ -108,10 +110,14 @@ public class Tank extends GameObject {
             addForce(baseAcceleration, moveDirection);
         }
 
+        // Update auto fire
+        if (controller.toggleAutoFire()) {
+            autoFire = !autoFire;  // Flip autoFire
+        }
+
         // Update all turrets
         tankBuild.update();
-        tankBuild.updateFire(controller.fire());
-
+        tankBuild.updateFire(autoFire || controller.fire());
     }
 
     @Override
@@ -126,6 +132,10 @@ public class Tank extends GameObject {
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
 
         Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
+    }
+
+    public boolean getAutoFire() {
+        return autoFire;
     }
 
     public boolean specialControl() {

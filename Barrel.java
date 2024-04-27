@@ -17,7 +17,7 @@ public class Barrel {
     boolean isTrapezoid = false, flippedTrapezoid = false;  // Flipped trapezoid has smaller end at the end of barrel
 
     // Custom to drone controlling turrets
-    int maxDrones;  // Maximum number of drones that can be spawned
+    int maxDrones = 0;  // Maximum number of drones that can be spawned
     boolean canControlDrones;
     int droneCount = 0;  // Number of drones currently spawned
 
@@ -120,7 +120,7 @@ public class Barrel {
             new Bullet(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
         } else if (bulletStats.type.equals("drone")) {
             if (droneCount == maxDrones) {
-                return new Vector2(0, 0);  // Return no recoil if max drones are spawned
+                return new Vector2(0, 0);  // Do not fire if max drones are spawned
             }
             new Drone(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
             incrementDroneCount();  // Increment drone count
@@ -131,6 +131,10 @@ public class Barrel {
         float recoilMagnitude = 2 * bulletStats.recoil * (1-host.friction) * 10;  // (1-host.friction)/(1-0.9) = 10 * (1-host.friction), conversion from 25 fps to 120 fps
         Vector2 recoilDirection = new Vector2((float) (-Math.cos(bulletAngle)), (float) (-Math.sin(bulletAngle))); // Return recoil direction, opposite of bullet direction
         return Raymath.Vector2Scale(recoilDirection, recoilMagnitude);  // Scale the recoil direction
+    }
+
+    public int getMaxDrones() {
+        return maxDrones;
     }
 
     public void incrementDroneCount() {

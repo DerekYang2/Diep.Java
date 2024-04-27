@@ -17,6 +17,11 @@ public class BotController implements Controller {
     }
 
     @Override
+    public boolean toggleAutoFire() {
+        return false;
+    }
+
+    @Override
     public float barrelDirection() {
         // Bot will always aim at the player
         Vector2 PlayerPos = Main.player.pos;

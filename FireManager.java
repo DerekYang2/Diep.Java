@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class FireManager {
     private int turretCount;
     private ArrayList<float[]> turretData;  // {delay, reload} for ith turret
+    private boolean[] isDroneBarrel;  // Whether ith turret is a drone barrel
     private int[] frameCounter;  // Current frame for ith turret
     private Tank host;
     private boolean paused = false;
@@ -16,6 +17,13 @@ public class FireManager {
         turretCount = data.length;
         turretData = new ArrayList<>();
         frameCounter = new int[turretCount];
+        isDroneBarrel = new boolean[turretCount];
+
+        // fill isDroneBarrel with false
+        for (int i = 0; i < turretCount; i++) {
+            isDroneBarrel[i] = false;
+        }
+
         for (double[] d : data) {
             turretData.add(new float[]{(float) d[0], (float) d[1]});  // {delay, reload}
         }
@@ -27,6 +35,14 @@ public class FireManager {
         for (int i = 0; i < turretCount; i++) {
             frameCounter[i] = getDelayFrames(i);
         }
+    }
+
+    /**
+     * Sets a barrel index as a drone barrel
+     * @param index The index of the barrel
+     */
+    public void setDroneBarrel(int index) {
+        isDroneBarrel[index] = true;
     }
 
     /**
@@ -68,6 +84,7 @@ public class FireManager {
 
         if (!paused) {
             for (int i = 0; i < turretCount; i++) {  // For each turret
+                if (isDroneBarrel[i]) continue;  // Drone barrels handled separately below
                 if (frameCounter[i] == 0) {
                     if (isFiring) {  // Fire this turret
                         retList.add(i);
@@ -78,6 +95,17 @@ public class FireManager {
                 } else {
                     frameCounter[i]--;
                 }
+            }
+        }
+
+        // Drone barrels: always firing
+        for (int i = 0; i < turretCount; i++) {
+            if (!isDroneBarrel[i]) continue;  // Skip because only drone barrels are handled here
+            if (frameCounter[i] == 0) {
+                retList.add(i);
+                frameCounter[i] = getReloadFrames(i);
+            } else {
+                frameCounter[i]--;
             }
         }
 

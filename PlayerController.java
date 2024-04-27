@@ -18,6 +18,11 @@ public class PlayerController implements Controller {
     }
 
     @Override
+    public boolean toggleAutoFire() {
+        return Graphics.isKeyPressed(KEY_E);
+    }
+
+    @Override
     public float barrelDirection() {
         return (float) Math.atan2(Graphics.getVirtualMouse().y - host.pos.y, Graphics.getVirtualMouse().x - host.pos.x);
     }

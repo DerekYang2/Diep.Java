@@ -23,10 +23,10 @@ public abstract class GameObject implements Updatable, Drawable {
     float damage = 0;
     float damageFactor = 1;
     boolean isDead = false;
-    final int DEATH_ANIMATION_FRAMES = 10;
-    int deathAnimationFrames = DEATH_ANIMATION_FRAMES;  // A fifth of a second
+    final int DEATH_ANIMATION_FRAMES = 24;
+    int deathAnimationFrames = DEATH_ANIMATION_FRAMES;
     float opacity = 1;
-    final int DAMAGE_ANIMATION_FRAMES = 5;
+    final int DAMAGE_ANIMATION_FRAMES = 10;
     int damageAnimationFrames = 0;
 
     // Health bar variables
@@ -311,6 +311,7 @@ public abstract class GameObject implements Updatable, Drawable {
         isDead = true;  // Begin deletion animation
         if (healthBar != null)
             healthBar.forceHidden(true);
+        damageAnimationFrames = 0;  // Stop damage animation
     }
 
     @Override

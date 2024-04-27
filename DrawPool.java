@@ -13,8 +13,8 @@ public class DrawPool
     }
 
     public void clear() {
-         drawPools.clear();
-        for (int i = 0; i < 4; i++) {
+        drawPools.clear();
+        for (int i = 0; i < 5; i++) {
             drawPools.add(new Pool<>());
         }
     }

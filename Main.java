@@ -14,7 +14,7 @@ public class Main {
     public static DrawPool drawablePool;
     public static HashPool<GameObject> gameObjectPool;
     public static IdServer idServer;
-    public static Stopwatch globalClock = new Stopwatch();
+    public static Stopwatch globalClock;
 
     static Tank player;
 
@@ -23,19 +23,29 @@ public class Main {
     public static void initialize() {
         Graphics.initialize("DiepJava");
         TankBuild.loadTankDefinitions();  // Load tank definitions from TankDefinitions.json
-        // Game initialization
-        globalClock.start();
+        globalClock = new Stopwatch();
         drawablePool = new DrawPool();
         gameObjectPool = new HashPool<>();
         idServer = new IdServer();
+
+        startGame();
+    }
+
+    public static void startGame() {
+        // Game initialization
+        globalClock.start();
+        drawablePool.clear();
+        gameObjectPool.clear();
+        idServer.reset();
+
         int spawn = 30;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1/*number of players*/)) * GRID_SIZE * 2);
         // new TestObj();
-        player = new Player(new Vector2(0,0));
+        player = new Player(new Vector2(0,0), "overlord");
 
         for (int i = 0; i < spawn; i++) {
-            Tank t = new Tank(new Vector2((float) (Math.random() * arenaWidth), (float) (Math.random() * arenaHeight)), new BotController(), new Stats(0, 7, 7, 7, 7, 0, 0, 0));
+            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), "overseer");
             t.group = -1;
         }
         Graphics.setCameraTarget(player.pos);
@@ -82,25 +92,17 @@ public class Main {
             gameObject.update();
         }
 
-        // Collide all the game objects
-/*        for (GameObject gameObject : Main.gameObjectPool.getObjects()) {
-            for (GameObject other : Main.gameObjectPool.getObjects()) {
-                if (gameObject != other && gameObject.group != other.group) {
-                    if (gameObject.checkCollision(other)) {
-                        gameObject.receiveKnockback(other);
-                    }
-                }
-            }
-        }*/
-
-
-
         if (Main.counter % 120 == 0) {
             percentage = 100 * (float) stopwatch.ms() / (1000.f/120);  // Time taken / max time allowed
         }
     }
 
     private static void drawGrid() {
+        // If too zoomed out, don't draw grid
+        if (Graphics.getCameraZoom() < 1.f/5) {
+            return;
+        }
+
         float zoom = Graphics.getCameraZoom();
         double scaledGrid = GRID_SIZE * zoom;
         Vector2 originScreen = Graphics.rlj.core.GetWorldToScreen2D(new Vector2(0, 0), Graphics.camera);
@@ -148,6 +150,10 @@ public class Main {
 
         Graphics.drawRectangle((int)xLeft2 + posFix, yTop, (int)(xRight2-xLeft2) + widthFix, ARENA_PADDING - yTop, Graphics.BOUNDARY);
         Graphics.drawRectangle((int)xLeft2 + posFix, arenaHeight - ARENA_PADDING, (int)(xRight2-xLeft2) + widthFix, yBottom - (arenaHeight - ARENA_PADDING), Graphics.BOUNDARY);
+    }
+
+    public static boolean onScreen(Vector2 pos, float radius) {
+        return pos.x + radius > cameraBox.x && pos.x - radius < cameraBox.x + cameraBox.width && pos.y + radius > cameraBox.y && pos.y - radius < cameraBox.y + cameraBox.height;
     }
 
     //static float xt = 0;

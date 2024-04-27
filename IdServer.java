@@ -9,6 +9,11 @@ public class IdServer {
     public IdServer() {
         pendingReturn = new Stack<>();
         idList = new int[MAX_IDS];
+        reset();
+    }
+
+    public void reset() {
+        pendingReturn.clear();
         for (int i = 0; i < idList.length; i++) {
             idList[i] = i;
         }

@@ -61,10 +61,13 @@ public class Barrel {
     }
 
     public void draw() {
-        drawRect((int) (pos.x + xAbsolute), (int) (pos.y + yAbsolute), (int) (turretLength * host.scale), (int) (turretWidth * host.scale), angleAbsolute + angleRelative);
+        final int widthScaled = (int) (turretWidth * host.scale), lengthScaled = (int) (turretLength * host.scale);
+        if (Main.onScreen(new Vector2(pos.x + xAbsolute, pos.y + yAbsolute), lengthScaled)) {  // Culling
+            drawTurret((int) (pos.x + xAbsolute), (int) (pos.y + yAbsolute), lengthScaled, widthScaled, angleAbsolute + angleRelative);
+        }
     }
 
-    private void drawRect(int xleft, int ycenter, int length, int width, double radians) {  // renamed parameters
+    private void drawTurret(int xleft, int ycenter, int length, int width, double radians) {  // renamed parameters
         //        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)radians, strokeCol);
         //        rShapes.DrawRectanglePro(rectangle, origin, radians * 180.f / (float) Math.PI, color);
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)theta, color);
@@ -72,9 +75,9 @@ public class Barrel {
         //rTextures.DrawTexturePro(testRect, srcRect, new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)(theta * 180/Math.PI), Main.strokeCol);
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * Graphics.strokeWidth), new Vector2(Graphics.strokeWidth, (width - 2 * Graphics.strokeWidth)/2.f), (float)theta, color);
         if (isTrapezoid) {
-            Graphics.drawTurretTrapezoid(xleft, ycenter, length, width, radians, Graphics.strokeWidth, Graphics.GREY, Graphics.GREY_STROKE, (float)Math.pow(host.opacity,3), flippedTrapezoid);
+            Graphics.drawTurretTrapezoid(xleft, ycenter, length, width, radians, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float)Math.pow(host.opacity,4), flippedTrapezoid);
         } else {
-            Graphics.drawTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, Graphics.GREY, Graphics.GREY_STROKE, (float) Math.pow(host.opacity, 3));  // Square host.opacity for a steeper curve (x^3)
+            Graphics.drawTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4));  // Square host.opacity for a steeper curve (x^4)
         }
     }
 

@@ -33,6 +33,7 @@ public class Drone extends GameObject {
         float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
         float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed - (float)Math.random() * bulletStats.scatterRate;  // src: not link above (check diepcustom repo)
         velMax *= 1.1f;  // TODO: TEST IF THIS IS RIGHT
+
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
@@ -50,14 +51,6 @@ public class Drone extends GameObject {
         radius = diameter * 0.5f * bulletStats.sizeRatio;  // Multiply radius by bullet stats size ratio
     }
 
-    @Override
-    public void draw() {
-        final float scaledRadius = radius * scale * 0.74f;  // scale is always 1 until death animation
-        if (pos.x + scaledRadius < Main.cameraBox.x || pos.x - scaledRadius > Main.cameraBox.x + Main.cameraBox.width || pos.y + scaledRadius < Main.cameraBox.y || pos.y - scaledRadius > Main.cameraBox.y + Main.cameraBox.height) {
-            return;
-        }
-        Graphics.drawTriangleRounded(pos, scaledRadius, direction, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(fillCol), opacity), Graphics.colAlpha(getDamageLerpColor(strokeCol), opacity));
-    }
 
     @Override
     public void update() {
@@ -94,6 +87,14 @@ public class Drone extends GameObject {
         addForce(acceleration, direction);
     }
 
+    @Override
+    public void draw() {
+        final float scaledRadius = radius * scale * 0.74f;  // scale is always 1 until death animation
+        if (Main.onScreen(pos, radius * scale)) {  // Use larger radius for culling
+            Graphics.drawTriangleRounded(pos, scaledRadius, direction, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(fillCol), opacity), Graphics.colAlpha(getDamageLerpColor(strokeCol), opacity));
+        }
+    }
+
     private Integer getClosestTarget() {
         float rectWidth =  2 * 850 * hostBarrel.host.scale;
         Rectangle view = new Rectangle(pos.x - rectWidth * 0.5f, pos.y - rectWidth * 0.5f, rectWidth, rectWidth);
@@ -106,7 +107,8 @@ public class Drone extends GameObject {
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
 
-            if (obj.group == this.group) {  // If same group, skip
+            // TODO: should drones chase other drones?
+            if (obj.group == this.group || obj.isProjectile) {  // If same group or projectile, skip
                 continue;
             }
             float distSquared = (pos.x - obj.pos.x) * (pos.x - obj.pos.x) + (pos.y - obj.pos.y) * (pos.y - obj.pos.y);

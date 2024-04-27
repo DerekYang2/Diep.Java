@@ -13,6 +13,12 @@ public class HashPool <T extends Deletable> {
         pendingDeletes = new Stack<>();
     }
 
+    public void clear() {
+        objects.clear();
+        pendingAdd.clear();
+        pendingDeletes.clear();
+    }
+
     public void addObj(T obj) {
         pendingAdd.push(obj);
     }

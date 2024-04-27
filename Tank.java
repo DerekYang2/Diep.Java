@@ -44,7 +44,6 @@ public class Tank extends GameObject {
 
         updateStats();  // Update tank based on level and stats
         this.controller.setHost(this);  // Set the controller's host to this tank
-        setTankBuild(TankBuild.createTankBuild("smasher"));  // Default tank build
     }
 
     public void setTankBuild(TankBuild tankBuild) {
@@ -123,15 +122,15 @@ public class Tank extends GameObject {
     @Override
     public void draw() {
         // Culling
-        if (pos.x + (radius*2*scale) < Main.cameraBox.x || pos.x - (radius*2*scale) > Main.cameraBox.x + Main.cameraBox.width || pos.y + (radius*2*scale) < Main.cameraBox.y || pos.y - (radius*2*scale) > Main.cameraBox.y + Main.cameraBox.height) {
-            return;
-        }
+
         // Draw Turrets
         tankBuild.draw();
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
 
-        Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
+        if (Main.onScreen(pos, radius*scale)) {
+            Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
+        }
     }
 
     public boolean getAutoFire() {

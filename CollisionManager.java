@@ -35,8 +35,6 @@ public class CollisionManager {
                 }
             }
         }
-        // Remove objects with the same group
-        result.removeIf(id -> Main.gameObjectPool.getObj(id).group == ignoreGroup);
         return result;
     }
 

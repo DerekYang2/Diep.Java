@@ -2,6 +2,8 @@ import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
+import java.util.ArrayList;
+
 public class Drone extends GameObject {
     protected float acceleration;
     float targetDirection;
@@ -10,8 +12,7 @@ public class Drone extends GameObject {
     Color fillCol;
     Color strokeCol;
     Barrel hostBarrel;
-
-    boolean aiOn = false;
+    boolean aiOn = false;  // Default to off
 
     public Drone(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
         super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f);
@@ -68,16 +69,24 @@ public class Drone extends GameObject {
             triggerDelete();
         }
 
-        if (aiOn) {
+        // Update AI on from host tank
+        aiOn = hostBarrel.host.getAutoFire();
 
+        if (aiOn) {
+            Integer closestTarget = getClosestTarget();
+            if (closestTarget != null) {  // If there is a closest target
+                target = Main.gameObjectPool.getObj(closestTarget).pos;
+            } else {  // If no target in range, set target to the tank pos
+                target = hostBarrel.host.pos;
+            }
         } else {
             target = hostBarrel.host.getTarget();
-            targetDirection = (float) Math.atan2(target.y - pos.y, target.x - pos.x);
+        }
 
-            // Repel
-            if (hostBarrel.host.specialControl()) {
-                targetDirection += (float) Math.PI;  // Reverse direction of target
-            }
+        targetDirection = (float) Math.atan2(target.y - pos.y, target.x - pos.x);
+
+        if (!aiOn && hostBarrel.host.specialControl()) {  // Repel
+            targetDirection += (float) Math.PI;  // Reverse direction of target
         }
 
         direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.17f);
@@ -85,8 +94,28 @@ public class Drone extends GameObject {
         addForce(acceleration, direction);
     }
 
-    private int getClosestTarget() {
-        return 0;
+    private Integer getClosestTarget() {
+        float rectWidth =  2 * 850 * hostBarrel.host.scale;
+        Rectangle view = new Rectangle(pos.x - rectWidth * 0.5f, pos.y - rectWidth * 0.5f, rectWidth, rectWidth);
+
+        ArrayList<Integer> targets = CollisionManager.queryBoundingBox(view, this.group);
+        // Get the closest target
+        float minDistSquared = Float.MAX_VALUE;
+        Integer closestTarget = null;  // Set id to some impossible value
+
+        for (int id : targets) {
+            GameObject obj = Main.gameObjectPool.getObj(id);
+
+            if (obj.group == this.group) {  // If same group, skip
+                continue;
+            }
+            float distSquared = (pos.x - obj.pos.x) * (pos.x - obj.pos.x) + (pos.y - obj.pos.y) * (pos.y - obj.pos.y);
+            if (distSquared < minDistSquared) {
+                minDistSquared = distSquared;
+                closestTarget = id;
+            }
+        }
+        return closestTarget;
     }
 
     @Override

@@ -1,5 +1,6 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
+import com.raylib.java.shapes.Rectangle;
 
 public class Drone extends GameObject {
     protected float acceleration;
@@ -9,6 +10,8 @@ public class Drone extends GameObject {
     Color fillCol;
     Color strokeCol;
     Barrel hostBarrel;
+
+    boolean aiOn = false;
 
     public Drone(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
         super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f);
@@ -28,7 +31,7 @@ public class Drone extends GameObject {
         float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
         float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
         float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed - (float)Math.random() * bulletStats.scatterRate;  // src: not link above (check diepcustom repo)
-
+        velMax *= 1.1f;  // TODO: TEST IF THIS IS RIGHT
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
@@ -65,18 +68,27 @@ public class Drone extends GameObject {
             triggerDelete();
         }
 
-        target = hostBarrel.host.getTarget();
-        targetDirection = (float) Math.atan2(target.y - pos.y, target.x - pos.x);
+        if (aiOn) {
 
-        // Repel
-        if (hostBarrel.host.specialControl()) {
-            targetDirection += (float) Math.PI;  // Reverse direction of target
+        } else {
+            target = hostBarrel.host.getTarget();
+            targetDirection = (float) Math.atan2(target.y - pos.y, target.x - pos.x);
+
+            // Repel
+            if (hostBarrel.host.specialControl()) {
+                targetDirection += (float) Math.PI;  // Reverse direction of target
+            }
         }
 
-        direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.18f);
+        direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.17f);
 
         addForce(acceleration, direction);
     }
+
+    private int getClosestTarget() {
+        return 0;
+    }
+
     @Override
     public void triggerDelete() {
         super.triggerDelete();

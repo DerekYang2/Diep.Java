@@ -22,6 +22,24 @@ public class CollisionManager {
         return (int) ((y - minY) / sectorSize);
     }
 
+    public static ArrayList<Integer> queryBoundingBox(Rectangle boundingBox, int ignoreGroup) {
+        ArrayList<Integer> result = new ArrayList<>();
+        int xiMin = getSectorX(boundingBox.x), xiMax = getSectorX(boundingBox.x + boundingBox.width);
+        int yiMin = getSectorY(boundingBox.y), yiMax = getSectorY(boundingBox.y + boundingBox.height);
+
+        for (int xi = xiMin; xi <= xiMax; xi++) {
+            for (int yi = yiMin; yi <= yiMax; yi++) {
+                int sectorHash = xi + sectorsX * yi;
+                if (collisionGroups.containsKey(sectorHash)) {
+                    result.addAll(collisionGroups.get(sectorHash));
+                }
+            }
+        }
+        // Remove objects with the same group
+        result.removeIf(id -> Main.gameObjectPool.getObj(id).group == ignoreGroup);
+        return result;
+    }
+
     public static void updateSectors() {
         collisionGroups.clear();
 

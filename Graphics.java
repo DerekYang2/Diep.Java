@@ -98,13 +98,13 @@ public class Graphics extends Raylib {
     }
 
     public static void initializeTextures() {
-        whiteCirc = loadTexture("whiteCircle.png");
-        whiteCircNoAA = loadTexture("whiteCircle.png");
-        whiteRect = loadTexture("whiteRect.png");
-        whiteRectRounder = loadTexture("whiteRect2.png");
-        whiteTrapezoid = loadTexture("trapezoid.png");
-        whiteTriangleRounded = loadTexture("RoundedTriangle.png");
-        whiteTriangleSharp = loadTexture("SharpTriangle.png");
+        whiteCirc = loadTexture("assets/Circle.png");
+        whiteCircNoAA = loadTexture("assets/Circle.png");
+        whiteRect = loadTexture("assets/SharpRectangle.png");
+        whiteRectRounder = loadTexture("assets/RoundedRectangle.png");
+        whiteTrapezoid = loadTexture("assets/RoundedTrapezoid.png");
+        whiteTriangleRounded = loadTexture("assets/RoundedTriangle.png");
+        whiteTriangleSharp = loadTexture("assets/SharpTriangle.png");
 
         if (ANTIALIASING == 1) {
             setTextureAntiAliasing(whiteCirc);
@@ -130,7 +130,7 @@ public class Graphics extends Raylib {
 
     public static void getEnvironmentVariables() {
         try {
-            File file = new File(".env");
+            File file = new File("config/.env");
 
             if (file.exists()) {  // If file exists, read from it
                 BufferedReader reader = new BufferedReader(new FileReader(file));

@@ -23,4 +23,4 @@ gen/
 *.code-workspace
 
 ### Environment ###
-.env
+config/.env

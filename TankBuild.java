@@ -71,7 +71,7 @@ public class TankBuild
     public static void loadTankDefinitions() {
         tankDefinitions = new HashMap<>();
         try {
-            JSONArray jsonArray = new JSONArray(TankBuild.readFile("TankDefinitions.json", Charset.defaultCharset()));
+            JSONArray jsonArray = new JSONArray(TankBuild.readFile("config/TankDefinitions.json", Charset.defaultCharset()));
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 tankDefinitions.put(jsonObject.getString("name").trim().toLowerCase(), jsonObject);

@@ -1,3 +1,5 @@
+package other;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,7 +19,7 @@ public class TestMain {
     static HashMap<String, JSONObject> tankDefinitions = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
-        JSONArray jsonArray = new JSONArray(readFile("TankDefinitions.json", Charset.defaultCharset()));
+        JSONArray jsonArray = new JSONArray(readFile("config/TankDefinitions.json", Charset.defaultCharset()));
         System.out.println(jsonArray.length());
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);

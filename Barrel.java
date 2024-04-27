@@ -40,7 +40,7 @@ public class Barrel {
         angleRelative = radians;
 
         // prevAngle = -Math.PI / 2; // spawn pointing upward
-    /*    testRect = rTextures.LoadTexture("whiteRect.png");
+    /*    testRect = rTextures.LoadTexture("SharpRectangle.png");
         Graphics.rlj.textures.GenTextureMipmaps(testRect);
         rTextures.SetTextureFilter(testRect, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
         float aspectRatio = length/width;

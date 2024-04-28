@@ -31,11 +31,7 @@ public class Tank extends GameObject {
 
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats) {
-        super(pos, 50, 1.f);
-
-        super.noInternalCollision = false;
-        super.keepInArena = true;
-        super.isProjectile = false;
+        super(pos, 50, 1.f, DrawPool.MIDDLE);
 
         initHealthBar();  // Initialize health bar object
 
@@ -44,6 +40,13 @@ public class Tank extends GameObject {
 
         updateStats();  // Update tank based on level and stats
         this.controller.setHost(this);  // Set the controller's host to this tank
+    }
+
+    @Override
+    protected void setFlags() {
+        super.noInternalCollision = false;
+        super.keepInArena = true;
+        super.isProjectile = false;
     }
 
     public void setTankBuild(TankBuild tankBuild) {
@@ -145,18 +148,6 @@ public class Tank extends GameObject {
     public void receiveDamage(float damage) {
         super.receiveDamage(damage);
         lastDamageFrame = Main.counter;
-    }
-
-    @Override
-    public void addToPools() {
-        super.addToPools();
-        Main.drawablePool.addObj(this, DrawPool.MIDDLE);
-    }
-
-    @Override
-    public void delete() {
-        super.delete();
-        Main.drawablePool.deleteObj(this.getId(), DrawPool.MIDDLE);
     }
 
     public Vector2 getTarget() {

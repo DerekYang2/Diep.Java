@@ -15,12 +15,7 @@ public class Drone extends GameObject {
     boolean aiOn = false;  // Default to off
 
     public Drone(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
-        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f);
-
-        // Flags
-        super.noInternalCollision = true;  // Does not collide with bullets from same group, exception: collides with drones of same group
-        super.keepInArena = true;
-        super.isProjectile = true;
+        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f, DrawPool.TOP_PROJECTILE);
 
         this.hostBarrel = hostBarrel;  // Set the host barrel object
         Tank host = hostBarrel.host;  // Get the tank of the host barrel
@@ -53,6 +48,14 @@ public class Drone extends GameObject {
         radius = diameter * 0.5f * bulletStats.sizeRatio;  // Multiply radius by bullet stats size ratio
     }
 
+
+    @Override
+    protected void setFlags() {
+        // Flags
+        super.noInternalCollision = true;  // Does not collide with bullets from same group, exception: collides with drones of same group
+        super.keepInArena = true;
+        super.isProjectile = true;
+    }
 
     @Override
     public void update() {
@@ -128,15 +131,8 @@ public class Drone extends GameObject {
     }
 
     @Override
-    public void addToPools() {
-        super.addToPools();
-        Main.drawablePool.addObj(this, DrawPool.TOP_PROJECTILE);
-    }
-
-    @Override
     public void delete() {
         super.delete();
-        Main.drawablePool.deleteObj(this.getId(), DrawPool.TOP_PROJECTILE);
         hostBarrel.decrementDroneCount();
     }
 

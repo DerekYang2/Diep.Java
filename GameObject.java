@@ -6,6 +6,7 @@ import com.raylib.java.shapes.Rectangle;
 public abstract class GameObject implements Updatable, Drawable {
     // Objects always collide each other regardless of group (unless noInternalCollision is true)
     int group;  // Objects in different groups damage each other
+    int DRAW_LAYER;
 
     // Special flags
     boolean noInternalCollision = false;  // Object does not collide with objects only in the same group (applies to bullets for now)
@@ -36,26 +37,32 @@ public abstract class GameObject implements Updatable, Drawable {
 
     // Collision
     float absorptionFactor = 1, pushFactor = 8;  // Default
-    public GameObject(Vector2 pos, int radius, float damageFactor) {
+    public GameObject(Vector2 pos, int radius, float damageFactor, int drawLayer) {
         this.pos = pos;
         this.vel = new Vector2(0, 0);
         this.radius = radius;
         this.damageFactor = damageFactor;
+        this.DRAW_LAYER = drawLayer;
         createId();
         addToPools();
         group = id;
+        setFlags();
     }
-    public GameObject(Vector2 pos, int radius, float absorptionFactor, float pushFactor, float damageFactor) {
+    public GameObject(Vector2 pos, int radius, float absorptionFactor, float pushFactor, float damageFactor, int drawLayer) {
         this.pos = pos;
         this.vel = new Vector2(0, 0);
         this.radius = radius;
         this.absorptionFactor = absorptionFactor;
         this.pushFactor = pushFactor;
         this.damageFactor = damageFactor;
+        this.DRAW_LAYER = drawLayer;
         createId();
         addToPools();
         group = id;
+        setFlags();
     }
+
+    protected abstract void setFlags();
 
     /**
      * Dependencies: radius, scale must be set
@@ -309,6 +316,7 @@ public abstract class GameObject implements Updatable, Drawable {
     @Override
     public void addToPools() {
         Main.gameObjectPool.addObj(this);
+        Main.drawablePool.addObj(this, DRAW_LAYER);
     }
 
     public void triggerDelete() {
@@ -324,6 +332,8 @@ public abstract class GameObject implements Updatable, Drawable {
         Main.idServer.returnId(this.getId());
         // All added to wait lists
         Main.gameObjectPool.deleteObj(this.getId());
+        // Delete from drawable pool
+        Main.drawablePool.deleteObj(this.getId(), DRAW_LAYER);
         // Delete health bar
         if (healthBar != null)
             healthBar.delete();

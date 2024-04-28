@@ -11,10 +11,7 @@ public class Bullet extends GameObject {
 
     // The bullet trajectory will be determined based on the position where it spawns
     public Bullet(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
-        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + hostBarrel.host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor, 1f);
-        this.noInternalCollision = true;  // No internal collision for bullets
-        this.keepInArena = false;
-        super.isProjectile = true;
+        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + hostBarrel.host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor, 1f, DrawPool.BOTTOM);
 
         this.host = hostBarrel.host;
         this.group = host.group;  // Set group to host group (TODO: make a collision and damage group)
@@ -48,6 +45,13 @@ public class Bullet extends GameObject {
     }
 
     @Override
+    protected void setFlags() {
+        this.noInternalCollision = true;  // No internal collision for bullets
+        this.keepInArena = false;
+        super.isProjectile = true;
+    }
+
+    @Override
     public void update() {
         super.update();
 
@@ -75,17 +79,5 @@ public class Bullet extends GameObject {
         if (Main.onScreen(pos, scaledRadius)) {
             Graphics.drawCircle((int) pos.x, (int) pos.y, scaledRadius, Graphics.strokeWidth, fillCol, strokeCol, opacity * opacity);  // Square opacity for a steeper curve (x^2)
         }
-    }
-
-    @Override
-    public void addToPools() {
-        super.addToPools();
-        Main.drawablePool.addObj(this, DrawPool.BOTTOM);
-    }
-
-    @Override
-    public void delete() {
-        super.delete();
-        Main.drawablePool.deleteObj(this.getId(), DrawPool.BOTTOM);
     }
 }

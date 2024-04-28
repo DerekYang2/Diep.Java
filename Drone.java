@@ -32,7 +32,7 @@ public class Drone extends GameObject {
         float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
         float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
         float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed - (float)Math.random() * bulletStats.scatterRate;  // src: not link above (check diepcustom repo)
-        velMax *= 1.1f;  // TODO: TEST IF THIS IS RIGHT
+        // velMax *= 1.1f;  // TODO: TEST IF THIS IS RIGHT
 
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
@@ -128,13 +128,13 @@ public class Drone extends GameObject {
     @Override
     public void addToPools() {
         super.addToPools();
-        Main.drawablePool.addObj(this, DrawPool.BOTTOM);
+        Main.drawablePool.addObj(this, DrawPool.TOP_PROJECTILE);
     }
 
     @Override
     public void delete() {
         super.delete();
-        Main.drawablePool.deleteObj(this.getId(), DrawPool.BOTTOM);
+        Main.drawablePool.deleteObj(this.getId(), DrawPool.TOP_PROJECTILE);
         hostBarrel.decrementDroneCount();
     }
 

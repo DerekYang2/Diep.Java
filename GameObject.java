@@ -26,7 +26,7 @@ public abstract class GameObject implements Updatable, Drawable {
     final int DEATH_ANIMATION_FRAMES = 24;
     int deathAnimationFrames = DEATH_ANIMATION_FRAMES;
     float opacity = 1;
-    final int DAMAGE_ANIMATION_FRAMES = 10;
+    final int DAMAGE_ANIMATION_FRAMES = 12;
     int damageAnimationFrames = 0;
 
     // Health bar variables
@@ -146,7 +146,10 @@ public abstract class GameObject implements Updatable, Drawable {
      * @return
      */
     public Color getDamageLerpColor(Color col) {
-        return Graphics.lerpColor(col, Color.RED, 0.4f*damageAnimationFrames/DAMAGE_ANIMATION_FRAMES);
+        if (damageAnimationFrames >= DAMAGE_ANIMATION_FRAMES - 2)
+            return Graphics.lerpColor(col, Color.WHITE, 0.85f*damageAnimationFrames/DAMAGE_ANIMATION_FRAMES);
+        else
+            return Graphics.lerpColor(col, Color.RED, 0.9f*damageAnimationFrames/DAMAGE_ANIMATION_FRAMES);
     }
 
     public void addForce(Vector2 force) {
@@ -217,7 +220,8 @@ public abstract class GameObject implements Updatable, Drawable {
         }
 
         health -= damage;
-        damageAnimationFrames = DAMAGE_ANIMATION_FRAMES;  // Start damage animation
+        if (damageAnimationFrames <= 1)  // If basically finished damage animation
+            damageAnimationFrames = DAMAGE_ANIMATION_FRAMES;  // Start damage animation
 
         if (health <= 1e-6) {  // Close enough to 0
             triggerDelete();

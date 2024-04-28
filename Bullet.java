@@ -23,7 +23,7 @@ public class Bullet extends GameObject {
         // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
         float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
         float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
-        float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed - (float)Math.random() * bulletStats.scatterRate;  // src: not link above (check diepcustom repo)
+        float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed;  // src: not link above (check diepcustom repo)
 
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
@@ -35,7 +35,7 @@ public class Bullet extends GameObject {
         // Calculate acceleration to converge to max speed (https://www.desmos.com/calculator/9hakym7jxy)
         this.acceleration = (velMax * 25.f/120) * (1-friction);
         //System.out.println(velMax + " " + acceleration + " " + friction);
-        float initialSpeed = (float) ((velMax) * 25./120) + 30 * (1-friction)/(1-0.9f);
+        float initialSpeed = (velMax * 25.f/120) + (30 - (float)Math.random() * bulletStats.scatterRate) * (1-friction)/(1-0.9f);  // Initial speed is acceleration + 30 - scatter rate
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 
         // Life length

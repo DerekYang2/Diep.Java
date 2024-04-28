@@ -136,12 +136,8 @@ public class TankBuild
         Set<String> keys = tankDefinitions.keySet();
         ArrayList<String> keyList = new ArrayList<>(keys);
         // Generate a random build until a valid one is found
-        TankBuild randBuild;
-        do {
-            String randomKey = keyList.get((int)(Math.random() * keyList.size()));
-            randBuild = createTankBuild(randomKey);
-        } while (randBuild == null);
-        return randBuild;
+        String randomKey = keyList.get((int)(Math.random() * keyList.size()));
+        return createTankBuild(randomKey);
     }
 
     public static float getRand(float maxV) {

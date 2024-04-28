@@ -31,7 +31,7 @@ public class Drone extends Projectile {
 
         // Calculate acceleration to converge to max speed
         this.acceleration = (velMax * 25.f/120) * (1-friction);
-        float initialSpeed = (velMax * 25.f/120) + (30 - (float)Math.random() * bulletStats.scatterRate) * (1-friction)/(1-0.9f);
+        float initialSpeed = (velMax * 25.f/120) + (30 + Graphics.randf(-bulletStats.scatterRate, bulletStats.scatterRate)) * (1-friction)/(1-0.9f);
         initialSpeed /= 3;
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 

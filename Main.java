@@ -38,14 +38,14 @@ public class Main {
         gameObjectPool.clear();
         idServer.reset();
 
-        int spawn = 1;
+        int spawn = 0;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2);
         // new TestObj();
-        player = new Player(new Vector2(0,0), "gunner trapper");
+        player = new Player(new Vector2(0,0), "mega trapper");
 
         for (int i = 0; i < spawn; i++) {
-            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), "tank");
+            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), "mega trapper");
             t.group = -1;
         }
         Graphics.setCameraTarget(player.pos);

@@ -8,7 +8,7 @@ public class Trap extends Projectile {
     public Trap(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
         super(hostBarrel, centerX, centerY, direction, cannonLength, diameter, bulletStats, fillCol, strokeCol, DrawPool.BOTTOM);
         collideFrames = lifeFrames/8;
-        rotation = Math.random() * Math.PI * 2;  // Random rotation
+        rotation = Graphics.randf(0, Math.PI * 2);  // Random rotation
     }
 
     @Override
@@ -18,14 +18,17 @@ public class Trap extends Projectile {
 
         float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
         float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
-        float velMax = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed;  // src: not link above (check diepcustom repo)
+
+        // Scale factor of bullet speed stat: https://www.desmos.com/calculator/efuvwmrgf1 (scale factor is 1 at bs=0 and 4.5 at bs=7)
+        float scaleFactor = (float)(1.32288 * Math.sqrt(host.stats.getStat(Stats.BULLET_PENETRATION)) + 1);
+        float velMax = (20 + scaleFactor * 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed;  // src: not link above (check diepcustom repo)
 
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
         this.acceleration = 0;  // No acceleration
         // TODO: test initial speed of trapper, with speed upgrades
-        float initialSpeed = (velMax * 25.f/120 + 30 - (float)Math.random() * bulletStats.scatterRate) * (1-friction)/(1-0.9f);  // Initial speed is max speed + 30 - scatter rate
+        float initialSpeed = (velMax * 25.f/120 + 30 + Graphics.randf(-bulletStats.scatterRate, bulletStats.scatterRate)) * (1-friction)/(1-0.9f);  // Initial speed is max speed + 30 - scatter rate
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 
         // Life length
@@ -35,7 +38,7 @@ public class Trap extends Projectile {
     @Override
     protected void setFlags() {
         super.setFlags();
-        super.keepInArena = true;
+        super.keepInArena = false;
     }
 
     @Override

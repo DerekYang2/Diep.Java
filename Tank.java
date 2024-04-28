@@ -32,7 +32,7 @@ public class Tank extends GameObject {
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats) {
         super(pos, 50, 1.f, DrawPool.MIDDLE);
-
+        setCollisionFactors(1, 8);
         initHealthBar();  // Initialize health bar object
 
         this.stats = stats;
@@ -58,6 +58,7 @@ public class Tank extends GameObject {
      * Call whenever level or stats change
      * Should be callable multiple times without issue
      */
+    @Override
     public void updateStats() {
         // Max health
         super.setMaxHealth(50 + (2 * (level - 1)) + (20 * stats.getStat(Stats.MAX_HEALTH)));

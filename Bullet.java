@@ -1,22 +1,24 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 
-public class Bullet extends GameObject {
-    protected float acceleration;
-    float direction;
-    int lifeFrames;
-    Color fillCol;
-    Color strokeCol;
-    Tank host;
+public class Bullet extends Projectile {
 
     // The bullet trajectory will be determined based on the position where it spawns
-    public Bullet(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
-        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, (7.f / 3 + hostBarrel.host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor, 1f, DrawPool.BOTTOM);
+    public Bullet(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol, int drawLayer) {
+        super(hostBarrel, centerX, centerY, direction, cannonLength, diameter, bulletStats, fillCol, strokeCol, drawLayer);
+    }
 
-        this.host = hostBarrel.host;
-        this.group = host.group;  // Set group to host group (TODO: make a collision and damage group)
+    @Override
+    protected void setFlags() {
+        super.setFlags();
+        this.keepInArena = false;
+    }
 
+    @Override
+    public void updateStats() {
         // Calculate bullet stats
+        setCollisionFactors(bulletStats.absorbtionFactor, (7.f / 3 + host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
+
         // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
         float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
         float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
@@ -25,52 +27,18 @@ public class Bullet extends GameObject {
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
-        // Calculate direction (scatter angle already applied by Barrel.java)
-        this.direction = direction;
-
-
         // Calculate acceleration to converge to max speed (https://www.desmos.com/calculator/9hakym7jxy)
         this.acceleration = (velMax * 25.f/120) * (1-friction);
-        //System.out.println(velMax + " " + acceleration + " " + friction);
-        float initialSpeed = (velMax * 25.f/120) + (30 - (float)Math.random() * bulletStats.scatterRate) * (1-friction)/(1-0.9f);  // Initial speed is acceleration + 30 - scatter rate
+        float initialSpeed = (velMax * 25.f/120) + (30 - (float)Math.random() * bulletStats.scatterRate) * (1-friction)/(1-0.9f);  // Initial speed is max speed + 30 - scatter rate
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 
         // Life length
         lifeFrames = Math.round(bulletStats.lifeLength * 72 * (120.f / 25));  // Lengthen because 25 fps -> 120 fps
-
-        // Drawing variables
-        this.fillCol = fillCol;
-        this.strokeCol = strokeCol;
-        radius = diameter * 0.5f * bulletStats.sizeRatio;  // Multiply radius by bullet stats size ratio
-    }
-
-    @Override
-    protected void setFlags() {
-        this.noInternalCollision = true;  // No internal collision for bullets
-        this.keepInArena = false;
-        super.isProjectile = true;
     }
 
     @Override
     public void update() {
         super.update();
-
-        if (isDead) return;
-
-        if (host.isDead) {
-            triggerDelete();
-            return;
-        }
-
-        addForce(acceleration, direction);
-        lifeFrames--;
-        if (lifeFrames <= 0) {
-            triggerDelete();
-        }
-
-/*        if (Main.counter % 60 == 0) {
-            System.out.println(Math.sqrt(vel.x * vel.x + vel.y * vel.y));
-        }*/
     }
 
     @Override

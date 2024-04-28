@@ -48,20 +48,13 @@ public abstract class GameObject implements Updatable, Drawable {
         group = id;
         setFlags();
     }
-    public GameObject(Vector2 pos, int radius, float absorptionFactor, float pushFactor, float damageFactor, int drawLayer) {
-        this.pos = pos;
-        this.vel = new Vector2(0, 0);
-        this.radius = radius;
+
+    protected void setCollisionFactors(float absorptionFactor, float pushFactor) {
         this.absorptionFactor = absorptionFactor;
         this.pushFactor = pushFactor;
-        this.damageFactor = damageFactor;
-        this.DRAW_LAYER = drawLayer;
-        createId();
-        addToPools();
-        group = id;
-        setFlags();
     }
 
+    public abstract void updateStats();
     protected abstract void setFlags();
 
     /**
@@ -217,8 +210,12 @@ public abstract class GameObject implements Updatable, Drawable {
         if (a.isDead || b.isDead) {
             return;
         }
-        a.receiveKnockback(b);
-        b.receiveKnockback(a);
+
+        // If different group OR same group but neither have no collision flag OR same group drone/trap
+        if (a.group != b.group || (!a.noInternalCollision && !b.noInternalCollision) || a.sameGroupCollision(b)) {
+            a.receiveKnockback(b);
+            b.receiveKnockback(a);
+        }
     }
 
     public void receiveDamage(float damage) {
@@ -236,7 +233,12 @@ public abstract class GameObject implements Updatable, Drawable {
     }
 
     public static void receiveDamage(GameObject a, GameObject b) {
-        if (a.isDead || b.isDead) {
+        if (a.isDead || b.isDead || a.group == b.group) {  // If either is dead or same group
+            return;
+        }
+
+        if ((a.isProjectile && b.isProjectile) && (a instanceof Drone || b instanceof Drone)) {  // If both are projectiles and at least one is a drone
+            receiveDamageInstant(a, b);  // Instant damage
             return;
         }
 
@@ -264,7 +266,6 @@ public abstract class GameObject implements Updatable, Drawable {
             b.receiveDamage(aDamage);
         }
     }
-
 
     /**
      * Applies damage instantly, happens between drones and other projectiles (drone-drone, drone-bullet)
@@ -301,6 +302,16 @@ public abstract class GameObject implements Updatable, Drawable {
             a.receiveDamage(scaleDown * bDamage);
             b.receiveDamage(scaleDown * aDamage);
         }
+    }
+
+    /**
+     * A custom method to override
+     * Returns true if two objects of the same group should collide
+     * @param other Game object guaranteed to be in the same group
+     * @return True if two objects of the same group should collide (drone-drone, trap-trap, etc.)
+     */
+    protected boolean sameGroupCollision(GameObject other) {
+        return false;
     }
 
     @Override

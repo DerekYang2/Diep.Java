@@ -126,13 +126,15 @@ public class Barrel {
         float bulletAngle = (float) (angleAbsolute + angleRelative + scatterAngle);  // Apply scatter angle to bullet angle
 
         if (bulletStats.type.equals("bullet")) {
-            new Bullet(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+            new Bullet(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol, DrawPool.BOTTOM);  // swapped width with length
         } else if (bulletStats.type.equals("drone")) {
             if (droneCount == maxDrones) {
                 return new Vector2(0, 0);  // Do not fire if max drones are spawned
             }
             new Drone(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
             incrementDroneCount();  // Increment drone count
+        } else if (bulletStats.type.equals("trap")) {
+            new Trap(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
         }
 
         recoilFrames = recoilTime;  // Set to max recoil time (animation)

@@ -91,28 +91,13 @@ public class CollisionManager {
                         }
 
                         GameObject obj1 = Main.gameObjectPool.getObj(idSmall), obj2 = Main.gameObjectPool.getObj(idLarge);
-                        if (obj1.group != obj2.group) { // Collision if groups are different, knockback and damage
-                            int objHash = obj1.id * maxId + obj2.id;  // Unique hash for a pair of ids
-                            if (obj1.checkCollision(obj2) && !collidedPairs.contains(objHash)) {
-                                GameObject.receiveKnockback(obj1, obj2);
+                        int objHash = obj1.id * maxId + obj2.id;  // Unique hash for a pair of ids
 
-                                // Check whether to apply instant damage (a drone and another projectile)
-                                if ((obj1.isProjectile && obj2.isProjectile) && (obj1 instanceof Drone || obj2 instanceof Drone)) {  // If both are projectiles and at least one is a drone
-                                    GameObject.receiveDamageInstant(obj1, obj2);
-                                } else {
-                                    GameObject.receiveDamage(obj1, obj2);
-                                }
-
-                                collidedPairs.add(objHash);
-                            }
-                        } else if ((!obj1.noInternalCollision && !obj2.noInternalCollision) || (obj1 instanceof Drone && obj2 instanceof Drone)) {  // Same group, but neither have no collision flag, or same group drones
-                            int objHash = obj1.id * maxId + obj2.id;  // Unique hash for a pair of ids
-                            if (obj1.checkCollision(obj2) && !collidedPairs.contains(objHash)) {
-                                GameObject.receiveKnockback(obj1, obj2);  // Only knockback, no damage
-                                collidedPairs.add(objHash);
-                            }
+                        if (!collidedPairs.contains(objHash) && obj1.checkCollision(obj2)) {
+                            GameObject.receiveKnockback(obj1, obj2);
+                            GameObject.receiveDamage(obj1, obj2);
+                            collidedPairs.add(objHash);
                         }
-
 
                         /*
                         Tests for duplicate pairs:
@@ -120,7 +105,6 @@ public class CollisionManager {
                         assert(!testPairs.contains(collideStr)); // Make sure no duplicate pairs
                         testPairs.add(collideStr);
                         */
-
                     }
                 }
             }

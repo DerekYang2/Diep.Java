@@ -202,6 +202,10 @@ public abstract class GameObject implements Updatable, Drawable {
         // https://www.desmos.com/calculator/p9tyewb18m
         float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.0245f;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
+        if (diffX == 0 && diffY == 0) {  // If objects are perfectly stacked
+            diffX = (float)Math.random() + 0.1f;  // Randomize
+            diffY = (float)Math.random() + 0.1f;
+        }
         float knockbackAngle = (float) Math.atan2(diffY, diffX);
         addForce(knockbackMagnitude, knockbackAngle);
     }

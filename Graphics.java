@@ -133,6 +133,7 @@ public class Graphics extends Raylib {
     private static void setTextureAntiAliasing(Texture2D texture) {
         rlj.textures.GenTextureMipmaps(texture);
         rTextures.SetTextureFilter(texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        rlj.textures.SetTextureWrap(texture, RLGL.RL_TEXTURE_WRAP_CLAMP);
     }
 
     public static void getEnvironmentVariables() {
@@ -356,7 +357,7 @@ public class Graphics extends Raylib {
     }
 
     public static void drawTrap(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {
-        strokeWidth *= 1.3f;
+        strokeWidth *= 1.4f;
         // Height of triangle is 3/2 * diameter or 3 * radius
         float height = 3 * radius;  // Height of the triangle
         float sideLen = (float) (2.0/Math.sqrt(3) * height);  // Width of the triangle

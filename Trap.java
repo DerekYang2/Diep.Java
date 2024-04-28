@@ -24,6 +24,7 @@ public class Trap extends Projectile {
         super.setMaxHealth(maxHealth);
 
         this.acceleration = 0;  // No acceleration
+        // TODO: test initial speed of trapper, with speed upgrades
         float initialSpeed = (velMax * 25.f/120 + 30 - (float)Math.random() * bulletStats.scatterRate) * (1-friction)/(1-0.9f);  // Initial speed is max speed + 30 - scatter rate
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 

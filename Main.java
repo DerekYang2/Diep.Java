@@ -18,6 +18,18 @@ public class Main {
 
     static Tank player;
 
+    // Variables for game reset
+    static Stopwatch lastReset = new Stopwatch();  // For resetting the game
+    static boolean pendingReset = false;
+    public static void resetGame() {
+        pendingReset = true;
+        lastReset.start();
+    }
+
+    // TEMP: Debugging/analysis
+    static float percentage;
+    static Stopwatch stopwatch = new Stopwatch();
+
     // Called in GamePanel.java to initialize game
 
     public static void initialize() {
@@ -27,7 +39,7 @@ public class Main {
         drawablePool = new DrawPool();
         gameObjectPool = new HashPool<>();
         idServer = new IdServer();
-
+        lastReset.start();
         startGame();
     }
 
@@ -38,14 +50,14 @@ public class Main {
         gameObjectPool.clear();
         idServer.reset();
 
-        int spawn = 0;
+        int spawn = 10;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2);
         // new TestObj();
-        player = new Player(new Vector2(0,0), "mega trapper");
+        player = new Player(new Vector2(0,0), "spike");
 
         for (int i = 0; i < spawn; i++) {
-            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), "mega trapper");
+            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), TankBuild.getRandomBuildName());
             t.group = -1;
         }
         Graphics.setCameraTarget(player.pos);
@@ -66,11 +78,12 @@ public class Main {
         Graphics.setCameraZoom(Math.max(0.1f, Math.min(10f, Graphics.getCameraZoom())));
     }
 
-    // TEMP: Debugging/analysis
-    static float percentage;
-    static Stopwatch stopwatch = new Stopwatch();
-
     private static void update() {
+        // Reset game was called, only once per second
+        if (Graphics.isKeyDown(Keyboard.KEY_O) && lastReset.s() > 1) {
+            resetGame();
+        }
+
         counter++;
 
         if (Main.counter % 120 == 0) {
@@ -173,8 +186,11 @@ public class Main {
         {
             // Update
             //----------------------------------------------------------------------------------
+            if (pendingReset) {
+                startGame();
+                pendingReset = false;
+            }
             for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
-
                 // Compute required framebuffer scaling
                 Graphics.updateMouse();
                 update();

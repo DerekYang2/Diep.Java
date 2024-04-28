@@ -74,6 +74,7 @@ public class Graphics extends Raylib {
         // Raylib window
         rlj = new Raylib();
         rCore.SetConfigFlags(Config.ConfigFlag.FLAG_MSAA_4X_HINT | Config.ConfigFlag.FLAG_WINDOW_RESIZABLE | Config.ConfigFlag.FLAG_WINDOW_MAXIMIZED);
+        rlj.core.SetExitKey(0);  // Disable exit key (not working in raylib java?)
 
         rlj.core.InitWindow(screenWidth, screenHeight, title);
         rlj.core.MaximizeWindow();

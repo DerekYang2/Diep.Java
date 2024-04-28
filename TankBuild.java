@@ -12,6 +12,7 @@ import java.util.Set;
 
 public class TankBuild
 {
+    String name;
     Barrel[] barrels;
     BulletStats[] bulletStats;
     FireManager fireManager;
@@ -19,7 +20,8 @@ public class TankBuild
     Tank host;
     Vector2[] pendingRecoil;  // Recoil to be applied after fire
 
-    public TankBuild(Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats, float fieldFactor) {
+    public TankBuild(String name, Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats, float fieldFactor) {
+        this.name = name;
         this.barrels = barrels;
         this.fireManager = fireManager;
         this.bulletStats = bulletStats;
@@ -36,6 +38,10 @@ public class TankBuild
 
     public void setHost(Tank host) {
         this.host = host;
+        if (name.equalsIgnoreCase("spike")) {
+            host.setDamage(host.damage * 1.5f);  // Spike tank does 50% more damage, TODO: check if right
+        }
+
         for (Barrel b : barrels) {
             b.setHost(host);
         }
@@ -67,11 +73,12 @@ public class TankBuild
 
     // Static creation methods
     public static HashMap<String, JSONObject> tankDefinitions;
+    public static final String DEFINITIONS_PATH = "config/TankDefinitions.json";
 
     public static void loadTankDefinitions() {
         tankDefinitions = new HashMap<>();
         try {
-            JSONArray jsonArray = new JSONArray(TankBuild.readFile("config/TankDefinitions.json", Charset.defaultCharset()));
+            JSONArray jsonArray = new JSONArray(TankBuild.readFile(DEFINITIONS_PATH, Charset.defaultCharset()));
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 tankDefinitions.put(jsonObject.getString("name").trim().toLowerCase(), jsonObject);
@@ -125,26 +132,27 @@ public class TankBuild
         FireManager fireManager = new FireManager(reloadData);
         float fieldFactor = jsonTank.getFloat("fieldFactor");
 
-        return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
+        return new TankBuild(name, barrels, fireManager, bulletStats, fieldFactor);
     }
 
     /**
-     * Create a TankBuild object from a random tank definition in TankDefinitions.json
-     * @return
+     * Returns a random tank definition name
+     * @return Random tank definition name
      */
-    public static TankBuild createRandomBuild() {
+    public static String getRandomBuildName() {
         Set<String> keys = tankDefinitions.keySet();
         ArrayList<String> keyList = new ArrayList<>(keys);
         // Generate a random build until a valid one is found
-        String randomKey = keyList.get((int)(Math.random() * keyList.size()));
-        return createTankBuild(randomKey);
+        return (keyList.get((int)(Math.random() * keyList.size())));
     }
+
+
 
     public static float getRand(float maxV) {
         return (float)Math.random() * maxV;
     }
 
-    public static TankBuild william() {
+    public static TankBuild customRandomBuild() {
         int barrelAmount = (int)(Math.random() * 20);
 
         Barrel[] barrels = new Barrel[barrelAmount];
@@ -163,7 +171,7 @@ public class TankBuild
         FireManager fireManager = new FireManager(reloadData);
         float fieldFactor = 1f;
 
-        return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
+        return new TankBuild("custom", barrels, fireManager, bulletStats, fieldFactor);
     }
     
     public static TankBuild createNewRandomBuild() {
@@ -185,128 +193,7 @@ public class TankBuild
         FireManager fireManager = new FireManager(reloadData);
         float fieldFactor = 1f;
 
-        return new TankBuild(barrels, fireManager, bulletStats, fieldFactor);
+        return new TankBuild("custom", barrels, fireManager, bulletStats, fieldFactor);
     }
-
- /*   // Static creation methods
-    public static TankBuild tank() {
-        Barrel[] barrels = new Barrel[]{
-                new Barrel(42, 95, 0, 0)
-        };
-        FireManager fireManager = new FireManager(new double[][]{{0, 1}});
-        return new TankBuild(barrels, fireManager, new BulletStats[]{
-                new BulletStats(1, 1, 1,1 , 1, 1, 1, 1)
-        }, 1);
-    }
-
-    // Triplet
-    public static TankBuild triplet() {
-        Barrel[] barrels = new Barrel[]{
-                new Barrel(42, 80, 26, 0),
-                new Barrel(42, 80, -26, 0),
-                new Barrel(42, 95, 0, 0)
-        };
-        FireManager fireManager = new FireManager(new double[][]{{0.5, 1}, {0.5, 1}, {0, 1}});
-        return new TankBuild(barrels, fireManager,
-                new BulletStats[]{
-                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1, 0.5f),
-                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1, 0.5f),
-                        new BulletStats(1, 0.7f, 0.6f, 1, 1, 1, 1, 0.5f)
-                }, 1);
-    }
-
-    // Pentashot
-    public static TankBuild pentaShot() {
-        Barrel[] barrels = new Barrel[]{
-                new Barrel(42, 80, 0, -0.7853981633974483),
-                new Barrel(42, 80, 0, 0.7853981633974483),
-                new Barrel(42, 95, 0, -0.39269908169872414),
-                new Barrel(42, 95, 0, 0.39269908169872414),
-                new Barrel(42, 110, 0, 0)
-        };
-        FireManager fireManager = new FireManager(new double[][]{{2.0/3, 1}, {2.0/3, 1}, {1.0/3, 1}, {1.0/3, 1}, {0, 1}});
-        return new TankBuild(barrels, fireManager,
-                new BulletStats[]{
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f),
-                        new BulletStats(1, 1, 0.55f, 1, 1, 1, 1, 0.7f)
-                }, 1);
-    }
-
-    // Predator
-    public static TankBuild predator() {
-        Barrel[] barrels = new Barrel[]{
-                new Barrel(42, 110, 0, 0),
-                new Barrel(56.7f, 95, 0, 0),
-                new Barrel(71.4f, 80, 0, 0)
-        };
-        FireManager fireManager = new FireManager(new double[][]{{0, 3}, {0.2, 3}, {0.4, 3}});
-        return new TankBuild(barrels, fireManager,
-                new BulletStats[]{
-                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1, 0.3f),
-                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1, 0.3f),
-                        new BulletStats(0.7f, 1, 0.75f, 1.4f, 0.3f, 1, 1, 0.3f)
-                }, 0.85f);
-    }
-
-    // Destroyer
-    public static TankBuild destroyer() {
-        Barrel[] barrels = new Barrel[]{
-                new Barrel(71.4f, 95, 0, 0)
-        };
-        FireManager fireManager = new FireManager(new double[][]{{0, 4}});
-        return new TankBuild(barrels, fireManager,
-                new BulletStats[]{
-                        new BulletStats(1, 2, 3, 0.7f, 1, 1, 0.1f, 15)
-                }, 1);
-    }
-
-    // OctoTank
-    public static TankBuild octoTank() {
-        Barrel[] barrels = new Barrel[]{
-                new Barrel(42, 95, 0, -0.7853981633974483),
-                new Barrel(42, 95, 0, 0.7853981633974483),
-                new Barrel(42, 95, 0, -2.356194490192345),
-                new Barrel(42, 95, 0, 2.356194490192345),
-                new Barrel(42, 95, 0, 3.141592653589793),
-                new Barrel(42, 95, 0, -1.5707963267948966),
-                new Barrel(42, 95, 0, 1.5707963267948966),
-                new Barrel(42, 95, 0, 0)
-        };
-        FireManager fireManager = new FireManager(new double[][]{{0.5, 1}, {0.5, 1}, {0.5, 1}, {0.5, 1}, {0, 1}, {0, 1}, {0, 1}, {0, 1}});
-        return new TankBuild(barrels, fireManager,
-                new BulletStats[]{
-                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1),
-                        new BulletStats(1, 1, 0.65f, 1, 1, 1, 1, 1)
-                }, 1);
-    }
-
-    // Booster
-    public static TankBuild booster() {
-        Barrel[] barrels = new Barrel[]{
-                new Barrel(42, 95, 0, 0),
-                new Barrel(42, 70, 0, 3.9269908169872414),
-                new Barrel(42, 70, 0, 2.356194490192345),
-                new Barrel(42, 80, 0, 3.665191429188092),
-                new Barrel(42, 80, 0, 2.6179938779914944),
-        };
-        FireManager fireManager = new FireManager(new double[][]{{0, 1}, {2.f / 3, 1}, {2.f / 3, 1}, {1.f / 3, 1}, {1.f / 3, 1}});
-        return new TankBuild(barrels, fireManager,
-                new BulletStats[]{
-                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 0.2f),
-                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 0.2f),
-                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 0.2f),
-                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 2.5f),
-                        new BulletStats(1, 1, 0.6f, 1, 1, 1, 1, 2.5f)
-                }, 1);
-    }*/
 }
 

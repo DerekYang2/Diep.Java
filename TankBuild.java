@@ -108,7 +108,7 @@ public class TankBuild
 
         for (int i = 0; i < jsonBarrels.length(); i++) {  // Loop through each barrel object
             JSONObject jsonBarrel = jsonBarrels.getJSONObject(i);
-            barrels[i] = new Barrel(jsonBarrel.getFloat("width"), jsonBarrel.getFloat("size"), jsonBarrel.getFloat("offset"), jsonBarrel.getDouble("angle"), jsonBarrel.getBoolean("isTrapezoid"), jsonBarrel.getDouble("trapezoidDirection") != 0);
+            barrels[i] = new Barrel(jsonBarrel.getFloat("width"), jsonBarrel.getFloat("size"), jsonBarrel.getFloat("offset"), jsonBarrel.getDouble("angle"), jsonBarrel.getBoolean("isTrapezoid"), jsonBarrel.getDouble("trapezoidDirection") != 0, !jsonBarrel.isNull("addon") && jsonBarrel.getString("addon").equals("trapLauncher"));
 
             reloadData[i] = new double[] {jsonBarrel.getDouble("delay"), jsonBarrel.getDouble("reload")};
 
@@ -157,7 +157,7 @@ public class TankBuild
 
         for (int i = 0; i < barrelAmount; i++) {  // Loop through each barrel object
             
-            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false, false);
+            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false, false, false);
 
             reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
 
@@ -179,7 +179,7 @@ public class TankBuild
 
         for (int i = 0; i < barrelAmount; i++) {  // Loop through each barrel object
             
-            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false, false);
+            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false, false, false);
 
             reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
 

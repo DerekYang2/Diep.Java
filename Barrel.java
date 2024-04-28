@@ -14,8 +14,9 @@ public class Barrel {
     float turretLength;
 
     // Custom to trapezoid rendered turrets
-    boolean isTrapezoid = false, flippedTrapezoid = false;  // Flipped trapezoid has smaller end at the end of barrel
-
+    boolean isTrapezoid, flippedTrapezoid;  // Flipped trapezoid has smaller end at the end of barrel
+    // Custom to trapper rendered turrets
+    boolean isTrapper;
     // Custom to drone controlling turrets
     int maxDrones = 0;  // Maximum number of drones that can be spawned
     boolean canControlDrones;
@@ -26,13 +27,16 @@ public class Barrel {
     final float recoilLengthFactor = 0.1f;  // Percent of turret width to reduce in recoil animation
     Tank host;  // For color and other things that may appear in the future
 
-    Barrel(float width, float length, float offset, double radians, boolean isTrapezoid, boolean flippedTrapezoid) {  // renamed parameters
+    Barrel(float width, float length, float offset, double radians, boolean isTrapezoid, boolean flippedTrapezoid, boolean isTrapper) {  // renamed parameters
         this.turretWidth = width;
         this.turretLengthOG = turretLength = length;
 
         // Trapezoid turrets
         this.isTrapezoid = isTrapezoid;
         this.flippedTrapezoid = flippedTrapezoid;
+
+        // Trapper turrets
+        this.isTrapper = isTrapper;
 
         // Rotate (0, offset) by radians around 0, 0
         posOriginal = Graphics.rotatePoint(new Vector2(0, offset), new Vector2(0, 0), radians);
@@ -76,6 +80,8 @@ public class Barrel {
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * Graphics.strokeWidth), new Vector2(Graphics.strokeWidth, (width - 2 * Graphics.strokeWidth)/2.f), (float)theta, color);
         if (isTrapezoid) {
             Graphics.drawTurretTrapezoid(xleft, ycenter, length, width, radians, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float)Math.pow(host.opacity,4), flippedTrapezoid);
+        } else if (isTrapper) {
+            Graphics.drawTrapperTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4));  // Square host.opacity for a steeper curve (x^4)
         } else {
             Graphics.drawTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4));  // Square host.opacity for a steeper curve (x^4)
         }

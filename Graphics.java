@@ -34,7 +34,7 @@ public class Graphics extends Raylib {
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
-    public static Texture2D whiteCirc, whiteRect, whiteCircNoAA, whiteRectRounder, whiteTrapezoid, whiteTriangleRounded, whiteTriangleSharp;
+    public static Texture2D whiteCirc, whiteRect, whiteCircNoAA, whiteRectRounder, whiteTrapezoid, whiteTriangleRounded, whiteTriangleSharp, trapperHead, innerTrapperHead;
 
     // Colors
     public static Color RED = rgb(241, 78, 84),
@@ -105,6 +105,8 @@ public class Graphics extends Raylib {
         whiteTrapezoid = loadTexture("assets/RoundedTrapezoid.png");
         whiteTriangleRounded = loadTexture("assets/RoundedTriangle.png");
         whiteTriangleSharp = loadTexture("assets/SharpTriangle.png");
+        trapperHead = loadTexture("assets/TrapperHead.png");
+        innerTrapperHead = loadTexture("assets/InnerTrapperHead.png");
 
         if (ANTIALIASING == 1) {
             setTextureAntiAliasing(whiteCirc);
@@ -113,6 +115,8 @@ public class Graphics extends Raylib {
             setTextureAntiAliasing(whiteTrapezoid);
             setTextureAntiAliasing(whiteTriangleRounded);
             setTextureAntiAliasing(whiteTriangleSharp);
+            setTextureAntiAliasing(trapperHead);
+            setTextureAntiAliasing(innerTrapperHead);
         }
     }
 
@@ -352,16 +356,37 @@ public class Graphics extends Raylib {
         // Set opacity of colors
         color = colAlpha(color, opacity);
         strokeCol = colAlpha(strokeCol, opacity);
-
+        float aspectRatio = length/height;
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)radians, strokeCol);
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
 
-        float aspectRatio = length/height;
         Texture2D rectTexture = (height < 75) ? whiteRectRounder : whiteRect;
         Rectangle srcRect = new Rectangle(rectTexture.width - rectTexture.height * aspectRatio, 0, rectTexture.height * aspectRatio, rectTexture.height);
         rTextures.DrawTexturePro(rectTexture, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), strokeCol);
         Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
     }
+    public static void drawTrapperTurret(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity) {
+        // Set opacity of colors
+        color = colAlpha(color, opacity);
+        strokeCol = colAlpha(strokeCol, opacity);
+        float trapperHeight = height * (3.f/1.81f);  // Longer side of the trapezoid
+        float trapperLength = trapperHead.width * (trapperHeight / trapperHead.height);  // Length of the trapper head, maintain texture aspect ratio
+        //length -= trapperLength;  // Subtract the length of the trapper head
+        float aspectRatio = length/height;
+
+        rTextures.DrawTexturePro(trapperHead, new Rectangle(0, 0, trapperHead.width, trapperHead.height), new Rectangle(xleft, ycenter, trapperLength, trapperHeight), new Vector2(-(length-strokeWidth), trapperHeight/2), (float)(radians * 180/Math.PI), strokeCol);
+        float k = (trapperLength - strokeWidth)/trapperLength;
+        trapperHeight *= k * 0.97f;
+        trapperLength *= k;
+        rTextures.DrawTexturePro(innerTrapperHead, new Rectangle(0, 0, innerTrapperHead.width, innerTrapperHead.height), new Rectangle(xleft, ycenter, trapperLength, trapperHeight), new Vector2(-(length-strokeWidth), trapperHeight/2), (float)(radians * 180/Math.PI), color);
+
+
+        Texture2D rectTexture = (height < 75) ? whiteRectRounder : whiteRect;
+        Rectangle srcRect = new Rectangle(rectTexture.width - rectTexture.height * aspectRatio, 0, rectTexture.height * aspectRatio, rectTexture.height);
+        rTextures.DrawTexturePro(rectTexture, srcRect, new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), strokeCol);
+        Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
+    }
+
 
     public static void drawTurretTrapezoid(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity, boolean isFlipped) {
         color = colAlpha(color, opacity);

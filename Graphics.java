@@ -399,7 +399,11 @@ public class Graphics extends Raylib {
 
         height *= 2.19f/1.32f;
         rTextures.DrawTexturePro(whiteTrapezoid, new Rectangle(0, 0, (isFlipped?-1:1)*textureWidth, textureHeight), new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)(radians * 180/Math.PI), strokeCol);
-        rTextures.DrawTexturePro(whiteTrapezoid, new Rectangle(0, 0, (isFlipped?-1:1)*textureWidth, textureHeight), new Rectangle(xleft, ycenter, length - 2*stroke, height - 2 * stroke), new Vector2(-stroke, (height - 2 * stroke)/2.f), (float)(radians * 180/Math.PI), color);
+        //rTextures.DrawTexturePro(whiteTrapezoid, new Rectangle(0, 0, (isFlipped?-1:1)*textureWidth, textureHeight), new Rectangle(xleft, ycenter, length - 2*stroke, height - 2 * stroke), new Vector2(-stroke, (height - 2 * stroke)/2.f), (float)(radians * 180/Math.PI), color);
+
+        length *= (length - 2 * stroke)/length;
+        height *= (height - 2 * stroke)/height;
+        rTextures.DrawTexturePro(whiteTrapezoid, new Rectangle(0, 0, (isFlipped?-1:1)*textureWidth, textureHeight), new Rectangle(xleft, ycenter, length, height), new Vector2(-stroke-1, height/2.f), (float)(radians * 180/Math.PI), color);
     }
 
     public static void drawRectangleLines(Rectangle rect, float stroke, Color color) {

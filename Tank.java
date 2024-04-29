@@ -1,6 +1,7 @@
 import com.raylib.java.raymath.Vector2;
 
 import com.raylib.java.core.Color;
+import com.raylib.java.shapes.Rectangle;
 
 /**
  * NOTES:
@@ -154,5 +155,18 @@ public class Tank extends GameObject {
 
     public Vector2 getTarget() {
         return controller.getTarget();
+    }
+
+    /**
+     * Gets the view bounds of a tank
+     * @return A rectangle representing the view bounds
+     */
+    public Rectangle getView() {
+        float zoom = (float) ((.55f * this.tankBuild.fieldFactor) / Math.pow(1.01, (level - 1) *0.5f));
+        float viewWidth = Graphics.cameraWidth / zoom;
+        float viewHeight = Graphics.cameraHeight / zoom;
+        float cornerX = pos.x - viewWidth * 0.5f;
+        float cornerY = pos.y - viewHeight * 0.5f;
+        return new Rectangle(cornerX, cornerY, viewWidth, viewHeight);
     }
 }

@@ -34,7 +34,7 @@ public class Graphics extends Raylib {
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
-    public static Texture2D circle, sharpRectangle, circleNoAA, roundedRectangle, roundedTrapezoid, roundedTriangle, sharpTriangle, trapperHead, innerTrapperHead, roundedTrap, sharpTrap;
+    public static Texture2D circle, sharpRectangle, circleNoAA, roundedRectangle, roundedTrapezoid, trapezoidNoAA, roundedTriangle, sharpTriangle, trapperHead, innerTrapperHead, roundedTrap, sharpTrap;
 
     // Colors
     public static Color RED = rgb(241, 78, 84),
@@ -104,6 +104,7 @@ public class Graphics extends Raylib {
         sharpRectangle = loadTexture("assets/SharpRectangle.png");
         roundedRectangle = loadTexture("assets/RoundedRectangle.png");
         roundedTrapezoid = loadTexture("assets/RoundedTrapezoid.png");
+        trapezoidNoAA = loadTexture("assets/RoundedTrapezoid.png");
         roundedTriangle = loadTexture("assets/RoundedTriangle.png");
         sharpTriangle = loadTexture("assets/SharpTriangle.png");
         trapperHead = loadTexture("assets/TrapperHead.png");
@@ -113,14 +114,15 @@ public class Graphics extends Raylib {
 
         if (ANTIALIASING == 1) {
             setTextureAntiAliasing(circle);
-            setTextureAntiAliasing(sharpRectangle);
+            //setTextureAntiAliasing(sharpRectangle);
             setTextureAntiAliasing(roundedRectangle);
             setTextureAntiAliasing(roundedTrapezoid);
             setTextureAntiAliasing(roundedTriangle);
-            setTextureAntiAliasing(sharpTriangle);
+            //setTextureAntiAliasing(sharpTriangle);
             setTextureAntiAliasing(trapperHead);
-            setTextureAntiAliasing(innerTrapperHead);
-            setTextureAntiAliasing(sharpTrap);
+            // setTextureAntiAliasing(innerTrapperHead);
+            // setTextureAntiAliasing(sharpTrap);
+            setTextureAntiAliasing(roundedTrap);
         }
     }
 
@@ -415,7 +417,7 @@ public class Graphics extends Raylib {
 
         length *= (length - 2 * stroke)/length;
         height *= (height - 2 * stroke)/height;
-        rTextures.DrawTexturePro(roundedTrapezoid, new Rectangle(0, 0, (isFlipped?-1:1)*textureWidth, textureHeight), new Rectangle(xleft, ycenter, length, height), new Vector2(-stroke-1, height/2.f), (float)(radians * 180/Math.PI), color);
+        rTextures.DrawTexturePro(trapezoidNoAA, new Rectangle(0, 0, (isFlipped?-1:1)*textureWidth, textureHeight), new Rectangle(xleft, ycenter, length, height), new Vector2(-stroke-1, height/2.f), (float)(radians * 180/Math.PI), color);
     }
 
     public static void drawRectangleLines(Rectangle rect, float stroke, Color color) {

@@ -294,14 +294,12 @@ public abstract class GameObject implements Updatable, Drawable {
             b.receiveDamage((ticks-1) * aDamage);
         }
 
-        assert !a.isDead && !b.isDead;  // Should not happen
-
         // Apply the last tick
-        if (aDamage > b.health) {  // Overkill
+        if (aDamage > b.health) {  // A overkills B
             float scaleDown = b.health / aDamage;  // Scale down damage so that b just dies
             b.receiveDamage(scaleDown * aDamage);
             a.receiveDamage(scaleDown * bDamage);
-        } else if (bDamage > a.health) {
+        } else {  // B overkills A
             float scaleDown = a.health / bDamage;  // Scale down damage so that a just dies
             a.receiveDamage(scaleDown * bDamage);
             b.receiveDamage(scaleDown * aDamage);

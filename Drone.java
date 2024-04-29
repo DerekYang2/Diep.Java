@@ -86,9 +86,7 @@ public class Drone extends Projectile {
     }
 
     private Integer getClosestTarget() {
-        float rectWidth =  2 * 850 * host.scale;  // TODO: make sure this is the viewport size of the tank??
-        Rectangle view = new Rectangle(host.pos.x - rectWidth * 0.5f, host.pos.y - rectWidth * 0.5f, rectWidth, rectWidth);
-
+        Rectangle view = host.getView();
         ArrayList<Integer> targets = CollisionManager.queryBoundingBox(view, this.group);
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;

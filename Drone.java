@@ -60,7 +60,12 @@ public class Drone extends Projectile {
             if (closestTarget != null) {  // If there is a closest target
                 target = Main.gameObjectPool.getObj(closestTarget).pos;
             } else {  // If no target in range, set target to the tank pos
-                target = host.pos;
+                float scaleFactor = (12-17)/7.f * host.stats.getStat(Stats.BULLET_SPEED) + 17;  // Linear regression, stat 0: 17, stat 7: 12
+
+                double radians = (scaleFactor) * acceleration * Math.toRadians(Main.counter) + id;  // Add id for a random offset
+                float rotationRadius = host.radius * host.scale * 2;
+
+                target = new Vector2(host.pos.x + rotationRadius * (float) Math.cos(radians), host.pos.y + rotationRadius * (float) Math.sin(radians));
             }
         } else {
             target = host.getTarget();

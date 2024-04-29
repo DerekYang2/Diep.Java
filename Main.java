@@ -50,14 +50,15 @@ public class Main {
         gameObjectPool.clear();
         idServer.reset();
 
-        int spawn = 10;
+        int spawn = 30;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2);
         // new TestObj();
-        player = new Player(new Vector2(0,0), "spike");
+        player = new Player(new Vector2(0,0), "overlord");
 
         for (int i = 0; i < spawn; i++) {
-            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), TankBuild.getRandomBuildName());
+            //Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), TankBuild.getRandomBuildName());
+            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight),"mega trapper");
             t.group = -1;
         }
         Graphics.setCameraTarget(player.pos);
@@ -169,11 +170,11 @@ public class Main {
         return pos.x + radius > cameraBox.x && pos.x - radius < cameraBox.x + cameraBox.width && pos.y + radius > cameraBox.y && pos.y - radius < cameraBox.y + cameraBox.height;
     }
 
-    //static float xt = 0;
+    static float xt = 0;
     private static void draw() {
         drawBounds();
-        //Graphics.drawCircle(xt, 100, 10, Color.RED);360
-        //xt += 6 * GRID_SIZE/120;
+        //Graphics.drawCircle(xt, 100, 10, Color.RED, 1);
+        //xt += 6.25f;
         // Draw all the drawable objects
         drawablePool.drawAll();
     }

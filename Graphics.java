@@ -34,7 +34,7 @@ public class Graphics extends Raylib {
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
-    public static Texture2D circle, sharpRectangle, circleNoAA, roundedRectangle, roundedTrapezoid, trapezoidNoAA, roundedTriangle, sharpTriangle, trapperHead, innerTrapperHead, roundedTrap, sharpTrap, sharpRoundTriangle;
+    public static Texture2D circle, sharpRectangle, circleNoAA, roundedRectangle, roundedTrapezoid, trapezoidNoAA, roundedTriangle, sharpTriangle, trapperHead, innerTrapperHead, roundedTrap, sharpTrap, sharpRoundTriangle, roundHexagon;
 
     // Colors
     public static Color RED = rgb(241, 78, 84),
@@ -48,7 +48,7 @@ public class Graphics extends Raylib {
             BOUNDARY = rgba(0, 0, 0, 15),
             HEALTH_BAR = rgb(133, 227, 125),
             HEALTH_BAR_STROKE = rgb(85, 85, 85),
-            DARK_GREY =  rgb(85, 85, 85),
+            DARK_GREY = rgb(85, 85, 85),
             DARK_GREY_STROKE = rgb(63, 63, 63);
 
 
@@ -115,6 +115,7 @@ public class Graphics extends Raylib {
         sharpTrap = loadTexture("assets/SharpTrap.png");
         roundedTrap = loadTexture("assets/RoundedTrap.png");
         sharpRoundTriangle = loadTexture("assets/SharpRoundTriangle.png");
+        roundHexagon = loadTexture("assets/RoundHexagon.png");
 
         if (ANTIALIASING == 1) {
             setTextureAntiAliasing(circle);
@@ -128,6 +129,7 @@ public class Graphics extends Raylib {
             // setTextureAntiAliasing(sharpTrap);
             setTextureAntiAliasing(roundedTrap);
             setTextureAntiAliasing(sharpRoundTriangle);
+            setTextureAntiAliasing(roundHexagon);
         }
     }
 
@@ -209,7 +211,7 @@ public class Graphics extends Raylib {
                         (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, Color.WHITE);
 
         try {
-        rlj.core.EndDrawing();
+            rlj.core.EndDrawing();
         } catch (java.lang.ArrayIndexOutOfBoundsException e) {
             System.out.println("Unhandled input exception (middle click, etc).");
         }
@@ -241,7 +243,7 @@ public class Graphics extends Raylib {
     }
 
     public static float getCameraZoom() {
-       return  camera.getZoom();
+        return camera.getZoom();
     }
 
     public static Vector2 getCameraTarget() {
@@ -250,11 +252,12 @@ public class Graphics extends Raylib {
 
     /**
      * Set the zoom of the camera
+     *
      * @param fieldFactor Field factor of the turret
-     * @param level Level of the player
+     * @param level       Level of the player
      */
     public static void setZoom(float fieldFactor, int level) {
-        camera.setZoom((float) ((.55f * fieldFactor) / Math.pow(1.01, (level - 1) *0.5f)));
+        camera.setZoom((float) ((.55f * fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f)));
     }
 
     // Get the camera bounds
@@ -307,6 +310,7 @@ public class Graphics extends Raylib {
     public static Color rgba(int r, int g, int b, int a) {
         return new Color(r, g, b, a);
     }
+
     // Get color with brightness correction, brightness factor goes from -1.0f to 1.0f
     public static Color lerpColor(Color color1, Color color2, float factor) {
         return new Color((int) (color1.r + (color2.r - color1.r) * factor),
@@ -321,7 +325,7 @@ public class Graphics extends Raylib {
     }
 
     public static Color lerpColorGrid(Color color, float opacity) {
-        return lerpColor(color, GRID, 1-opacity);
+        return lerpColor(color, GRID, 1 - opacity);
     }
 
     public static void drawFPS(int x, int y, int fontSize, Color color) {
@@ -347,6 +351,7 @@ public class Graphics extends Raylib {
     public static void drawRectangle(float x, float y, float width, float height, Color color) {
         rlj.shapes.DrawRectangle((int) x, (int) y, (int) width, (int) height, color);
     }
+
     public static void drawRectangle(Rectangle rectangle, Vector2 origin, float radians, Color color) {
         rShapes.DrawRectanglePro(rectangle, origin, radians * 180.f / (float) Math.PI, color);
     }
@@ -359,31 +364,41 @@ public class Graphics extends Raylib {
     private static float shiftFactor(float radius) {
         double a = 0.000155254, b = 0.000221842, c = 0.800486;
         double u = 0.01, v = 0.07;
-        return (float)(a * radius * radius + b * radius + c);  // Quadratic
+        return (float) (a * radius * radius + b * radius + c);  // Quadratic
     }
 
 
     public static void drawTriangleRounded(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {
         // Height of triangle is 3/2 * diameter or 3 * radius
-        if (radius > 40) { drawTriangleRounded2(centerPos, radius, radians, strokeWidth, color, strokeCol); return;}
+        if (radius > 40) {
+            drawTriangleRounded2(centerPos, radius, radians, strokeWidth, color, strokeCol);
+            return;
+        }
         strokeWidth *= 1.12f;
         float height = 3 * radius;  // Height of the triangle
-        float sideLen = (float) (2.0/Math.sqrt(3) * height);  // Width of the triangle
+        float sideLen = (float) (2.0 / Math.sqrt(3) * height);  // Width of the triangle
         // Note on texture, texture height is sideLen and texture width is height (since sideways is 0 radians)
-        rTextures.DrawTexturePro(roundedTriangle, new Rectangle(0, 0, roundedTriangle.width, roundedTriangle.height), new Rectangle(centerPos.x, centerPos.y, height, sideLen), new Vector2(height/3* 1.07f, sideLen/2.f), (float)(radians * 180/Math.PI), strokeCol);
-        rTextures.DrawTexturePro(sharpTriangle, new Rectangle(0, 0, sharpTriangle.width, sharpTriangle.height), new Rectangle(centerPos.x, centerPos.y, height - 2 * strokeWidth, sideLen - 2 * strokeWidth), new Vector2(height/3* 1.07f - strokeWidth * shiftFactor(radius), (sideLen - 2*strokeWidth) * 0.5f), (float)(radians * 180/Math.PI), color);
+        rTextures.DrawTexturePro(roundedTriangle, new Rectangle(0, 0, roundedTriangle.width, roundedTriangle.height), new Rectangle(centerPos.x, centerPos.y, height, sideLen), new Vector2(height / 3 * 1.07f, sideLen / 2.f), (float) (radians * 180 / Math.PI), strokeCol);
+        rTextures.DrawTexturePro(sharpTriangle, new Rectangle(0, 0, sharpTriangle.width, sharpTriangle.height), new Rectangle(centerPos.x, centerPos.y, height - 2 * strokeWidth, sideLen - 2 * strokeWidth), new Vector2(height / 3 * 1.07f - strokeWidth * shiftFactor(radius), (sideLen - 2 * strokeWidth) * 0.5f), (float) (radians * 180 / Math.PI), color);
     }
 
 
     private static void drawTriangleRounded2(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {
         // Height of triangle is 3/2 * diameter or 3 * radius
         float height = 3 * radius;  // Height of the triangle
-        float sideLen = (float) (2.0/Math.sqrt(3) * height);  // Width of the triangle
-        rTextures.DrawTexturePro(sharpRoundTriangle, new Rectangle(0, 0, sharpRoundTriangle.width, sharpRoundTriangle.height), new Rectangle(centerPos.x, centerPos.y, height, sideLen), new Vector2(height/3* 1.04f, sideLen/2.f), (float)(radians * 180/Math.PI), strokeCol);
-        float k = (sideLen - 2 * strokeWidth * (float)Math.sqrt(3)/2)/sideLen;
+        float sideLen = (float) (2.0 / Math.sqrt(3) * height);  // Width of the triangle
+        rTextures.DrawTexturePro(sharpRoundTriangle, new Rectangle(0, 0, sharpRoundTriangle.width, sharpRoundTriangle.height), new Rectangle(centerPos.x, centerPos.y, height, sideLen), new Vector2(height / 3 * 1.04f, sideLen / 2.f), (float) (radians * 180 / Math.PI), strokeCol);
+        float k = (sideLen - 2 * strokeWidth * (float) Math.sqrt(3) / 2) / sideLen;
         float innerSideLen = sideLen * k;
         float innerHeight = height * k;
-        rTextures.DrawTexturePro(sharpTriangle, new Rectangle(0, 0, sharpTriangle.width, sharpTriangle.height), new Rectangle(centerPos.x, centerPos.y, innerHeight, innerSideLen), new Vector2(height/3* 1.04f - strokeWidth * (float)Math.sqrt(3)/2, innerSideLen * 0.5f), (float)(radians * 180/Math.PI), color);
+        rTextures.DrawTexturePro(sharpTriangle, new Rectangle(0, 0, sharpTriangle.width, sharpTriangle.height), new Rectangle(centerPos.x, centerPos.y, innerHeight, innerSideLen), new Vector2(height / 3 * 1.04f - strokeWidth * (float) Math.sqrt(3) / 2, innerSideLen * 0.5f), (float) (radians * 180 / Math.PI), color);
+    }
+
+    public static void drawHexagon(Vector2 centerPos, float sideLen, float radians, float strokeWidth, Color color, Color strokeCol) {
+        float height = (float) (Math.sqrt(3) * sideLen);  // Height of the hexagon
+        float width = 2 * sideLen;  // Width of the hexagon
+
+        rTextures.DrawTexturePro(roundHexagon, new Rectangle(0, 0, roundHexagon.width, roundHexagon.height), new Rectangle(centerPos.x, centerPos.y, width, height), new Vector2(width / 2, height / 2), (float) (radians * 180 / Math.PI), strokeCol);
     }
 
     public static void drawTrap(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {

@@ -1,14 +1,12 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
-import com.raylib.java.shapes.Rectangle;
-
-import java.util.ArrayList;
 
 public class Drone extends Projectile {
     float targetDirection;
     Vector2 target;
     Barrel hostBarrel;
     boolean aiOn = false;  // Default to off
+    protected static final float VIEW_RADIUS = 850;
 
     public Drone(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
         // super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f, DrawPool.TOP_PROJECTILE);
@@ -56,7 +54,7 @@ public class Drone extends Projectile {
 
         // Get the target
         if (aiOn) {
-            Integer closestTarget = getClosestTarget();
+            Integer closestTarget = CollisionManager.getClosestTarget(host.pos, Drone.VIEW_RADIUS * host.scale, group);
             if (closestTarget != null) {  // If there is a closest target
                 target = Main.gameObjectPool.getObj(closestTarget).pos;
             } else {  // If no target in range, set target to the tank pos
@@ -88,29 +86,6 @@ public class Drone extends Projectile {
         if (Main.onScreen(pos, radius * scale)) {  // Use larger radius for culling
             Graphics.drawTriangleRounded(pos, scaledRadius, direction, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(fillCol), opacity), Graphics.colAlpha(getDamageLerpColor(strokeCol), opacity));
         }
-    }
-
-    private Integer getClosestTarget() {
-        Rectangle view = host.getView();
-        ArrayList<Integer> targets = CollisionManager.queryBoundingBox(view, this.group);
-        // Get the closest target
-        float minDistSquared = Float.MAX_VALUE;
-        Integer closestTarget = null;  // Set id to some impossible value
-
-        for (int id : targets) {
-            GameObject obj = Main.gameObjectPool.getObj(id);
-
-            // TODO: should drones chase other drones?
-            if (obj.group == this.group || obj.isProjectile) {  // If same group or projectile, skip
-                continue;
-            }
-            float distSquared = (pos.x - obj.pos.x) * (pos.x - obj.pos.x) + (pos.y - obj.pos.y) * (pos.y - obj.pos.y);
-            if (distSquared < minDistSquared) {
-                minDistSquared = distSquared;
-                closestTarget = id;
-            }
-        }
-        return closestTarget;
     }
 
     @Override

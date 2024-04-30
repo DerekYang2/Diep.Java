@@ -1,3 +1,4 @@
+import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 import java.util.ArrayList;
@@ -109,5 +110,36 @@ public class CollisionManager {
                 }
             }
         }
+    }
+
+    /**
+     * Gets the id of the closest target following parameter filter
+     * Will ignore projectiles
+     * @param pos The source position
+     * @param radius The radius around the position to query
+     * @param group The group of the source (will be ignored)
+     * @return The closest target of another group within the radius
+     */
+    public static Integer getClosestTarget(Vector2 pos, float radius, int group) {
+        Rectangle view = new Rectangle(pos.x - radius, pos.y - radius, 2*radius, 2*radius);
+
+        ArrayList<Integer> targets = CollisionManager.queryBoundingBox(view, group);
+        // Get the closest target
+        float minDistSquared = Float.MAX_VALUE;
+        Integer closestTarget = null;  // Set id to some impossible value
+
+        for (int id : targets) {
+            GameObject obj = Main.gameObjectPool.getObj(id);
+            float distSquared = Graphics.distanceSq(pos, obj.pos);
+
+            if (obj.group == group || obj.isProjectile || distSquared > radius * radius) {  // If same group or projectile OR too far, skip
+                continue;
+            }
+            if (distSquared < minDistSquared) {
+                minDistSquared = distSquared;
+                closestTarget = id;
+            }
+        }
+        return closestTarget;
     }
 }

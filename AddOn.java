@@ -1,4 +1,5 @@
 import com.raylib.java.core.Color;
+import com.raylib.java.raymath.Vector2;
 
 public abstract class AddOn {
     protected Tank host;
@@ -135,7 +136,20 @@ class DominatorAddOn extends AddOn {
 class AutoTurretAddOn extends AddOn {
     FireManager fireManager;
     Barrel barrel;
-    protected final static BulletStats bulletStats = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
+    protected final static BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
+    protected final static float PASSIVE_ROTATION = 0.02f * 25/120;
+    protected final static float VIEW_RADIUS = 1700;
+    float targetDirection, direction;
+    boolean idle;
+
+    Stopwatch idleWatch;  // For a delay for idle -> firing
+
+    public AutoTurretAddOn() {
+        targetDirection = 0;
+        direction = 0;
+        idle = true;
+        idleWatch = new Stopwatch();
+    }
 
     @Override
     public void setHost(Tank tank) {
@@ -144,18 +158,37 @@ class AutoTurretAddOn extends AddOn {
         barrel = new Barrel(42 * 0.8f, 55, 0, tank.direction, false, false, false);
         barrel.setHost(tank);
 
-        fireManager = new FireManager(new double[][]{{0.01, 1}});
+        fireManager = new FireManager(new double[][]{{0, 1}});
         fireManager.setHost(tank);
+        fireManager.setFiring(true);  // Auto turret always fires unless idle (no target)
     }
 
     @Override
     public void update() {
-        // Updates
-        barrel.update(host.pos.x, host.pos.y, host.direction);
-        fireManager.setFiring(host.isFiring());
+        Integer closestTarget = CollisionManager.getClosestTarget(host.pos, VIEW_RADIUS * host.scale, host.group);  // Get closest target
 
-        if (!fireManager.getFireIndices().isEmpty()) {
-            host.addForce(barrel.shoot(bulletStats, DrawPool.TOP));
+        if (closestTarget != null) {  // If there is a closest target
+            if (idle) {
+                idle = false;
+                idleWatch.start();
+            }
+            Vector2 target = Main.gameObjectPool.getObj(closestTarget).pos;
+            targetDirection = (float) Math.atan2(target.y - host.pos.y, target.x - host.pos.x);
+        } else {
+            idle = true;
+        }
+
+        if (idle) {
+            direction += PASSIVE_ROTATION;
+        } else {
+            direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.17f);
+        }
+
+        barrel.update(host.pos.x, host.pos.y, direction);
+        fireManager.setFiring(!idle && idleWatch.ms() > 250);  // If not idle and idleWatch is over 250ms, start firing
+
+        if (!fireManager.getFireIndices().isEmpty()) {  // If index in fire queue
+            host.addForce(barrel.shoot(BULLET_STATS, DrawPool.TOP));  // Shoot at top layer and apply recoil
         }
     }
 

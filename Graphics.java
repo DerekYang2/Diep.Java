@@ -19,7 +19,7 @@ import java.io.*;
 import static com.raylib.java.core.input.Mouse.MouseButton.*;
 
 public class Graphics extends Raylib {
-    public static int ANTIALIASING = 1, PERFORMANCE_MODE = 0;  // Constant environment variables
+    public static int ANTIALIASING = 0, PERFORMANCE_MODE = 0;  // Constant environment variables
     public static float strokeWidth = 7f;
     public static int FPS = 60 * (2 - PERFORMANCE_MODE);
     final public static int cameraWidth = 1920;
@@ -566,5 +566,13 @@ public class Graphics extends Raylib {
 
     public static float randf(double min, double max) {
         return (float) (Math.random() * (max - min) + min);
+    }
+
+    public static float distance(Vector2 vec1, Vector2 vec2) {
+        return Raymath.Vector2Distance(vec1, vec2);
+    }
+
+    public static float distanceSq(Vector2 vec1, Vector2 vec2) {
+        return (vec1.x - vec2.x) * (vec1.x - vec2.x)  + (vec1.y - vec2.y) * (vec1.y - vec2.y);
     }
 }

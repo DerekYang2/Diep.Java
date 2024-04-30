@@ -17,6 +17,7 @@ public abstract class AddOn {
             case "dombase" -> new DominatorAddOn();
             case "autoturret" -> new AutoTurretAddOn();
             case "autosmasher" -> new AutoSmasherAddOn();
+            case "auto5" -> new Auto5AddOn();
             default -> null;
         };
     }
@@ -134,62 +135,33 @@ class DominatorAddOn extends AddOn {
 }
 
 class AutoTurretAddOn extends AddOn {
-    FireManager fireManager;
-    Barrel barrel;
-    protected final static BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
-    protected final static float PASSIVE_ROTATION = 0.02f * 25/120;
-    protected final static float VIEW_RADIUS = 1700;
-    float targetDirection, direction;
-    boolean idle;
-
-    Stopwatch idleWatch;  // For a delay for idle -> firing
+    AutoTurret autoTurret;
 
     public AutoTurretAddOn() {
-        targetDirection = 0;
-        direction = 0;
-        idle = true;
-        idleWatch = new Stopwatch();
+
     }
 
     @Override
     public void setHost(Tank tank) {
         this.host = tank;
 
-        barrel = new Barrel(42 * 0.8f, 55, 0, tank.direction, false, false, false);
+        Barrel barrel = new Barrel(42 * 0.8f, 55, 0, tank.direction, false, false, false);
         barrel.setHost(tank);
 
-        fireManager = new FireManager(new double[][]{{0, 1}});
+        FireManager fireManager = new FireManager(new double[][]{{0, 1}});
         fireManager.setHost(tank);
-        fireManager.setFiring(true);  // Auto turret always fires unless idle (no target)
+
+        final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
+
+        autoTurret = new AutoTurret(tank, barrel, fireManager, BULLET_STATS);
+        autoTurret.setOffset(new Vector2(0, 0));  // No offset
     }
+
 
     @Override
     public void update() {
-        Integer closestTarget = CollisionManager.getClosestTarget(host.pos, VIEW_RADIUS * host.scale, host.group);  // Get closest target
-
-        if (closestTarget != null) {  // If there is a closest target
-            if (idle) {
-                idle = false;
-                idleWatch.start();
-            }
-            Vector2 target = Main.gameObjectPool.getObj(closestTarget).pos;
-            targetDirection = (float) Math.atan2(target.y - host.pos.y, target.x - host.pos.x);
-        } else {
-            idle = true;
-        }
-
-        if (idle) {
-            direction += PASSIVE_ROTATION;
-        } else {
-            direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.17f);
-        }
-
-        barrel.update(host.pos.x, host.pos.y, direction);
-        fireManager.setFiring(!idle && idleWatch.ms() > 250);  // If not idle and idleWatch is over 250ms, start firing
-
-        if (!fireManager.getFireIndices().isEmpty()) {  // If index in fire queue
-            host.addForce(barrel.shoot(BULLET_STATS, DrawPool.TOP));  // Shoot at top layer and apply recoil
-        }
+        autoTurret.update(host.pos);
+        autoTurret.shoot(DrawPool.TOP);
     }
 
     @Override
@@ -198,13 +170,7 @@ class AutoTurretAddOn extends AddOn {
 
     @Override
     public void drawAfter() {
-        float scaledRadius = host.radius * host.scale;
-
-        if (Main.onScreen(host.pos, barrel.getTurretLength())) {
-            barrel.draw();
-            final Color fillCol = host.getDamageLerpColor(Graphics.GREY), strokeCol = host.getDamageLerpColor(Graphics.GREY_STROKE);
-            Graphics.drawCircleTexture(host.pos.x, host.pos.y, scaledRadius * 0.5f, Graphics.strokeWidth, fillCol, strokeCol, host.opacity);
-        }
+        autoTurret.draw();
     }
 }
 
@@ -230,5 +196,62 @@ class AutoSmasherAddOn extends AutoTurretAddOn {
             final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(host.opacity, 4));
             Graphics.drawHexagon(host.pos, sideLen, offsetRadians, col);
         }
+    }
+}
+
+class Auto5AddOn extends AddOn {
+    AutoTurret[] autoTurrets;
+    final int numTurrets = 5;
+    float offsetRadians;
+    final float radPerTick = 0.02f * 25/120;  // Rotation of turret, 0.1 radian per tick (25 ticks per second)
+
+    public Auto5AddOn() {
+        autoTurrets = new AutoTurret[numTurrets];
+        offsetRadians = 0;
+    }
+
+    @Override
+    public void setHost(Tank tank) {
+        this.host = tank;
+        for (int i = 0; i < numTurrets; i++) {
+            Barrel barrel = new Barrel(42 * 0.7f, 55, 0, tank.direction, false, false, false);
+            barrel.setHost(tank);
+
+            FireManager fireManager = new FireManager(new double[][]{{0, 1}});
+            fireManager.setHost(tank);
+
+            final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.4f, 1.2f, 1, 1, 1, 0.3f);
+
+            autoTurrets[i] = new AutoTurret(tank, barrel, fireManager, BULLET_STATS);
+        }
+    }
+
+    @Override
+    public void update() {
+        offsetRadians += radPerTick;
+
+        // Set relative positions
+        float radiusScaled = host.radius * host.scale * 0.8f;
+        for (int i = 0; i < numTurrets; i++) {
+            double angle = offsetRadians + (2*Math.PI/numTurrets) * i;
+            autoTurrets[i].setOffset(new Vector2((float) (radiusScaled * Math.cos(angle)), (float) (radiusScaled * Math.sin(angle))));
+        }
+
+        // Update and shoot
+        for (AutoTurret autoTurret : autoTurrets) {
+            autoTurret.update(host.pos);  // Call update function and set absoulte position
+            autoTurret.shoot(DrawPool.BOTTOM);  // Shoot at bottom layer
+        }
+    }
+
+    @Override
+    public void drawBefore() {
+        for (AutoTurret autoTurret : autoTurrets) {
+            autoTurret.draw();
+        }
+    }
+
+    @Override
+    public void drawAfter() {
     }
 }

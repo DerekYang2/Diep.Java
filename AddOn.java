@@ -1,9 +1,9 @@
 import com.raylib.java.core.Color;
 
 public interface AddOn {
-    public void drawBefore(Tank tank);
-    public void drawAfter(Tank tank);
-    public static AddOn createAddOn(String name) {
+    void drawBefore(Tank tank);
+    void drawAfter(Tank tank);
+    static AddOn createAddOn(String name) {
         switch (name) {
             case "spike":
                 return new spikeAddOn();

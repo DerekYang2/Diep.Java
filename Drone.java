@@ -12,7 +12,7 @@ public class Drone extends Projectile {
 
     public Drone(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
         // super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f, DrawPool.TOP_PROJECTILE);
-        super(hostBarrel, centerX, centerY, direction, cannonLength, diameter, bulletStats, fillCol, strokeCol, DrawPool.TOP_PROJECTILE);
+        super(hostBarrel, centerX, centerY, direction, cannonLength, diameter, bulletStats, fillCol, strokeCol, DrawPool.TOP);
         this.hostBarrel = hostBarrel;  // Set the host barrel object
         this.targetDirection = this.direction = direction;  // Set direction to normalized angle
     }

@@ -15,6 +15,7 @@ public abstract class AddOn {
             case "landmine" -> new LandmineAddOn();
             case "dombase" -> new DominatorAddOn();
             case "autoturret" -> new AutoTurretAddOn();
+            case "autosmasher" -> new AutoSmasherAddOn();
             default -> null;
         };
     }
@@ -131,37 +132,16 @@ class DominatorAddOn extends AddOn {
     }
 }
 
-/*
-    angle: 0,
-    offset: 0,
-    size: 55,
-    width: 42 * 0.7,
-    delay: 0.01,
-    reload: 1,
-    recoil: 0.3,
-    isTrapezoid: false,
-    trapezoidDirection: 0,
-    addon: null,
-    bullet: {
-        type: "bullet",
-        health: 1,
-        damage: 0.3,
-        speed: 1.2,
-        scatterRate: 1,
-        lifeLength: 1,
-        sizeRatio: 1,
-        absorbtionFactor: 1
-    }
- */
 class AutoTurretAddOn extends AddOn {
     FireManager fireManager;
     Barrel barrel;
-    final BulletStats bulletStats = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
+    protected final static BulletStats bulletStats = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
+
     @Override
     public void setHost(Tank tank) {
         this.host = tank;
 
-        barrel = new Barrel(42 * 0.7f, 55, 0, tank.direction, false, false, false);
+        barrel = new Barrel(42 * 0.8f, 55, 0, tank.direction, false, false, false);
         barrel.setHost(tank);
 
         fireManager = new FireManager(new double[][]{{0.01, 1}});
@@ -175,7 +155,7 @@ class AutoTurretAddOn extends AddOn {
         fireManager.setFiring(host.isFiring());
 
         if (!fireManager.getFireIndices().isEmpty()) {
-            host.addForce(barrel.shoot(bulletStats));
+            host.addForce(barrel.shoot(bulletStats, DrawPool.TOP));
         }
     }
 
@@ -185,9 +165,37 @@ class AutoTurretAddOn extends AddOn {
 
     @Override
     public void drawAfter() {
-        barrel.draw();
-        float scaledRadius = host.radius * host.scale * 0.5f;
-        final Color fillCol = host.getDamageLerpColor(Graphics.GREY), strokeCol = host.getDamageLerpColor(Graphics.GREY_STROKE);
-        Graphics.drawCircleTexture(host.pos.x, host.pos.y, scaledRadius, Graphics.strokeWidth, fillCol, strokeCol, host.opacity);
+        float scaledRadius = host.radius * host.scale;
+
+        if (Main.onScreen(host.pos, barrel.getTurretLength())) {
+            barrel.draw();
+            final Color fillCol = host.getDamageLerpColor(Graphics.GREY), strokeCol = host.getDamageLerpColor(Graphics.GREY_STROKE);
+            Graphics.drawCircleTexture(host.pos.x, host.pos.y, scaledRadius * 0.5f, Graphics.strokeWidth, fillCol, strokeCol, host.opacity);
+        }
+    }
+}
+
+class AutoSmasherAddOn extends AutoTurretAddOn {
+    float offsetRadians;
+    final float radPerTick = 0.1f * 25/120;  // 0.1 radian per tick (25 ticks per second)
+
+    public AutoSmasherAddOn() {
+        super();
+        offsetRadians = 0;
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        offsetRadians += radPerTick;
+    }
+
+    @Override
+    public void drawBefore() {
+        float sideLen = (host.radius * host.scale) * 1.15f;
+        if (Main.onScreen(host.pos, sideLen)) {  // Use larger radius for culling
+            final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(host.opacity, 4));
+            Graphics.drawHexagon(host.pos, sideLen, offsetRadians, col);
+        }
     }
 }

@@ -149,7 +149,7 @@ public abstract class GameObject implements Updatable, Drawable {
         if (damageAnimationFrames >= DAMAGE_ANIMATION_FRAMES - 2)
             return Graphics.lerpColor(col, Color.WHITE, 0.85f*damageAnimationFrames/DAMAGE_ANIMATION_FRAMES);
         else
-            return Graphics.lerpColor(col, Color.RED, 0.9f*damageAnimationFrames/DAMAGE_ANIMATION_FRAMES);
+            return Graphics.lerpColor(col, Color.RED, (float)damageAnimationFrames/DAMAGE_ANIMATION_FRAMES);
     }
 
     public void addForce(Vector2 force) {

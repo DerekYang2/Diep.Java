@@ -50,7 +50,9 @@ public class TankBuild
             b.setHost(host);
         }
         fireManager.setHost(host);
-        addOn.setHost(host);
+        if (addOn != null) {
+            addOn.setHost(host);
+        }
     }
 
     public void update() {

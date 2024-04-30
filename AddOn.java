@@ -1,3 +1,5 @@
+import com.raylib.java.core.Color;
+
 public interface AddOn {
     public void drawBefore(Tank tank);
     public void drawAfter(Tank tank);
@@ -23,10 +25,11 @@ class spikeAddOn implements AddOn {
         offsetRadians += radPerTick;
         final float radius = tank.radius * tank.scale, scaledRadius = radius * 0.707f * 0.92f;  // scale is always 1 until death animation
         if (Main.onScreen(tank.pos, radius)) {  // Use larger radius for culling
-            Graphics.drawTriangleRounded(tank.pos, scaledRadius, offsetRadians, Graphics.strokeWidth, Graphics.DARK_GREY, Graphics.DARK_GREY_STROKE);
-            Graphics.drawTriangleRounded(tank.pos, scaledRadius, offsetRadians + (float) (Math.PI/3), Graphics.strokeWidth, Graphics.DARK_GREY, Graphics.DARK_GREY_STROKE);
-            Graphics.drawTriangleRounded(tank.pos, scaledRadius, offsetRadians + (float) (Math.PI/6), Graphics.strokeWidth, Graphics.DARK_GREY, Graphics.DARK_GREY_STROKE);
-            Graphics.drawTriangleRounded(tank.pos, scaledRadius, offsetRadians + (float) (Math.PI/2), Graphics.strokeWidth, Graphics.DARK_GREY, Graphics.DARK_GREY_STROKE);
+            final Color fillCol = Graphics.colAlpha(tank.getDamageLerpColor(Graphics.DARK_GREY), (float) Math.pow(tank.opacity, 4)), strokeCol = Graphics.colAlpha(tank.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(tank.opacity, 4));
+            Graphics.drawTriangleRounded(tank.pos, scaledRadius, offsetRadians, Graphics.strokeWidth, fillCol, strokeCol);
+            Graphics.drawTriangleRounded(tank.pos, scaledRadius, offsetRadians + (float) (Math.PI/3), Graphics.strokeWidth, fillCol, strokeCol);
+            Graphics.drawTriangleRounded(tank.pos, scaledRadius, offsetRadians + (float) (Math.PI/6), Graphics.strokeWidth, fillCol, strokeCol);
+            Graphics.drawTriangleRounded(tank.pos, scaledRadius, offsetRadians + (float) (Math.PI/2), Graphics.strokeWidth, fillCol, strokeCol);
         }
     }
     @Override

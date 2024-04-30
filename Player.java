@@ -2,7 +2,7 @@ import com.raylib.java.raymath.Vector2;
 
 public class Player extends Tank {
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(10, 7 , 7, 7, 4, 10, 10, 7));
+        super(spawn, new PlayerController(), new Stats(10, 7 , 7, 7, 7, 10, 10, 7));
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         setTankBuild(TankBuild.createTankBuild(buildName));
         Graphics.setZoom(this.tankBuild.fieldFactor, level);  // Set zoom level, remember to call on level and tank build change

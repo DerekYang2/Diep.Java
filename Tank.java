@@ -24,6 +24,7 @@ public class Tank extends GameObject {
     Controller controller;
 
     boolean autoFire = false;
+    Stopwatch autoFireWatch = new Stopwatch();
 
     // Colors
     Color fillCol = Graphics.RED;
@@ -104,7 +105,7 @@ public class Tank extends GameObject {
             health += regenPerFrame;
         }
         health = Math.min(health, maxHealth);  // Cap health at maxHealth
-
+        controller.update();
 
         // Update the direction barrel is facing
         setDirection(controller.barrelDirection());
@@ -116,13 +117,14 @@ public class Tank extends GameObject {
         }
 
         // Update auto fire
-        if (controller.toggleAutoFire()) {
+        if (autoFireWatch.ms() > 100 && controller.toggleAutoFire()) {
             autoFire = !autoFire;  // Flip autoFire
+            autoFireWatch.start();  // Restart the timer
         }
 
         // Update all turrets
         tankBuild.update();
-        tankBuild.updateFire(autoFire || controller.fire());
+        tankBuild.updateFire(isFiring());
     }
 
     @Override
@@ -137,6 +139,10 @@ public class Tank extends GameObject {
             Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
         }
         tankBuild.addOnDrawAfter();
+    }
+
+    public boolean isFiring() {
+        return autoFire || controller.fire();
     }
 
     public boolean getAutoFire() {

@@ -17,6 +17,11 @@ public class BotController implements Controller {
     }
 
     @Override
+    public void update() {
+
+    }
+
+    @Override
     public boolean toggleAutoFire() {
         return false;
     }

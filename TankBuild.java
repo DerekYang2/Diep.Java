@@ -50,6 +50,7 @@ public class TankBuild
             b.setHost(host);
         }
         fireManager.setHost(host);
+        addOn.setHost(host);
     }
 
     public void update() {
@@ -58,6 +59,9 @@ public class TankBuild
             if (barrels[i].recoilFrames == barrels[i].recoilTime/2) {
                 host.addForce(pendingRecoil[i]);
             }
+        }
+        if (addOn != null) {
+            addOn.update();
         }
     }
 
@@ -77,13 +81,13 @@ public class TankBuild
 
     public void addOnDrawBefore() {
         if (addOn != null) {
-            addOn.drawBefore(host);
+            addOn.drawBefore();
         }
     }
 
     public void addOnDrawAfter() {
         if (addOn != null) {
-            addOn.drawAfter(host);
+            addOn.drawAfter();
         }
     }
 

@@ -1,15 +1,15 @@
 public class Stopwatch {
-    double initialTime;
+    long initialTime;
     Stopwatch() {
-        initialTime = -1e9;
+        initialTime = -(long)1e9;
     }
     public void start() {
-        initialTime = System.nanoTime();
+        initialTime = System.currentTimeMillis();
     }
     public double s() {
-        return (System.nanoTime() - initialTime) / 1e9;
+        return (System.currentTimeMillis() - initialTime) / 1e3;
     }
-    public double ms() {
-        return (System.nanoTime() - initialTime) / 1e6;
+    public long ms() {
+        return (System.currentTimeMillis() - initialTime);
     }
 }

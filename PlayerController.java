@@ -13,43 +13,13 @@ public class PlayerController implements Controller {
         keyQueue = new ArrayList<>();
     }
 
+    @Override
     public void setHost(Tank host) {
         this.host = host;
     }
 
     @Override
-    public boolean toggleAutoFire() {
-        return Graphics.isKeyPressed(KEY_E);
-    }
-
-    @Override
-    public float barrelDirection() {
-        return (float) Math.atan2(Graphics.getVirtualMouse().y - host.pos.y, Graphics.getVirtualMouse().x - host.pos.x);
-    }
-
-    @Override
-    public Vector2 getTarget() {
-        return Graphics.getVirtualMouse();
-    }
-
-    /**
-     * Method is required so that if a user holds more than two keys, only the most recent two are used
-     * @param key
-     * @return
-     */
-    private boolean isKeyDown(int key) {
-        // Only check the latest two keys in the queue
-        if (keyQueue.size() > 1) {
-            return keyQueue.get(keyQueue.size() - 1) == key || keyQueue.get(keyQueue.size() - 2) == key;
-        }
-        if (keyQueue.size() == 1) {
-            return keyQueue.get(0) == key;
-        }
-        return false;
-    }
-
-    @Override
-    public float moveDirection() {
+    public void update() {
         // Push key to top of queue if pressed
         // Issue when performance mode on, added to queue twice
         if (Graphics.isKeyPressed(KEY_W)) {
@@ -85,7 +55,41 @@ public class PlayerController implements Controller {
         if (Graphics.isKeyReleased(KEY_D)) {
             keyQueue.remove((Integer) KEY_D);
         }
+    }
 
+    @Override
+    public boolean toggleAutoFire() {
+        return Graphics.isKeyPressed(KEY_E);
+    }
+
+    @Override
+    public float barrelDirection() {
+        return (float) Math.atan2(Graphics.getVirtualMouse().y - host.pos.y, Graphics.getVirtualMouse().x - host.pos.x);
+    }
+
+    @Override
+    public Vector2 getTarget() {
+        return Graphics.getVirtualMouse();
+    }
+
+    /**
+     * Method is required so that if a user holds more than two keys, only the most recent two are used
+     * @param key
+     * @return
+     */
+    private boolean isKeyDown(int key) {
+        // Only check the latest two keys in the queue
+        if (keyQueue.size() > 1) {
+            return keyQueue.get(keyQueue.size() - 1) == key || keyQueue.get(keyQueue.size() - 2) == key;
+        }
+        if (keyQueue.size() == 1) {
+            return keyQueue.get(0) == key;
+        }
+        return false;
+    }
+
+    @Override
+    public float moveDirection() {
         // Calculate move direction
         float moveDirection = -1;
         if (isKeyDown(KEY_S) ) {

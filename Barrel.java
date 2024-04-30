@@ -144,6 +144,30 @@ public class Barrel {
         return Raymath.Vector2Scale(recoilDirection, recoilMagnitude);  // Scale the recoil direction
     }
 
+    @Override
+    public Vector2 shoot(BulletStats bulletStats, int drawLayer) {
+        double scatterAngle = Math.toRadians(bulletStats.scatterRate * (Math.random() - 0.5) * 10);  // -5 to 5 degrees times scatter rate
+        float bulletAngle = (float) (angleAbsolute + angleRelative + scatterAngle);  // Apply scatter angle to bullet angle
+
+        if (bulletStats.type.equals("bullet")) {
+            new Bullet(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol, drawLayer);  // swapped width with length
+        } else if (bulletStats.type.equals("drone")) {
+            if (droneCount == maxDrones) {
+                return new Vector2(0, 0);  // Do not fire if max drones are spawned
+            }
+            new Drone(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+            incrementDroneCount();  // Increment drone count
+        } else if (bulletStats.type.equals("trap")) {
+            new Trap(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+        }
+
+        recoilFrames = recoilTime;  // Set to max recoil time (animation)
+
+        float recoilMagnitude = 2 * bulletStats.recoil * (1-host.friction) * 10;  // (1-host.friction)/(1-0.9) = 10 * (1-host.friction), conversion from 25 fps to 120 fps
+        Vector2 recoilDirection = new Vector2((float) (-Math.cos(bulletAngle)), (float) (-Math.sin(bulletAngle))); // Return recoil direction, opposite of bullet direction
+        return Raymath.Vector2Scale(recoilDirection, recoilMagnitude);  // Scale the recoil direction
+    }
+
     public int getMaxDrones() {
         return maxDrones;
     }

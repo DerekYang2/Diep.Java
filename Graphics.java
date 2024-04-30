@@ -34,7 +34,7 @@ public class Graphics extends Raylib {
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
-    public static Texture2D circle, sharpRectangle, circleNoAA, roundedRectangle, roundedTrapezoid, trapezoidNoAA, roundedTriangle, sharpTriangle, trapperHead, innerTrapperHead, roundedTrap, sharpTrap;
+    public static Texture2D circle, sharpRectangle, circleNoAA, roundedRectangle, roundedTrapezoid, trapezoidNoAA, roundedTriangle, sharpTriangle, trapperHead, innerTrapperHead, roundedTrap, sharpTrap, sharpRoundTriangle;
 
     // Colors
     public static Color RED = rgb(241, 78, 84),
@@ -47,7 +47,10 @@ public class Graphics extends Raylib {
             GRID_STROKE = rgba(0, 0, 0, 6),
             BOUNDARY = rgba(0, 0, 0, 15),
             HEALTH_BAR = rgb(133, 227, 125),
-            HEALTH_BAR_STROKE = rgb(85, 85, 85);
+            HEALTH_BAR_STROKE = rgb(85, 85, 85),
+            DARK_GREY =  rgb(85, 85, 85),
+            DARK_GREY_STROKE = rgb(63, 63, 63);
+
 
     public static Color getColor(String hexStr) {
         return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
@@ -111,6 +114,7 @@ public class Graphics extends Raylib {
         innerTrapperHead = loadTexture("assets/InnerTrapperHead.png");
         sharpTrap = loadTexture("assets/SharpTrap.png");
         roundedTrap = loadTexture("assets/RoundedTrap.png");
+        sharpRoundTriangle = loadTexture("assets/SharpRoundTriangle.png");
 
         if (ANTIALIASING == 1) {
             setTextureAntiAliasing(circle);
@@ -123,6 +127,7 @@ public class Graphics extends Raylib {
             // setTextureAntiAliasing(innerTrapperHead);
             // setTextureAntiAliasing(sharpTrap);
             setTextureAntiAliasing(roundedTrap);
+            setTextureAntiAliasing(sharpRoundTriangle);
         }
     }
 
@@ -350,13 +355,35 @@ public class Graphics extends Raylib {
         rlj.shapes.DrawRectangleRounded(new Rectangle(x, y, width, height), roundness, 7, color);
     }
 
+    // https://www.desmos.com/calculator/odkmazouws
+    private static float shiftFactor(float radius) {
+        double a = 0.000155254, b = 0.000221842, c = 0.800486;
+        double u = 0.01, v = 0.07;
+        return (float)(a * radius * radius + b * radius + c);  // Quadratic
+    }
+
+
     public static void drawTriangleRounded(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {
         // Height of triangle is 3/2 * diameter or 3 * radius
+        if (radius > 40) { drawTriangleRounded2(centerPos, radius, radians, strokeWidth, color, strokeCol); return;}
+        strokeWidth *= 1.12f;
         float height = 3 * radius;  // Height of the triangle
         float sideLen = (float) (2.0/Math.sqrt(3) * height);  // Width of the triangle
         // Note on texture, texture height is sideLen and texture width is height (since sideways is 0 radians)
-        rTextures.DrawTexturePro(roundedTriangle, new Rectangle(0, 0, roundedTriangle.width, roundedTriangle.height), new Rectangle(centerPos.x, centerPos.y, height, sideLen), new Vector2(height/3, sideLen/2.f), (float)(radians * 180/Math.PI), strokeCol);
-        rTextures.DrawTexturePro(sharpTriangle, new Rectangle(0, 0, sharpTriangle.width, sharpTriangle.height), new Rectangle(centerPos.x, centerPos.y, height - 2 * strokeWidth, sideLen - 2 * strokeWidth), new Vector2(height/3 - strokeWidth, (sideLen - 2*strokeWidth) * 0.5f), (float)(radians * 180/Math.PI), color);
+        rTextures.DrawTexturePro(roundedTriangle, new Rectangle(0, 0, roundedTriangle.width, roundedTriangle.height), new Rectangle(centerPos.x, centerPos.y, height, sideLen), new Vector2(height/3* 1.07f, sideLen/2.f), (float)(radians * 180/Math.PI), strokeCol);
+        rTextures.DrawTexturePro(sharpTriangle, new Rectangle(0, 0, sharpTriangle.width, sharpTriangle.height), new Rectangle(centerPos.x, centerPos.y, height - 2 * strokeWidth, sideLen - 2 * strokeWidth), new Vector2(height/3* 1.07f - strokeWidth * shiftFactor(radius), (sideLen - 2*strokeWidth) * 0.5f), (float)(radians * 180/Math.PI), color);
+    }
+
+
+    private static void drawTriangleRounded2(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {
+        // Height of triangle is 3/2 * diameter or 3 * radius
+        float height = 3 * radius;  // Height of the triangle
+        float sideLen = (float) (2.0/Math.sqrt(3) * height);  // Width of the triangle
+        rTextures.DrawTexturePro(sharpRoundTriangle, new Rectangle(0, 0, sharpRoundTriangle.width, sharpRoundTriangle.height), new Rectangle(centerPos.x, centerPos.y, height, sideLen), new Vector2(height/3* 1.04f, sideLen/2.f), (float)(radians * 180/Math.PI), strokeCol);
+        float k = (sideLen - 2 * strokeWidth * (float)Math.sqrt(3)/2)/sideLen;
+        float innerSideLen = sideLen * k;
+        float innerHeight = height * k;
+        rTextures.DrawTexturePro(sharpTriangle, new Rectangle(0, 0, sharpTriangle.width, sharpTriangle.height), new Rectangle(centerPos.x, centerPos.y, innerHeight, innerSideLen), new Vector2(height/3* 1.04f - strokeWidth * (float)Math.sqrt(3)/2, innerSideLen * 0.5f), (float)(radians * 180/Math.PI), color);
     }
 
     public static void drawTrap(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {
@@ -403,10 +430,9 @@ public class Graphics extends Raylib {
 
 
     public static void drawTurretTrapezoid(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity, boolean isFlipped) {
+        stroke *= 1.1f;
         color = colAlpha(color, opacity);
         strokeCol = colAlpha(strokeCol, opacity);
-
-        stroke *= (ANTIALIASING == 1 ? 0.95f: 1);
 
         float textureWidth = roundedTrapezoid.getWidth();
         float textureHeight = roundedTrapezoid.getHeight();

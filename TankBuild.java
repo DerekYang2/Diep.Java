@@ -20,12 +20,16 @@ public class TankBuild
     Tank host;
     Vector2[] pendingRecoil;  // Recoil to be applied after fire
 
-    public TankBuild(String name, Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats, float fieldFactor) {
+    // AddOn object
+    AddOn addOn;
+
+    public TankBuild(String name, AddOn addOn, Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats, float fieldFactor) {
         this.name = name;
         this.barrels = barrels;
         this.fireManager = fireManager;
         this.bulletStats = bulletStats;
         this.fieldFactor = fieldFactor;
+        this.addOn = addOn;
         pendingRecoil = new Vector2[barrels.length];
 
         // Set whether barrels are drone barrels
@@ -71,6 +75,19 @@ public class TankBuild
         }
     }
 
+    public void addOnDrawBefore() {
+        if (addOn != null) {
+            addOn.drawBefore(host);
+        }
+    }
+
+    public void addOnDrawAfter() {
+        if (addOn != null) {
+            addOn.drawAfter(host);
+        }
+    }
+
+
     // Static creation methods
     public static HashMap<String, JSONObject> tankDefinitions;
     public static final String DEFINITIONS_PATH = "config/TankDefinitions.json";
@@ -107,6 +124,7 @@ public class TankBuild
             jsonTank = tankDefinitions.get("tank");  // Default to tank
         }
 
+        AddOn addOn = jsonTank.isNull("postAddon")? null : AddOn.createAddOn(jsonTank.getString("postAddon"));
         JSONArray jsonBarrels = jsonTank.getJSONArray("barrels");
 
         Barrel[] barrels = new Barrel[jsonBarrels.length()];
@@ -132,7 +150,7 @@ public class TankBuild
         FireManager fireManager = new FireManager(reloadData);
         float fieldFactor = jsonTank.getFloat("fieldFactor");
 
-        return new TankBuild(name, barrels, fireManager, bulletStats, fieldFactor);
+        return new TankBuild(name, addOn, barrels, fireManager, bulletStats, fieldFactor);
     }
 
     /**
@@ -171,7 +189,7 @@ public class TankBuild
         FireManager fireManager = new FireManager(reloadData);
         float fieldFactor = 1f;
 
-        return new TankBuild("custom", barrels, fireManager, bulletStats, fieldFactor);
+        return new TankBuild("custom", null, barrels, fireManager, bulletStats, fieldFactor);
     }
     
     public static TankBuild createNewRandomBuild() {
@@ -193,7 +211,7 @@ public class TankBuild
         FireManager fireManager = new FireManager(reloadData);
         float fieldFactor = 1f;
 
-        return new TankBuild("custom", barrels, fireManager, bulletStats, fieldFactor);
+        return new TankBuild("custom", null, barrels, fireManager, bulletStats, fieldFactor);
     }
 }
 

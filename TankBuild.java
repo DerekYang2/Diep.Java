@@ -125,6 +125,10 @@ public class TankBuild
         }
 
         AddOn addOn = jsonTank.isNull("postAddon")? null : AddOn.createAddOn(jsonTank.getString("postAddon"));
+        if (addOn == null) {
+            addOn = jsonTank.isNull("preAddon")? null : AddOn.createAddOn(jsonTank.getString("preAddon"));
+        }
+
         JSONArray jsonBarrels = jsonTank.getJSONArray("barrels");
 
         Barrel[] barrels = new Barrel[jsonBarrels.length()];

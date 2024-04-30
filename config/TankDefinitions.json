@@ -5521,7 +5521,7 @@
     },
     {
         "id": 45,
-        "name": "Dominator",
+        "name": "Dominator Destroyer",
         "upgradeMessage": "",
         "levelRequirement": 0,
         "upgrades": [],
@@ -5603,7 +5603,7 @@
     },
     {
         "id": 46,
-        "name": "Dominator",
+        "name": "Dominator Gunner",
         "upgradeMessage": "",
         "levelRequirement": 0,
         "upgrades": [],
@@ -5729,7 +5729,7 @@
     },
     {
         "id": 47,
-        "name": "Dominator",
+        "name": "Dominator Trapper",
         "upgradeMessage": "",
         "levelRequirement": 0,
         "upgrades": [],

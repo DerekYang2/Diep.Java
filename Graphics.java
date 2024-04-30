@@ -394,11 +394,12 @@ public class Graphics extends Raylib {
         rTextures.DrawTexturePro(sharpTriangle, new Rectangle(0, 0, sharpTriangle.width, sharpTriangle.height), new Rectangle(centerPos.x, centerPos.y, innerHeight, innerSideLen), new Vector2(height / 3 * 1.04f - strokeWidth * (float) Math.sqrt(3) / 2, innerSideLen * 0.5f), (float) (radians * 180 / Math.PI), color);
     }
 
-    public static void drawHexagon(Vector2 centerPos, float sideLen, float radians, float strokeWidth, Color color, Color strokeCol) {
+
+    public static void drawHexagon(Vector2 centerPos, float sideLen, float radians, Color color) {
         float height = (float) (Math.sqrt(3) * sideLen);  // Height of the hexagon
         float width = 2 * sideLen;  // Width of the hexagon
 
-        rTextures.DrawTexturePro(roundHexagon, new Rectangle(0, 0, roundHexagon.width, roundHexagon.height), new Rectangle(centerPos.x, centerPos.y, width, height), new Vector2(width / 2, height / 2), (float) (radians * 180 / Math.PI), strokeCol);
+        rTextures.DrawTexturePro(roundHexagon, new Rectangle(0, 0, roundHexagon.width, roundHexagon.height), new Rectangle(centerPos.x, centerPos.y, width, height), new Vector2(width / 2, height / 2), (float) (radians * 180 / Math.PI), color);
     }
 
     public static void drawTrap(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {

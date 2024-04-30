@@ -35,6 +35,12 @@ public class BotController implements Controller {
 
     @Override
     public float moveDirection() {
+        if (host.stats.getStat(Stats.BODY_DAMAGE) >= 6) {
+            // Bot will chase the player
+            Vector2 PlayerPos = Main.player.pos;
+            moveDir = (float) Math.atan2(PlayerPos.y - host.pos.y, PlayerPos.x - host.pos.x);
+            return moveDir;
+        }
         // Bot will bounce around the arena
         float xComp = (float) Math.cos(moveDir);
         float yComp = (float) Math.sin(moveDir);

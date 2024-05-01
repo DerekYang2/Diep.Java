@@ -11,7 +11,7 @@ public class AutoTurret {
     float targetDirection, direction;
     boolean idle;
     Stopwatch idleWatch;  // For a delay for idle -> firing
-
+    float range = (float) Math.toRadians(170);
     Vector2 pos, offset;
 
 
@@ -44,13 +44,15 @@ public class AutoTurret {
             targetDirection = (float) Math.atan2(target.y - absPos.y, target.x - absPos.x);
         } else {
             idle = true;
+            if (offset.x == 0 && offset.y == 0) {
+                targetDirection += PASSIVE_ROTATION;
+            } else {
+                targetDirection = (float) Math.atan2(offset.y, offset.x);
+            }
         }
 
-        if (idle) {
-            direction += PASSIVE_ROTATION;
-        } else {
-            direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.17f);
-        }
+        direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.17f);
+
 
         barrel.update(absPos.x, absPos.y, direction);
         fireManager.setFiring(!idle && idleWatch.ms() > 250);  // If not idle and idleWatch is over 250ms, start firing

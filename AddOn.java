@@ -199,6 +199,10 @@ class AutoSmasherAddOn extends AutoTurretAddOn {
     }
 }
 
+/**
+ * TODO: use Atan2 to get absolute angle, check if targets are within absolute angle range (turret angle +- 85 degrees)
+ * Normalize angles
+ */
 class Auto5AddOn extends AddOn {
     AutoTurret[] autoTurrets;
     final int numTurrets = 5;
@@ -217,7 +221,7 @@ class Auto5AddOn extends AddOn {
             Barrel barrel = new Barrel(42 * 0.7f, 55, 0, tank.direction, false, false, false);
             barrel.setHost(tank);
 
-            FireManager fireManager = new FireManager(new double[][]{{0, 1}});
+            FireManager fireManager = new FireManager(new double[][]{{i * (1.0/numTurrets), 1}});
             fireManager.setHost(tank);
 
             final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.4f, 1.2f, 1, 1, 1, 0.3f);

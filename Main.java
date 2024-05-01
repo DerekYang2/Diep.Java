@@ -50,7 +50,7 @@ public class Main {
         gameObjectPool.clear();
         idServer.reset();
 
-        int spawn = 1;
+        int spawn = 30;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2);
         // new TestObj();
@@ -58,7 +58,7 @@ public class Main {
 
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
-            //buildName = "auto gunner";
+            //buildName = "auto 5";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
             t.group = -1;
         }

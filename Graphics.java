@@ -575,4 +575,25 @@ public class Graphics extends Raylib {
     public static float distanceSq(Vector2 vec1, Vector2 vec2) {
         return (vec1.x - vec2.x) * (vec1.x - vec2.x)  + (vec1.y - vec2.y) * (vec1.y - vec2.y);
     }
+
+    public boolean isAngleBetween(float target, float angle1, float angle2) {
+        // Convert to radians
+        target = (float) normalizeAngle(target);
+        angle1 = (float) normalizeAngle(angle1);
+        angle2 = (float) normalizeAngle(angle2);
+
+        // make the angle from angle1 to angle2 to be <= 180 degrees
+        float rAngle = ((angle2 - angle1) % (2 * (float)Math.PI) + 2 * (float)Math.PI) % (2 * (float)Math.PI);
+        if (rAngle >= Math.PI) {
+            float temp = angle1;
+            angle1 = angle2;
+            angle2 = temp;
+        }
+
+        // check if it passes through zero
+        if (angle1 <= angle2)
+            return target >= angle1 && target <= angle2;
+        else
+            return target >= angle1 || target <= angle2;
+    }
 }

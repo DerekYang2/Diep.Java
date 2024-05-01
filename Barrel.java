@@ -67,7 +67,7 @@ public class Barrel {
     public void draw() {
         final int widthScaled = (int) getTurretWidth(), lengthScaled = (int) getTurretLength();
         if (Main.onScreen(new Vector2(pos.x + xAbsolute, pos.y + yAbsolute), lengthScaled)) {  // Culling
-            drawTurret((int) (pos.x + xAbsolute), (int) (pos.y + yAbsolute), lengthScaled, widthScaled, angleAbsolute + angleRelative);
+            drawTurret((int) (pos.x + xAbsolute), (int) (pos.y + yAbsolute), lengthScaled, widthScaled, angleAbsolute);
         }
     }
 
@@ -105,12 +105,12 @@ public class Barrel {
         xAbsolute = xAbs;
         yAbsolute = yAbs;
 
-        // Update tank angle
+        // Calculate relative position by rotating xOriginal and yOriginal (scaled) around 0, 0
+        pos = Graphics.rotatePoint(Graphics.scale(posOriginal, host.scale), new Vector2(0, 0), tankAngle);
+
+        // Update absolute tank angle
         angleAbsolute = tankAngle + angleRelative;
         scatterDegrees = Graphics.randf(-5, 5);  // -5 to 5 degrees times scatter rate, not multiplied by bullet stats scatter rate yet
-
-        // Calculate new RELATIVE position by rotating xOriginal and yOriginal (scaled) around 0, 0
-        pos = Graphics.rotatePoint(Graphics.scale(posOriginal, host.scale), new Vector2(0, 0), angleAbsolute);
 
         recoilFrames--;
         if (recoilFrames < 0) {
@@ -172,7 +172,13 @@ public class Barrel {
         return turretLength * host.scale;
     }
     public Vector2 getSpawnPoint() {
-        return new Vector2((float) (pos.x + xAbsolute + Math.cos(angleAbsolute) * getTurretLength()), (float) (pos.y + yAbsolute + Math.sin(angleAbsolute) * getTurretLength()));
+        float turretLength = getTurretLength();
+        if (isTrapper) {
+            final float trapperHeight = getTurretWidth() * (3.f/1.81f);  // Longer side of the trapezoid
+            final float trapperLength = Graphics.trapperHead.width * (trapperHeight / Graphics.trapperHead.height);  // Length of the trapper head, maintain texture aspect ratio
+            turretLength += trapperLength;  // Add trapper head length
+        }
+        return new Vector2((float) (pos.x + xAbsolute + Math.cos(angleAbsolute) * turretLength), (float) (pos.y + yAbsolute + Math.sin(angleAbsolute) * turretLength));
     }
 
 }

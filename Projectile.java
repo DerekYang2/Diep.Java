@@ -35,6 +35,8 @@ public abstract class Projectile extends GameObject {
         radius = diameter * 0.5f * bulletStats.sizeRatio;  // Multiply radius by bullet stats size ratio
     }
 
+    public abstract float getMaxSpeed();
+
     /**
      * Only differs whether to keep in arena or not
      */

@@ -29,20 +29,24 @@ public class Trap extends Projectile {
         float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
         float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
 
-        // Scale factor of bullet speed stat: https://www.desmos.com/calculator/efuvwmrgf1 (scale factor is 1 at bs=0 and 4.5 at bs=7)
-        float scaleFactor = (float)(1.32288 * Math.sqrt(host.stats.getStat(Stats.BULLET_PENETRATION)) + 1);
-        float velMax = (20 + scaleFactor * 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed;  // src: not link above (check diepcustom repo)
-
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
         this.acceleration = 0;  // No acceleration
         // TODO: test initial speed of trapper, with speed upgrades
-        float initialSpeed = (velMax * 25.f/120 + 30 + Graphics.randf(-bulletStats.scatterRate, bulletStats.scatterRate)) * (1-friction)/(1-0.9f);  // Initial speed is max speed + 30 - scatter rate
+        float initialSpeed = (getMaxSpeed() + 30 + Graphics.randf(-bulletStats.scatterRate, bulletStats.scatterRate)) * (1-friction)/(1-0.9f);  // Initial speed is max speed + 30 - scatter rate
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 
         // Life length
         lifeFrames = Math.round(bulletStats.lifeLength * 75 * (120.f / 25));  // Lengthen because 25 fps -> 120 fps
+    }
+
+    @Override
+    public float getMaxSpeed() {
+        // Scale factor of bullet speed stat: https://www.desmos.com/calculator/nganqiqqf3 (scale factor is 1.6 at bs=0 and 5.1 at bs=7)
+        float scaleFactor = (float)(1.32288 * Math.sqrt(host.stats.getStat(Stats.BULLET_PENETRATION)) + 1.6);
+        float velMax = (20 + scaleFactor * 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed;  // src: not link above (check diepcustom repo)
+        return velMax * 25.f/120;
     }
 
     @Override

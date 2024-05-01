@@ -209,7 +209,7 @@ class AutoNAddOn extends AddOn {
     int numTurrets;
     float offsetRadians;
     final float radPerTick = 0.01f * 25/120;  // Rotation of turret, 0.01 radian per tick (25 ticks per second)
-    final double rangeRad = Math.toRadians(180);  // Range of turret
+    final double rangeRad = Math.toRadians(175);  // Range of turret
 
     public AutoNAddOn(int numTurrets) {
         this.numTurrets = numTurrets;

@@ -61,7 +61,7 @@ public class AutoTurret {
         direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.2f);
 
         barrel.update(absPos.x, absPos.y, direction);
-        fireManager.setFiring(!idle && idleWatch.ms() > 250);  // If not idle and idleWatch is over 250ms, start firing
+        fireManager.setFiring(!idle && idleWatch.ms() > 300);  // If not idle and idleWatch is over 300ms, start firing
     }
 
     public void shoot(int drawLayer) {
@@ -86,7 +86,7 @@ public class AutoTurret {
 
     // AI Functions Below
 
-    protected static double sqr(double v) {
+    private static double sqr(double v) {
         return v*v;
     }
 
@@ -96,6 +96,11 @@ public class AutoTurret {
         return (float) ((dist-2000) * (dist-2000)/(1.7 * 2000 * 2000)+ 1.1);
     }
 
+    /**
+     * Get the target shift based on the target's velocity
+     * @param target The GameObject target
+     * @return The target with velocity accounted for
+     */
     Vector2 getTargetShift(GameObject target) {
         Vector2 spawnPoint = barrel.getSpawnPoint();
 
@@ -113,7 +118,6 @@ public class AutoTurret {
         // Quad formula
         double t1 = (-b + Math.sqrt(discriminant)) / (2 * a), t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
         double t = (t1 > 0 && t2 > 0) ? Math.min(t1, t2) : Math.max(t1, t2);
-        assert t >= 0;
         return new Vector2((float) (target.pos.x + target.vel.x * t), (float) (target.pos.y + target.vel.y * t));
     }
 
@@ -128,7 +132,7 @@ public class AutoTurret {
 
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;
-        Vector2 closestTarget = null;  // Set id to some impossible value
+        Vector2 closestTarget = null;  // Set to null if no target found
 
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
@@ -143,15 +147,15 @@ public class AutoTurret {
             if (range < 2 * Math.PI) {
                 double baseAngle = Math.atan2(offset.y, offset.x);
                 double startAngle = baseAngle - range * 0.5, endAngle = baseAngle + range * 0.5;  // End angle is ccw
-                double targetAngle = Math.atan2(shiftedTarget.y - pos.y, shiftedTarget.x - pos.x);
-                if (!Graphics.isAngleBetween(targetAngle, startAngle, endAngle)) {
+                double targetAngle = Math.atan2(shiftedTarget.y - pos.y, shiftedTarget.x - pos.x);  // Angle towards the target
+                if (!Graphics.isAngleBetween(targetAngle, startAngle, endAngle)) {  // If target not within angle range, skip
                     continue;
                 }
             }
 
-            if (distSquared < minDistSquared) {
+            if (distSquared < minDistSquared) {  // If closer, update
                 minDistSquared = distSquared;
-                closestTarget = shiftedTarget;
+                closestTarget = shiftedTarget;  // Update closest target
             }
         }
         return closestTarget;

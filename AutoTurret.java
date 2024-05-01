@@ -1,5 +1,4 @@
 import com.raylib.java.core.Color;
-import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
@@ -31,6 +30,7 @@ public class AutoTurret {
 
         offset = new Vector2(0, 0);
         range = 2 * Math.PI; // Default range is 360 degrees
+        // bulletStats.scatterRate = 0; // Test for accuracy
     }
 
     public void setOffset(Vector2 offset, double range) {
@@ -64,20 +64,46 @@ public class AutoTurret {
         fireManager.setFiring(!idle && idleWatch.ms() > 250);  // If not idle and idleWatch is over 250ms, start firing
     }
 
+    public void shoot(int drawLayer) {
+        if (!fireManager.getFireIndices().isEmpty()) {  // If index in fire queue
+            host.addForce(barrel.shoot(bulletStats, drawLayer));  // Shoot at top layer and apply recoil
+        }
+    }
+
+    public void draw() {
+        float scaledRadius = host.radius * host.scale;
+        Vector2 absPos = getAbsPos();
+        if (Main.onScreen(absPos, barrel.getTurretLength())) {
+            barrel.draw();
+            final Color fillCol = host.getDamageLerpColor(Graphics.GREY), strokeCol = host.getDamageLerpColor(Graphics.GREY_STROKE);
+            Graphics.drawCircleTexture(absPos.x, absPos.y, scaledRadius * 0.5f, Graphics.strokeWidth, fillCol, strokeCol, host.opacity);
+        }
+    }
+
+    public Vector2 getAbsPos() {
+        return new Vector2(pos.x + offset.x, pos.y + offset.y);
+    }
+
+    // AI Functions Below
+
     protected static double sqr(double v) {
         return v*v;
     }
-    Vector2 getTargetShift(GameObject target) {
-        Vector2 absPos = getAbsPos();
-        double bLength = barrel.getTurretLength();
-        absPos.x += bLength * Math.cos(direction);
-        absPos.y += bLength * Math.sin(direction);
 
-        double projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
+    // https://www.desmos.com/calculator/wi99dkcfsy
+    private static float scaleFactor(float dist) {
+        if (dist >= 2000) return 1.1f;
+        return (float) ((dist-2000) * (dist-2000)/(1.7 * 2000 * 2000)+ 1.1);
+    }
+
+    Vector2 getTargetShift(GameObject target) {
+        Vector2 spawnPoint = barrel.getSpawnPoint();
+
+        double projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120 * scaleFactor(Graphics.distance(spawnPoint, target.pos));
 
         double a = sqr(target.vel.x) + sqr(target.vel.y) - sqr(projectile_speed);
-        double b = 2 * (target.vel.x * (target.pos.x - absPos.x) + target.vel.y * (target.pos.y - absPos.y));
-        double c = sqr(target.pos.x - absPos.x) + sqr(target.pos.y - absPos.y);
+        double b = 2 * (target.vel.x * (target.pos.x - spawnPoint.x) + target.vel.y * (target.pos.y - spawnPoint.y));
+        double c = sqr(target.pos.x - spawnPoint.x) + sqr(target.pos.y - spawnPoint.y);
 
         double discriminant = b * b - 4 * a * c;
         if (discriminant < 0) {
@@ -129,25 +155,5 @@ public class AutoTurret {
             }
         }
         return closestTarget;
-    }
-
-    public void shoot(int drawLayer) {
-        if (!fireManager.getFireIndices().isEmpty()) {  // If index in fire queue
-            host.addForce(barrel.shoot(bulletStats, drawLayer));  // Shoot at top layer and apply recoil
-        }
-    }
-
-    public void draw() {
-        float scaledRadius = host.radius * host.scale;
-        Vector2 absPos = getAbsPos();
-        if (Main.onScreen(absPos, barrel.getTurretLength())) {
-            barrel.draw();
-            final Color fillCol = host.getDamageLerpColor(Graphics.GREY), strokeCol = host.getDamageLerpColor(Graphics.GREY_STROKE);
-            Graphics.drawCircleTexture(absPos.x, absPos.y, scaledRadius * 0.5f, Graphics.strokeWidth, fillCol, strokeCol, host.opacity);
-        }
-    }
-
-    public Vector2 getAbsPos() {
-        return new Vector2(pos.x + offset.x, pos.y + offset.y);
     }
 }

@@ -9,9 +9,19 @@ public abstract class Projectile extends GameObject {
     Tank host;
     BulletStats bulletStats;
 
-    // The bullet trajectory will be determined based on the position where it spawns
-    public Projectile(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol, int drawLayer) {
-        super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), 1f, drawLayer);
+    /**
+     * Creates a projectile game object and spawns right away
+     * @param hostBarrel The pointer to the barrel that fired this projectile
+     * @param spawnPos The position where the projectile spawns (center position of projectile)
+     * @param direction The direction the projectile is fired (radians)
+     * @param diameter The diameter of the projectile
+     * @param bulletStats The bullet stats of the projectile
+     * @param fillCol The fill color of the projectile
+     * @param strokeCol The stroke color of the projectile
+     * @param drawLayer The draw layer of the projectile
+     */
+    public Projectile(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol, int drawLayer) {
+        super(spawnPos, (int) (diameter * 0.5f), 1f, drawLayer);
         this.direction = direction;  // Calculate direction (scatter angle already applied by Barrel.java)
         this.bulletStats = bulletStats;
         this.host = hostBarrel.host;

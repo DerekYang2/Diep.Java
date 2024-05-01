@@ -596,17 +596,33 @@ public class Graphics extends Raylib {
         }
     }
 
-    public static double vector2Length(Vector2 vec) {
+    /**
+     * Returns the length (magnitude) of the vector
+     * @param vec The vector to get the length of
+     * @return The length of the vector
+     */
+    public static double length(Vector2 vec) {
         return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
     }
 
     /**
      * Angle between two vectors in Radians
-     * @param vec1
-     * @param vec2
-     * @return
+     * @param vec1 The first vector
+     * @param vec2 The second vector
+     * @return The inner angle between the two vectors in Radians
      */
-    public static double vector2Angle(Vector2 vec1, Vector2 vec2) {
+    public static double angle(Vector2 vec1, Vector2 vec2) {
         return Math.toRadians(Raymath.Vector2Angle(vec1, vec2));
     }
+
+    /**
+     * Scale a vector by a factor
+     * @param vec The vector to scale
+     * @param scale The constant factor to scale by
+     * @return The scaled vector
+     */
+    public static Vector2 scale(Vector2 vec, float scale) {
+        return new Vector2(vec.x * scale, vec.y * scale);
+    }
+
 }

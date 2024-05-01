@@ -221,7 +221,7 @@ class AutoNAddOn extends AddOn {
     public void setHost(Tank tank) {
         this.host = tank;
         for (int i = 0; i < numTurrets; i++) {
-            Barrel barrel = new Barrel(42 * 0.7f, 55, 0, tank.direction, false, false, false);
+            Barrel barrel = new Barrel(42 * 0.8f, 55, 0, tank.direction, false, false, false);
             barrel.setHost(tank);
 
             FireManager fireManager = new FireManager(new double[][]{{0.01, 1}});

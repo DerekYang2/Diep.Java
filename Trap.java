@@ -3,10 +3,20 @@ import com.raylib.java.raymath.Vector2;
 
 public class Trap extends Projectile {
     int collideFrames;  // Number of frames left to collide with itself
-    double rotation = 0;  // Rotation of the trap texture
+    double rotation;  // Rotation of the trap texture
 
-    public Trap(Barrel hostBarrel, float centerX, float centerY, float direction, float cannonLength, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
-        super(hostBarrel, centerX, centerY, direction, cannonLength, diameter, bulletStats, fillCol, strokeCol, DrawPool.BOTTOM);
+    /**
+     * Creates a trap game object and spawns right away
+     * @param hostBarrel The pointer to the barrel that fired this projectile
+     * @param spawnPos The position where the projectile spawns (center position of projectile)
+     * @param direction The direction the projectile is fired (radians)
+     * @param diameter The diameter of the projectile
+     * @param bulletStats The bullet stats of the projectile
+     * @param fillCol The fill color of the projectile
+     * @param strokeCol The stroke color of the projectile
+     */
+    public Trap(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
+        super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol, DrawPool.BOTTOM);
         collideFrames = lifeFrames/8;
         rotation = Graphics.randf(0, Math.PI * 2);  // Random rotation
     }

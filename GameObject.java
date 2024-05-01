@@ -82,7 +82,7 @@ public abstract class GameObject implements Updatable, Drawable {
 
         // DO NOT FLIP THE ORDER, first add velocity, then apply friction
         pos = Raymath.Vector2Add(pos, vel);
-        vel = Raymath.Vector2Scale(vel, friction);
+        vel = Graphics.scale(vel, friction);
 
         if (keepInArena) {
             restrictPosition();
@@ -123,8 +123,8 @@ public abstract class GameObject implements Updatable, Drawable {
         float velSquared = vel.x * vel.x + vel.y * vel.y;
         if (velSquared > velMax * velMax) {
             // Normalize the vector
-            vel = Raymath.Vector2Scale(vel, 1.0f / (float)Math.sqrt(velSquared));
-            vel = Raymath.Vector2Scale(vel, velMax);
+            vel = Graphics.scale(vel, 1.0f / (float)Math.sqrt(velSquared));
+            vel = Graphics.scale(vel, velMax);
         }
         */
 
@@ -158,7 +158,7 @@ public abstract class GameObject implements Updatable, Drawable {
 
     public void addForce(float forceMagnitude, float radians) {
         Vector2 force = new Vector2((float)Math.cos(radians), (float)Math.sin(radians));
-        force = Raymath.Vector2Scale(force, forceMagnitude);
+        force = Graphics.scale(force, forceMagnitude);
         addForce(force);
     }
 

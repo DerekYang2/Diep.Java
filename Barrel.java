@@ -1,4 +1,3 @@
-import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 public class Barrel {
     Vector2 pos;
@@ -7,6 +6,7 @@ public class Barrel {
     float xAbsolute, yAbsolute;
     double angleRelative;
     double angleAbsolute;
+    double scatterDegrees = 0;
 
     int recoilFrames = 0;
 
@@ -61,7 +61,7 @@ public class Barrel {
     public void setHost(Tank host) {
         this.host = host;
         // Default spawn point, along the x axis with an offset from the origin (0, 0)
-        pos = Raymath.Vector2Scale(posOriginal, host.scale);
+        pos = Graphics.scale(posOriginal, host.scale);
     }
 
     public void draw() {
@@ -104,10 +104,13 @@ public class Barrel {
         // Redraw Turret in new position
         xAbsolute = xAbs;
         yAbsolute = yAbs;
-        angleAbsolute = tankAngle;
+
+        // Update tank angle
+        angleAbsolute = tankAngle + angleRelative;
+        scatterDegrees = Graphics.randf(-5, 5);  // -5 to 5 degrees times scatter rate, not multiplied by bullet stats scatter rate yet
 
         // Calculate new RELATIVE position by rotating xOriginal and yOriginal (scaled) around 0, 0
-        pos = Graphics.rotatePoint(Raymath.Vector2Scale(posOriginal, host.scale), new Vector2(0, 0), angleAbsolute);
+        pos = Graphics.rotatePoint(Graphics.scale(posOriginal, host.scale), new Vector2(0, 0), angleAbsolute);
 
         recoilFrames--;
         if (recoilFrames < 0) {
@@ -126,26 +129,30 @@ public class Barrel {
 
 
     public Vector2 shoot(BulletStats bulletStats, int drawLayer) {
-        double scatterAngle = Math.toRadians(bulletStats.scatterRate * (Math.random() - 0.5) * 10);  // -5 to 5 degrees times scatter rate
-        float bulletAngle = (float) (angleAbsolute + angleRelative + scatterAngle);  // Apply scatter angle to bullet angle
+        double scatterRadians = Math.toRadians(bulletStats.scatterRate * scatterDegrees);  // Multiply by scatter rate and convert to radians
+        float finalAngle = (float)(angleAbsolute + scatterRadians);  // Add scatter to angle
 
-        if (bulletStats.type.equals("bullet")) {
-            new Bullet(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol, drawLayer);  // swapped width with length
-        } else if (bulletStats.type.equals("drone")) {
-            if (droneCount == maxDrones) {
-                return new Vector2(0, 0);  // Do not fire if max drones are spawned
+        // Enhanced switch for bullet type (runs lambda expressions)
+        switch (bulletStats.type) {
+            case "bullet" ->
+                    new Bullet(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, host.fillCol, host.strokeCol, drawLayer);  // swapped width with length
+            case "drone" -> {
+                if (droneCount == maxDrones) {
+                    return new Vector2(0, 0);  // Do not fire if max drones are spawned
+                }
+                new Drone(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+
+                incrementDroneCount();  // Increment drone count
             }
-            new Drone(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
-            incrementDroneCount();  // Increment drone count
-        } else if (bulletStats.type.equals("trap")) {
-            new Trap(this, pos.x + xAbsolute, pos.y + yAbsolute, bulletAngle, (turretLength * host.scale), (turretWidth * host.scale), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+            case "trap" ->
+                    new Trap(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
         }
 
         recoilFrames = recoilTime;  // Set to max recoil time (animation)
 
-        float recoilMagnitude = 2 * bulletStats.recoil * (1-host.friction) * 10;  // (1-host.friction)/(1-0.9) = 10 * (1-host.friction), conversion from 25 fps to 120 fps
-        Vector2 recoilDirection = new Vector2((float) (-Math.cos(bulletAngle)), (float) (-Math.sin(bulletAngle))); // Return recoil direction, opposite of bullet direction
-        return Raymath.Vector2Scale(recoilDirection, recoilMagnitude);  // Scale the recoil direction
+        final float recoilMagnitude = 2 * bulletStats.recoil * (1-host.friction) * 10;  // (1-host.friction)/(1-0.9) = 10 * (1-host.friction), conversion from 25 fps to 120 fps
+        final Vector2 recoilDirection = new Vector2((float) (-Math.cos(finalAngle)), (float) (-Math.sin(finalAngle))); // Return recoil direction, opposite of bullet direction
+        return Graphics.scale(recoilDirection, recoilMagnitude);  // Scale the recoil direction
     }
 
     public int getMaxDrones() {
@@ -163,6 +170,9 @@ public class Barrel {
     }
     public float getTurretLength() {
         return turretLength * host.scale;
+    }
+    public Vector2 getSpawnPoint() {
+        return new Vector2((float) (pos.x + xAbsolute + Math.cos(angleAbsolute) * getTurretLength()), (float) (pos.y + yAbsolute + Math.sin(angleAbsolute) * getTurretLength()));
     }
 
 }

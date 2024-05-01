@@ -50,7 +50,7 @@ public class Main {
         gameObjectPool.clear();
         idServer.reset();
 
-        int spawn = 30;
+        int spawn = 1;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2);
         // new TestObj();
@@ -68,7 +68,7 @@ public class Main {
 
     private static void updateCamera() {
         Vector2 difference = Raymath.Vector2Subtract(player.pos, Graphics.getCameraTarget());
-        Graphics.shiftCameraTarget(Raymath.Vector2Scale(difference, 0.05f));
+        Graphics.shiftCameraTarget(Graphics.scale(difference, 0.05f));
         float delta = Graphics.getCameraZoom()/100;
         if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
             Graphics.setCameraZoom(Graphics.getCameraZoom() - delta);

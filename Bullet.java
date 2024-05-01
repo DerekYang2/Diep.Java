@@ -29,7 +29,7 @@ public class Bullet extends Projectile {
 
         // Calculate acceleration to converge to max speed (https://www.desmos.com/calculator/9hakym7jxy)
         this.acceleration = (velMax * 25.f/120) * (1-friction);
-        float initialSpeed = (velMax * 25.f/120) + (30 + Graphics.randf(-bulletStats.scatterRate, bulletStats.scatterRate)) * (1-friction)/(1-0.9f);  // Initial speed is max speed + 30 - scatter rate
+        float initialSpeed = (velMax * 25.f/120) + (/*30 + */Graphics.randf(-bulletStats.scatterRate, bulletStats.scatterRate)) * (1-friction)/(1-0.9f);  // Initial speed is max speed + 30 - scatter rate
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 
         // Life length

@@ -576,24 +576,37 @@ public class Graphics extends Raylib {
         return (vec1.x - vec2.x) * (vec1.x - vec2.x)  + (vec1.y - vec2.y) * (vec1.y - vec2.y);
     }
 
-    public boolean isAngleBetween(float target, float angle1, float angle2) {
-        // Convert to radians
-        target = (float) normalizeAngle(target);
-        angle1 = (float) normalizeAngle(angle1);
-        angle2 = (float) normalizeAngle(angle2);
+    /**
+     * Is angle between the angles start and end (going ccw)
+     * @param angle The angle to check
+     * @param start The starting angle
+     * @param end The ending angle after going ccw
+     * @return True if the angle is between start and end, false otherwise
+     */
+    public static boolean isAngleBetween(double angle, double start, double end) {
+        // Normalize angles
+        angle = normalizeAngle(angle);
+        start = normalizeAngle(start);
+        end = normalizeAngle(end);
 
-        // make the angle from angle1 to angle2 to be <= 180 degrees
-        float rAngle = ((angle2 - angle1) % (2 * (float)Math.PI) + 2 * (float)Math.PI) % (2 * (float)Math.PI);
-        if (rAngle >= Math.PI) {
-            float temp = angle1;
-            angle1 = angle2;
-            angle2 = temp;
+        if (end >= start) {
+            return start <= angle && angle <= end;
+        } else {
+            return (start <= angle && angle <= 2*Math.PI) || (0 <= angle && angle <= end);
         }
+    }
 
-        // check if it passes through zero
-        if (angle1 <= angle2)
-            return target >= angle1 && target <= angle2;
-        else
-            return target >= angle1 || target <= angle2;
+    public static double vector2Length(Vector2 vec) {
+        return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    }
+
+    /**
+     * Angle between two vectors in Radians
+     * @param vec1
+     * @param vec2
+     * @return
+     */
+    public static double vector2Angle(Vector2 vec1, Vector2 vec2) {
+        return Math.toRadians(Raymath.Vector2Angle(vec1, vec2));
     }
 }

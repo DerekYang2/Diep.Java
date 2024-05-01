@@ -17,7 +17,8 @@ public abstract class AddOn {
             case "dombase" -> new DominatorAddOn();
             case "autoturret" -> new AutoTurretAddOn();
             case "autosmasher" -> new AutoSmasherAddOn();
-            case "auto5" -> new Auto5AddOn();
+            case "auto5" -> new AutoNAddOn(5);
+            case "auto3" -> new AutoNAddOn(3);
             default -> null;
         };
     }
@@ -154,7 +155,7 @@ class AutoTurretAddOn extends AddOn {
         final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
 
         autoTurret = new AutoTurret(tank, barrel, fireManager, BULLET_STATS);
-        autoTurret.setOffset(new Vector2(0, 0));  // No offset
+        autoTurret.setOffset(new Vector2(0, 0), 2 * Math.PI);  // No offset
     }
 
 
@@ -203,13 +204,15 @@ class AutoSmasherAddOn extends AutoTurretAddOn {
  * TODO: use Atan2 to get absolute angle, check if targets are within absolute angle range (turret angle +- 85 degrees)
  * Normalize angles
  */
-class Auto5AddOn extends AddOn {
+class AutoNAddOn extends AddOn {
     AutoTurret[] autoTurrets;
-    final int numTurrets = 5;
+    int numTurrets;
     float offsetRadians;
-    final float radPerTick = 0.02f * 25/120;  // Rotation of turret, 0.1 radian per tick (25 ticks per second)
+    final float radPerTick = 0.01f * 25/120;  // Rotation of turret, 0.01 radian per tick (25 ticks per second)
+    final double rangeRad = Math.toRadians(180);  // Range of turret
 
-    public Auto5AddOn() {
+    public AutoNAddOn(int numTurrets) {
+        this.numTurrets = numTurrets;
         autoTurrets = new AutoTurret[numTurrets];
         offsetRadians = 0;
     }
@@ -221,7 +224,7 @@ class Auto5AddOn extends AddOn {
             Barrel barrel = new Barrel(42 * 0.7f, 55, 0, tank.direction, false, false, false);
             barrel.setHost(tank);
 
-            FireManager fireManager = new FireManager(new double[][]{{i * (1.0/numTurrets), 1}});
+            FireManager fireManager = new FireManager(new double[][]{{0.01, 1}});
             fireManager.setHost(tank);
 
             final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.4f, 1.2f, 1, 1, 1, 0.3f);
@@ -238,7 +241,7 @@ class Auto5AddOn extends AddOn {
         float radiusScaled = host.radius * host.scale * 0.8f;
         for (int i = 0; i < numTurrets; i++) {
             double angle = offsetRadians + (2*Math.PI/numTurrets) * i;
-            autoTurrets[i].setOffset(new Vector2((float) (radiusScaled * Math.cos(angle)), (float) (radiusScaled * Math.sin(angle))));
+            autoTurrets[i].setOffset(new Vector2((float) (radiusScaled * Math.cos(angle)), (float) (radiusScaled * Math.sin(angle))), rangeRad);
         }
 
         // Update and shoot

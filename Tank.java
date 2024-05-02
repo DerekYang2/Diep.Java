@@ -132,14 +132,16 @@ public class Tank extends GameObject {
     @Override
     public void draw() {
         tankBuild.addOnDrawBefore();
-        // Draw Turrets
-        tankBuild.draw();
+        tankBuild.draw(); // Draw Turrets
+        tankBuild.addOnDrawMiddle();
+
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
 //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
 
         if (Main.onScreen(pos, radius*scale)) {
             Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
         }
+
         tankBuild.addOnDrawAfter();
     }
 

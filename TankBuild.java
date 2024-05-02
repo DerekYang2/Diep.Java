@@ -87,10 +87,20 @@ public class TankBuild
         }
     }
 
+    public void addOnDrawMiddle() {
+        if (addOn != null) {
+            addOn.drawMiddle();
+        }
+    }
+
     public void addOnDrawAfter() {
         if (addOn != null) {
             addOn.drawAfter();
         }
+    }
+
+    public Barrel getBarrel(int idx) {
+        return barrels[idx];
     }
 
     /**

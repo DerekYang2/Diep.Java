@@ -8,6 +8,7 @@ public abstract class AddOn {
     }
     public abstract void update();
     public abstract void drawBefore();
+    public abstract void drawMiddle();
     public abstract void drawAfter();
     public static AddOn createAddOn(String name) {
         return switch (name) {
@@ -19,6 +20,7 @@ public abstract class AddOn {
             case "autosmasher" -> new AutoSmasherAddOn();
             case "auto5" -> new AutoNAddOn(5);
             case "auto3" -> new AutoNAddOn(3);
+            case "pronounced" -> new PronouncedAddOn();
             default -> null;
         };
     }
@@ -48,6 +50,10 @@ class SpikeAddOn extends AddOn {
         }
     }
 
+    @Override
+    public void drawMiddle() {
+    }
+
     public void drawAfter() {
         //final float radius = tank.radius * tank.scale, scaledRadius = radius * 0.707f * 0.92f;  // scale is always 1 until death animation
         //final Color fillCol = Graphics.colAlpha(tank.getDamageLerpColor(Graphics.DARK_GREY), (float) Math.pow(tank.opacity, 4)), strokeCol = Graphics.colAlpha(tank.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(tank.opacity, 4));
@@ -75,10 +81,12 @@ class SmasherAddOn extends AddOn {
             Graphics.drawHexagon(host.pos, sideLen, offsetRadians, col);
         }
     }
-    @Override
-    public void drawAfter() {
 
-    }
+    @Override
+    public void drawMiddle() {}
+
+    @Override
+    public void drawAfter() {}
 }
 
 class LandmineAddOn extends AddOn {
@@ -106,18 +114,17 @@ class LandmineAddOn extends AddOn {
     }
 
     @Override
-    public void drawAfter() {
+    public void drawMiddle() {}
 
-    }
+    @Override
+    public void drawAfter() {}
 }
 
 class DominatorAddOn extends AddOn {
-    public DominatorAddOn() {
-    }
+    public DominatorAddOn() {}
 
     @Override
-    public void update() {
-    }
+    public void update() {}
 
     @Override
     public void drawBefore() {
@@ -130,9 +137,15 @@ class DominatorAddOn extends AddOn {
     }
 
     @Override
-    public void drawAfter() {
-
+    public void drawMiddle() {
+        float offsetDist = host.radius * host.scale * 4.f/5;
+        float length = host.radius * host.scale * 2.1f/5;
+        float width = 35 * host.scale * 0.94f;
+        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float)Math.pow(host.opacity,4), true);
     }
+
+    @Override
+    public void drawAfter() {}
 }
 
 class AutoTurretAddOn extends AddOn {
@@ -166,8 +179,10 @@ class AutoTurretAddOn extends AddOn {
     }
 
     @Override
-    public void drawBefore() {
-    }
+    public void drawBefore() {}
+
+    @Override
+    public void drawMiddle() {}
 
     @Override
     public void drawAfter() {
@@ -249,15 +264,31 @@ class AutoNAddOn extends AddOn {
             autoTurret.shoot(DrawPool.BOTTOM);  // Shoot at bottom layer
         }
     }
-
     @Override
     public void drawBefore() {
         for (AutoTurret autoTurret : autoTurrets) {
             autoTurret.draw();
         }
     }
-
     @Override
-    public void drawAfter() {
+    public void drawMiddle() {}
+    @Override
+    public void drawAfter() {}
+}
+
+class PronouncedAddOn extends AddOn {
+    public PronouncedAddOn() {}
+    @Override
+    public void update() {}
+    @Override
+    public void drawBefore() {}
+    @Override
+    public void drawMiddle() {
+        float offsetDist = (host.radius * host.scale) * 3.1f/5;
+        float length = (host.radius * host.scale) * 3.3f/5;
+        float width = host.tankBuild.getBarrel(0).getTurretWidth() * 0.94f;
+        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float)Math.pow(host.opacity,4), true);
     }
+    @Override
+    public void drawAfter() {}
 }

@@ -141,6 +141,7 @@ public class Tank extends GameObject {
             Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
         }
         tankBuild.addOnDrawAfter();
+        Graphics.rlj.shapes.DrawRectangleLines((int) getView().x, (int) getView().y, (int) getView().width, (int) getView().height, Graphics.RED);
     }
 
     public boolean isFiring() {

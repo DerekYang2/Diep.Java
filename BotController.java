@@ -1,4 +1,5 @@
 import com.raylib.java.raymath.Vector2;
+import com.raylib.java.shapes.Rectangle;
 
 public class BotController implements Controller {
     Tank host;
@@ -8,7 +9,7 @@ public class BotController implements Controller {
     boolean shouldFire;
 
     Barrel frontBarrel;
-
+    Rectangle viewRect;
     public float medianBulletSpeed;
 
     float targetDirection, direction;
@@ -27,12 +28,13 @@ public class BotController implements Controller {
     public void updateTankBuild() {
         frontBarrel = host.tankBuild.getFrontBarrel();
         medianBulletSpeed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * host.tankBuild.getBulletSpeedMedian() * 25.f/120;
+        viewRect = host.getView();
     }
 
     @Override
     public void update() {
         if (frontBarrel != null) {
-            Vector2 closestTarget = AutoAim.getClosestTarget(host.pos, frontBarrel.getSpawnPoint(), 2000, host.group, 0, 2 * Math.PI, medianBulletSpeed);  // Get closest target
+            Vector2 closestTarget = AutoAim.getClosestTarget(host.pos, frontBarrel.getSpawnPoint(), viewRect, host.group, medianBulletSpeed);  // Get closest target
             if (closestTarget != null) {  // If there is a closest target
                 targetDirection = (float) Math.atan2(closestTarget.y - host.pos.y, closestTarget.x - host.pos.x);
                 shouldFire = true;

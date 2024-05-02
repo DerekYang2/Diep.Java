@@ -4,6 +4,7 @@ import com.raylib.java.shapes.Rectangle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Manages collisions between objects
@@ -23,8 +24,8 @@ public class CollisionManager {
         return (int) ((y - minY) / sectorSize);
     }
 
-    public static ArrayList<Integer> queryBoundingBox(Rectangle boundingBox, int ignoreGroup) {
-        ArrayList<Integer> result = new ArrayList<>();
+    public static List<Integer> queryBoundingBox(Rectangle boundingBox) {
+        HashSet<Integer> result = new HashSet<>();
         int xiMin = getSectorX(boundingBox.x), xiMax = getSectorX(boundingBox.x + boundingBox.width);
         int yiMin = getSectorY(boundingBox.y), yiMax = getSectorY(boundingBox.y + boundingBox.height);
 
@@ -36,7 +37,8 @@ public class CollisionManager {
                 }
             }
         }
-        return result;
+
+        return result.stream().toList();
     }
 
     public static void updateSectors() {
@@ -123,7 +125,7 @@ public class CollisionManager {
     public static Integer getClosestTarget(Vector2 pos, float radius, int group) {
         Rectangle view = new Rectangle(pos.x - radius, pos.y - radius, 2*radius, 2*radius);
 
-        ArrayList<Integer> targets = CollisionManager.queryBoundingBox(view, group);
+        List<Integer> targets = CollisionManager.queryBoundingBox(view);
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;
         Integer closestTarget = null;  // Set id to some impossible value

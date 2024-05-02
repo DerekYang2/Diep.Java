@@ -123,7 +123,7 @@ class DominatorAddOn extends AddOn {
     public void drawBefore() {
         final float sideLen = (host.radius * host.scale) * 1.24f;
         if (Main.onScreen(host.pos, sideLen)) {
-            final Color fillCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY), (float) Math.pow(host.opacity, 4)), strokeCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(host.opacity, 4));
+            final Color fillCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY), host.opacity), strokeCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity);
             Graphics.drawHexagon(host.pos, sideLen, 0, strokeCol);
             Graphics.drawHexagon(host.pos, sideLen - Graphics.strokeWidth, 0, fillCol);
         }
@@ -201,7 +201,6 @@ class AutoSmasherAddOn extends AutoTurretAddOn {
 }
 
 /**
- * TODO: use Atan2 to get absolute angle, check if targets are within absolute angle range (turret angle +- 85 degrees)
  * Normalize angles
  */
 class AutoNAddOn extends AddOn {

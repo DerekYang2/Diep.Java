@@ -28,15 +28,17 @@ public class BotController implements Controller {
     @Override
     public void updateTankBuild() {
         frontBarrel = host.tankBuild.getFrontBarrel();
-        BulletStats bulletStats = host.tankBuild.getBarrelBulletStats(frontBarrel);
-        frontBulletSpeed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
+        if (frontBarrel != null) {
+            BulletStats bulletStats = host.tankBuild.getBarrelBulletStats(frontBarrel);
+            frontBulletSpeed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f / 120;
+        }
     }
 
     @Override
     public void update() {
         if (frontBarrel != null) {
             safetyFireFrames = Math.max(0, safetyFireFrames - 1);  // Decrement safety fire frames
-
+            // TODO: drone target pos should only be adjusted at close range
             targetPos = AutoAim.getAdjustedTarget(host.pos, frontBarrel.getSpawnPoint(), host.getView(), host.group, frontBulletSpeed);  // Get closest target
             if (targetPos != null) {  // If there is a closest target
                 if (reactionWatch.ms() > reactionTime) {  // If reaction time has passed

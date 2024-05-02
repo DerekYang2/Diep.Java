@@ -597,6 +597,18 @@ public class Graphics extends Raylib {
     }
 
     /**
+     * Get the absolute (smaller) angle distance between two angles
+     * @param angle1 The first angle
+     * @param angle2 The second angle
+     * @return The absolute angle distance between the two angles
+     */
+    public static float absAngleDistance(double angle1, double angle2) {
+        angle1 = normalizeAngle(angle1);
+        angle2 = normalizeAngle(angle2);
+        return (float) Math.min(Math.abs(angle1 - angle2), 2*Math.PI - Math.abs(angle1 - angle2));
+    }
+
+    /**
      * Returns the length (magnitude) of the vector
      * @param vec The vector to get the length of
      * @return The length of the vector

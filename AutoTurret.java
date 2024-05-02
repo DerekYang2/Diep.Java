@@ -10,7 +10,6 @@ public class AutoTurret {
     protected final static float VIEW_RADIUS = 1700;
     float targetDirection, direction;
     boolean idle;
-    Stopwatch idleWatch;  // For a delay for idle -> firing
     double range;
     Vector2 pos, offset;
     Vector2 lastTargetPos;
@@ -20,7 +19,6 @@ public class AutoTurret {
         this.barrel = barrel;
         this.fireManager = fireManager;
         this.bulletStats = bulletStats;
-        idleWatch = new Stopwatch();
 
         targetDirection = direction = 0;
         fireManager.setFiring(true);
@@ -44,10 +42,7 @@ public class AutoTurret {
         Vector2 closestTarget = AutoAim.getAdjustedTarget(getAbsPos(), barrel.getSpawnPoint(), VIEW_RADIUS * host.scale, host.group, baseAngle, range, projectile_speed);  // Get closest target
 
         if (closestTarget != null) {  // If there is a closest target
-            if (idle) {
-                idle = false;
-                idleWatch.start();
-            }
+            idle = false;
             targetDirection = (float) Math.atan2(closestTarget.y - absPos.y, closestTarget.x - absPos.x);
         } else {
             idle = true;
@@ -61,7 +56,8 @@ public class AutoTurret {
         direction = (float)Graphics.angle_lerp(direction, targetDirection, 0.2f);
 
         barrel.update(absPos.x, absPos.y, direction);
-        fireManager.setFiring(!idle && idleWatch.ms() > 300);  // If not idle and idleWatch is over 300ms, start firing
+
+        fireManager.setFiring(!idle && Graphics.absAngleDistance(direction, targetDirection) < Math.toRadians(20));  // If not idle and within 10 degrees of target direction, fire
     }
 
     public void shoot(int drawLayer) {

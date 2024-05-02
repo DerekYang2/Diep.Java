@@ -106,7 +106,7 @@ public class AutoAim {
             Rectangle boundingBox = obj.boundingBox();
 
             // Increase obj bounding box because of barrel length TODO: assumes obj is a tank
-            float turretLength = ((Tank)obj).tankBuild.getFrontBarrel().getTurretLength();
+            float turretLength = ((Tank)obj).tankBuild.maxBarrelLength();
             boundingBox.x -= turretLength;
             boundingBox.y -= turretLength;
             boundingBox.width += 2 * turretLength;

@@ -120,6 +120,16 @@ public class TankBuild
         return null;
     }
 
+    public float maxBarrelLength() {
+        float maxLen = 0;
+        for (Barrel barrel : barrels) {
+            if (barrel.getTurretLength() > maxLen) {
+                maxLen = barrel.getTurretLength();
+            }
+        }
+        return maxLen;
+    }
+
     // Static creation methods
     public static HashMap<String, JSONObject> tankDefinitions;
     public static final String DEFINITIONS_PATH = "config/TankDefinitions.json";

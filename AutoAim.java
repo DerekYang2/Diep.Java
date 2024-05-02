@@ -1,8 +1,7 @@
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 public class AutoAim {
     // AI Functions Below
@@ -51,9 +50,9 @@ public class AutoAim {
      * @param bulletSpeed The speed of the bullet
      * @return The closest target position
      */
-    public static Vector2 getClosestTarget(Vector2 sourcePos, Vector2 spawnPoint, float radius, int group, double sourceAngle, double angleRange, float bulletSpeed) {
+    public static Vector2 getAdjustedTarget(Vector2 sourcePos, Vector2 spawnPoint, float radius, int group, double sourceAngle, double angleRange, float bulletSpeed) {
         Rectangle view = new Rectangle(sourcePos.x - radius, sourcePos.y - radius, 2*radius, 2*radius);
-        List<Integer> targets = CollisionManager.queryBoundingBox(view);
+        HashSet<Integer> targets = CollisionManager.queryBoundingBox(view);
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;
         Vector2 closestTarget = null;  // Set to null if no target found
@@ -93,8 +92,8 @@ public class AutoAim {
      * @param bulletSpeed The speed of the bullet
      * @return The closest target position
      */
-    public static Vector2 getClosestTarget(Vector2 sourcePos, Vector2 spawnPoint, Rectangle view, int group, float bulletSpeed) {
-        List<Integer> targets = CollisionManager.queryBoundingBox(view);
+    public static Vector2 getAdjustedTarget(Vector2 sourcePos, Vector2 spawnPoint, Rectangle view, int group, float bulletSpeed) {
+        HashSet<Integer> targets = CollisionManager.queryBoundingBox(view);
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;
         Vector2 closestTarget = null;  // Set to null if no target found
@@ -102,9 +101,7 @@ public class AutoAim {
             GameObject obj = Main.gameObjectPool.getObj(id);
             float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
 
-            Graphics.drawCircle(obj.pos.x, obj.pos.y, 5, Graphics.RED, 1);
-
-            if (obj.group == group || obj.isProjectile) {  // If same group or projectile OR too far, skip
+            if (obj.group == group || obj.isProjectile || !Graphics.isIntersecting(obj.boundingBox(), view)) {  // If same group or projectile OR not in view, skip
                 continue;
             }
             if (distSquared < minDistSquared) {  // Potential closest target

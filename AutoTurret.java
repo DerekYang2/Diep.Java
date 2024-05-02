@@ -41,7 +41,7 @@ public class AutoTurret {
         double baseAngle = Math.atan2(offset.y, offset.x);
         float projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
 
-        Vector2 closestTarget = AutoAim.getClosestTarget(getAbsPos(), barrel.getSpawnPoint(), VIEW_RADIUS * host.scale, host.group, baseAngle, range, projectile_speed);  // Get closest target
+        Vector2 closestTarget = AutoAim.getAdjustedTarget(getAbsPos(), barrel.getSpawnPoint(), VIEW_RADIUS * host.scale, host.group, baseAngle, range, projectile_speed);  // Get closest target
 
         if (closestTarget != null) {  // If there is a closest target
             if (idle) {

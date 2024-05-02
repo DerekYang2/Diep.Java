@@ -58,7 +58,7 @@ public class Main {
 
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
-            buildName = "sprayer";
+            buildName = "twin";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
             t.group = -1;
         }

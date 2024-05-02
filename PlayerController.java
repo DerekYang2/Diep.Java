@@ -58,6 +58,11 @@ public class PlayerController implements Controller {
     }
 
     @Override
+    public void updateTankBuild() {
+
+    }
+
+    @Override
     public boolean toggleAutoFire() {
         return Graphics.isKeyPressed(KEY_E);
     }

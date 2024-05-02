@@ -93,6 +93,33 @@ public class TankBuild
         }
     }
 
+    /**
+     * Returns the front barrel of the tank
+     * @return The barrel with the minimum offset
+     */
+    public Barrel getFrontBarrel() {
+        // Get barrel with minimum offset
+        float minOffset = Float.MAX_VALUE;
+        Barrel frontBarrel = null;
+        for (Barrel barrel : barrels) {
+            float offset = (float)Graphics.normalizeAngle(barrel.getOffset());
+            if (offset < minOffset) {
+                minOffset = offset;
+                frontBarrel = barrel;
+            }
+        }
+        return frontBarrel;
+    }
+
+    public float getBulletSpeedMedian() {
+        ArrayList<Float> bulletSpeeds = new ArrayList<>();
+        for (BulletStats bulletStat : bulletStats) {
+            bulletSpeeds.add(bulletStat.speed);
+        }
+        if (bulletSpeeds.isEmpty()) return 0;
+        bulletSpeeds.sort(Float::compareTo);
+        return bulletSpeeds.get(bulletSpeeds.size() / 2);
+    }
 
     // Static creation methods
     public static HashMap<String, JSONObject> tankDefinitions;

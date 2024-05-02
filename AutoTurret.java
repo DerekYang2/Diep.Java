@@ -1,8 +1,5 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
-import com.raylib.java.shapes.Rectangle;
-
-import java.util.ArrayList;
 
 public class AutoTurret {
     Tank host;
@@ -41,7 +38,10 @@ public class AutoTurret {
     public void update(Vector2 pos) {
         this.pos = pos;
         Vector2 absPos = getAbsPos();
-        Vector2 closestTarget = getClosestTarget();  // Get closest target
+        double baseAngle = Math.atan2(offset.y, offset.x);
+        float projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
+
+        Vector2 closestTarget = AutoAim.getClosestTarget(getAbsPos(), barrel.getSpawnPoint(), VIEW_RADIUS * host.scale, host.group, baseAngle, range, projectile_speed);  // Get closest target
 
         if (closestTarget != null) {  // If there is a closest target
             if (idle) {
@@ -82,82 +82,5 @@ public class AutoTurret {
 
     public Vector2 getAbsPos() {
         return new Vector2(pos.x + offset.x, pos.y + offset.y);
-    }
-
-    // AI Functions Below
-
-    private static double sqr(double v) {
-        return v*v;
-    }
-
-    // https://www.desmos.com/calculator/wi99dkcfsy
-    private static float scaleFactor(float dist) {
-        if (dist >= 2000) return 1.1f;
-        return (float) ((dist-2000) * (dist-2000)/(1.7 * 2000 * 2000)+ 1.1);
-    }
-
-    /**
-     * Get the target shift based on the target's velocity
-     * @param target The GameObject target
-     * @return The target with velocity accounted for
-     */
-    Vector2 getTargetShift(GameObject target) {
-        Vector2 spawnPoint = barrel.getSpawnPoint();
-
-        double projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120 * scaleFactor(Graphics.distance(spawnPoint, target.pos));
-
-        double a = sqr(target.vel.x) + sqr(target.vel.y) - sqr(projectile_speed);
-        double b = 2 * (target.vel.x * (target.pos.x - spawnPoint.x) + target.vel.y * (target.pos.y - spawnPoint.y));
-        double c = sqr(target.pos.x - spawnPoint.x) + sqr(target.pos.y - spawnPoint.y);
-
-        double discriminant = b * b - 4 * a * c;
-        if (discriminant < 0) {
-            return target.pos;
-        }
-
-        // Quad formula
-        double t1 = (-b + Math.sqrt(discriminant)) / (2 * a), t2 = (-b - Math.sqrt(discriminant)) / (2 * a);
-        double t = (t1 > 0 && t2 > 0) ? Math.min(t1, t2) : Math.max(t1, t2);
-        return new Vector2((float) (target.pos.x + target.vel.x * t), (float) (target.pos.y + target.vel.y * t));
-    }
-
-    Vector2 getClosestTarget() {
-        Vector2 pos = getAbsPos();
-
-        float radius = VIEW_RADIUS * host.scale;
-        int group = host.group;
-
-        Rectangle view = new Rectangle(pos.x - radius, pos.y - radius, 2*radius, 2*radius);
-        ArrayList<Integer> targets = CollisionManager.queryBoundingBox(view, group);
-
-        // Get the closest target
-        float minDistSquared = Float.MAX_VALUE;
-        Vector2 closestTarget = null;  // Set to null if no target found
-
-        for (int id : targets) {
-            GameObject obj = Main.gameObjectPool.getObj(id);
-            float distSquared = Graphics.distanceSq(pos, obj.pos);
-
-            if (obj.group == group || obj.isProjectile || distSquared > radius * radius) {  // If same group or projectile OR too far, skip
-                continue;
-            }
-
-            Vector2 shiftedTarget = getTargetShift(obj);
-            // Within angle range
-            if (range < 2 * Math.PI) {
-                double baseAngle = Math.atan2(offset.y, offset.x);
-                double startAngle = baseAngle - range * 0.5, endAngle = baseAngle + range * 0.5;  // End angle is ccw
-                double targetAngle = Math.atan2(shiftedTarget.y - pos.y, shiftedTarget.x - pos.x);  // Angle towards the target
-                if (!Graphics.isAngleBetween(targetAngle, startAngle, endAngle)) {  // If target not within angle range, skip
-                    continue;
-                }
-            }
-
-            if (distSquared < minDistSquared) {  // If closer, update
-                minDistSquared = distSquared;
-                closestTarget = shiftedTarget;  // Update closest target
-            }
-        }
-        return closestTarget;
     }
 }

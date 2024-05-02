@@ -2,6 +2,7 @@ import com.raylib.java.raymath.Vector2;
 public class Barrel {
     Vector2 pos;
     Vector2 posOriginal;
+    float offset;
 
     float xAbsolute, yAbsolute;
     double angleRelative;
@@ -30,6 +31,7 @@ public class Barrel {
     Barrel(float width, float length, float offset, double radians, boolean isTrapezoid, boolean flippedTrapezoid, boolean isTrapper) {  // renamed parameters
         this.turretWidth = width;
         this.turretLengthOG = turretLength = length;
+        this.offset = offset;
 
         // Trapezoid turrets
         this.isTrapezoid = isTrapezoid;
@@ -165,6 +167,9 @@ public class Barrel {
         droneCount--;
     }
 
+    public float getOffset() {
+        return offset;
+    }
     public float getTurretWidth() {
         return turretWidth * host.scale;
     }

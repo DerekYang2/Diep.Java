@@ -38,7 +38,7 @@ public class Drone extends Projectile {
     @Override
     public float getMaxSpeed() {
         // velMax *= 1.1f;  // TODO: test drone speed
-        return (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
+        return 1.1f * (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
     }
 
     @Override

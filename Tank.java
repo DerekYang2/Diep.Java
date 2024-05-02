@@ -39,9 +39,9 @@ public class Tank extends GameObject {
 
         this.stats = stats;
         this.controller = controller;
+        this.controller.setHost(this);  // Set the controller's host to this tank
 
         updateStats();  // Update tank based on level and stats
-        this.controller.setHost(this);  // Set the controller's host to this tank
     }
 
     @Override
@@ -54,6 +54,8 @@ public class Tank extends GameObject {
     public void setTankBuild(TankBuild tankBuild) {
         this.tankBuild = tankBuild;
         tankBuild.setHost(this);
+        // Update controller
+        this.controller.updateTankBuild();
     }
 
     /**

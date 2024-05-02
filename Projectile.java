@@ -31,6 +31,7 @@ public abstract class Projectile extends GameObject {
 
         // Drawing variables
         this.fillCol = fillCol;
+        
         this.strokeCol = strokeCol;
         radius = diameter * 0.5f * bulletStats.sizeRatio;  // Multiply radius by bullet stats size ratio
     }

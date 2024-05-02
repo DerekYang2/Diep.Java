@@ -601,8 +601,8 @@ public class Graphics extends Raylib {
      * @param vec The vector to get the length of
      * @return The length of the vector
      */
-    public static double length(Vector2 vec) {
-        return Math.sqrt(vec.x * vec.x + vec.y * vec.y);
+    public static float length(Vector2 vec) {
+        return (float)Math.sqrt(vec.x * vec.x + vec.y * vec.y);
     }
 
     /**

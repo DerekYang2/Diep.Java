@@ -99,12 +99,21 @@ public class AutoAim {
         Vector2 closestTarget = null;  // Set to null if no target found
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
-            float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
 
-            if (obj.group == group || obj.isProjectile || !Graphics.isIntersecting(obj.boundingBox(), view)) {  // If same group or projectile OR not in view, skip
+            if (obj.group == group || obj.isProjectile) {  // If same group or projectile OR not in view, skip
                 continue;
             }
-            if (distSquared < minDistSquared) {  // Potential closest target
+            Rectangle boundingBox = obj.boundingBox();
+
+            // Increase obj bounding box because of barrel length TODO: assumes obj is a tank
+            float turretLength = ((Tank)obj).tankBuild.getFrontBarrel().getTurretLength();
+            boundingBox.x -= turretLength;
+            boundingBox.y -= turretLength;
+            boundingBox.width += 2 * turretLength;
+            boundingBox.height += 2 * turretLength;
+
+            float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
+            if (Graphics.isIntersecting(boundingBox, view) && distSquared < minDistSquared) {  // New closest target
                 minDistSquared = distSquared;
                 closestTarget = getAdjustedTarget(obj, spawnPoint, bulletSpeed);  // Update the closest target (adjusted)
             }

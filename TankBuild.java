@@ -111,14 +111,13 @@ public class TankBuild
         return frontBarrel;
     }
 
-    public float getBulletSpeedMedian() {
-        ArrayList<Float> bulletSpeeds = new ArrayList<>();
-        for (BulletStats bulletStat : bulletStats) {
-            bulletSpeeds.add(bulletStat.speed);
+    public BulletStats getBarrelBulletStats(Barrel barrel) {
+        for (int i = 0; i < barrels.length; i++) {
+            if (barrels[i] == barrel) {
+                return bulletStats[i];
+            }
         }
-        if (bulletSpeeds.isEmpty()) return 0;
-        bulletSpeeds.sort(Float::compareTo);
-        return bulletSpeeds.get(bulletSpeeds.size() / 2);
+        return null;
     }
 
     // Static creation methods

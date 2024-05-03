@@ -27,6 +27,26 @@ public class Glider extends Bullet{
     }
 
     @Override
+    public void updateStats() {
+        // Calculate bullet stats
+        setCollisionFactors(bulletStats.absorbtionFactor, (7.f / 3 + host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
+
+        // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
+        float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
+        float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
+        super.setDamage(damage * (25.f / 120));  // Scale down because different fps
+        super.setMaxHealth(maxHealth);
+
+        // Calculate acceleration to converge to max speed (https://www.desmos.com/calculator/9hakym7jxy)
+        this.acceleration = getMaxSpeed() * (1-friction);
+        float initialSpeed = getMaxSpeed() + (45 + Graphics.randf(-bulletStats.scatterRate, bulletStats.scatterRate)) * (1-friction)/(1-0.9f);  // Initial speed is max speed + 30 - scatter rate
+        vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
+
+        // Life length
+        lifeFrames = Math.round(bulletStats.lifeLength * 72 * (120.f / 25));  // Lengthen because 25 fps -> 120 fps
+    }
+
+    @Override
     public void update() {
         super.update();
 

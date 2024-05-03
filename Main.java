@@ -51,7 +51,7 @@ public class Main {
         gameObjectPool.clear();
         idServer.reset();
 
-        int spawn = 3;
+        int spawn = 0;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2);
         // new TestObj();

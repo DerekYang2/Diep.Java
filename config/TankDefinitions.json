@@ -6672,11 +6672,11 @@
                 "bullet": {
                     "type": "glider",
                     "sizeRatio": 1,
-                    "health": 2,
+                    "health": 3,
                     "damage": 1,
-                    "speed": 0.3,
+                    "speed": 0.5,
                     "scatterRate": 1,
-                    "lifeLength": 1.25,
+                    "lifeLength": 1.3,
                     "absorbtionFactor": 0.1
                 }
             }

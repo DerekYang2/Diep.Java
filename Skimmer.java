@@ -14,8 +14,8 @@ public class Skimmer extends Bullet {
 
         fireManager = new FireManager(new double[][] {{0, 0.35}, {0, 0.35}});  // Reload factor of 0.35
         barrels = new Barrel[] {
-                new Barrel(BULLET_STAT, 31.5f * host.scale, 48.5f * host.scale, 0.35f, 0, 0, false, false, false),
-                new Barrel(BULLET_STAT,31.5f * host.scale, 48.5f * host.scale, 0.35f,0, Math.PI, false, false, false),
+                new Barrel(BULLET_STAT, 49, 48.5f * host.scale, 0.35f, 0, 0, false, false, false),
+                new Barrel(BULLET_STAT,49, 48.5f * host.scale, 0.35f,0, Math.PI, false, false, false),
         };
 
         // Set host

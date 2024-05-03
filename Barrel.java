@@ -48,7 +48,7 @@ public class Barrel {
 
         // Calculate recoil animation variables (https://www.desmos.com/calculator/2dgfekbtcw)
         float recoilDistFactor = (float)(9.51697 * Math.pow(0.767725, bulletStats.recoil) + 0.693587);
-        recoilDist = Math.max(4f, 0.6f * recoilDistFactor * bulletStats.recoil);  // Minimum of 4.5 pixels (for small turrets)
+        recoilDist = Math.max(4.5f, 0.6f * recoilDistFactor * bulletStats.recoil);  // Minimum of 4.5 pixels (for small turrets)
         recoilTime = Math.max(15, (int) Math.round(-44.9793 * Math.pow(0.111316, reload) + 35.0069));
         recoilFrames = 0;  // Start at 0 (animation done)
 
@@ -100,6 +100,7 @@ public class Barrel {
 
     // https://www.desmos.com/calculator/uddosuwdt4
     private float lengthShift(int frame) {
+        recoilDist = Math.min(turretLengthOG * directHost().scale * 0.07f, recoilDist);  // Maximum of 7% of turret length
         return (float) (-Math.abs(recoilDist) * Math.cos((Math.PI / recoilTime) * (frame - recoilTime * 0.5f)));
     }
 
@@ -183,6 +184,8 @@ public class Barrel {
                     new Skimmer(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, directHost().fillCol, directHost().strokeCol, drawLayer);  // swapped width with length
             case "rocket" ->
                     new Rocket(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, directHost().fillCol, directHost().strokeCol, drawLayer);  // swapped width with length
+            case "glider" ->
+                    new Glider(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, directHost().fillCol, directHost().strokeCol, drawLayer);  // swapped width with length
         }
 
         recoilFrames = recoilTime;  // Set to max recoil time (animation)

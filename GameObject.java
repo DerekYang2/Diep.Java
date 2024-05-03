@@ -30,6 +30,10 @@ public abstract class GameObject implements Updatable, Drawable {
     final int DAMAGE_ANIMATION_FRAMES = 12;
     int damageAnimationFrames = 0;
 
+    // Colors
+    Color fillCol = Graphics.RED;
+    Color strokeCol = Graphics.RED_STROKE;
+
     // Health bar variables
     Bar healthBar;  // Null if not initialized
     final float HEALTH_BAR_HEIGHT = 15;
@@ -56,6 +60,11 @@ public abstract class GameObject implements Updatable, Drawable {
 
     public abstract void updateStats();
     protected abstract void setFlags();
+
+    protected void setColor(Color fillCol, Color strokeCol) {
+        this.fillCol = fillCol;
+        this.strokeCol = strokeCol;
+    }
 
     /**
      * Dependencies: radius, scale must be set

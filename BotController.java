@@ -58,7 +58,7 @@ public class BotController implements Controller {
             if (targetPos != null) {  // If there is a closest target
                 if (reactionWatch.ms() > reactionTime) {  // If reaction time has passed
                     targetDirection = (float) Math.atan2(targetPos.y - host.pos.y, targetPos.x - host.pos.x);
-                    shouldFire = true;
+                    shouldFire = Graphics.absAngleDistance(direction, targetDirection) < Math.toRadians(10);   // Only fire if direction is close to target direction
                 }
                 safetyFireFrames = SAFETY_FRAMES;  // Set safety fire frames to max
             } else {
@@ -92,7 +92,7 @@ public class BotController implements Controller {
     @Override
     public Vector2 getTarget() {
         if (targetPos == null) {  // Return host position plus its direction vector
-            float vel = host.radius * host.scale + 10*Graphics.length(host.vel);  // Multiply by some amount so drones stay in front
+            float vel = host.radius * host.scale + 20*Graphics.length(host.vel);  // Multiply by some amount so drones stay in front
             return new Vector2(host.pos.x + vel * (float) Math.cos(moveDir), host.pos.y + vel * (float) Math.sin(moveDir));
         }
         return targetPos;

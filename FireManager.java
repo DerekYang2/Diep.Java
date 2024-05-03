@@ -8,7 +8,7 @@ public class FireManager {
     private Tank host;
     private boolean paused = false;
     private boolean isFiring = false;
-
+    Float manualReloadTime = null;
     /**
      * Constructor for FireManager
      * @param data The data for each turret. Each element is a list of 2 integers, the delay and reload factor
@@ -37,6 +37,10 @@ public class FireManager {
         }
     }
 
+    public void setReloadTime(float reloadTime) {
+        manualReloadTime = reloadTime;
+    }
+
     /**
      * Sets a barrel index as a drone barrel
      * @param index The index of the barrel
@@ -53,6 +57,7 @@ public class FireManager {
      * @return
      */
     public int getReloadFrames(int ti) {
+        if (manualReloadTime != null) return Math.round((120.f/25) * manualReloadTime * getReloadFactor(ti));
         return Math.round((120.f/25) * 15*(float)Math.pow(0.914, host.stats.getStat(Stats.RELOAD)) * getReloadFactor(ti));  // convert 25 fps to 120 fps
     }
 

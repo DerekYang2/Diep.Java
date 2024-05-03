@@ -1,5 +1,8 @@
+import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 public class Barrel {
+    boolean noDamageAnimation = false;  // Flag to disable damage animation
+
     Vector2 pos;
     Vector2 posOriginal;
     float offset;
@@ -8,9 +11,6 @@ public class Barrel {
     double angleRelative;
     double angleAbsolute;
     double scatterDegrees = 0;
-
-    int recoilFrames = 0;
-
     float turretWidth, turretLengthOG;  // renamed variables
     float turretLength;
 
@@ -24,14 +24,33 @@ public class Barrel {
     int droneCount = 0;  // Number of drones currently spawned
 
     // Recoil animation constants
-    final int recoilTime = 30;  // Time in frames for recoil animation
-    final float recoilLengthFactor = 0.1f;  // Percent of turret width to reduce in recoil animation
-    Tank host;  // For color and other things that may appear in the future
+    float recoilDist;
+    int recoilTime;  // Time in frames for recoil animation
+    int recoilFrames;
 
-    Barrel(float width, float length, float offset, double radians, boolean isTrapezoid, boolean flippedTrapezoid, boolean isTrapper) {  // renamed parameters
+    Tank host;
+    Projectile hostProjectile;  // For projectile hosts
+    BulletStats bulletStats;
+
+    // Barrel colors
+    Color fillCol, strokeCol;
+
+    Barrel(BulletStats bulletStats, float width, float length, float reload, float offset, double radians, boolean isTrapezoid, boolean flippedTrapezoid, boolean isTrapper) {  // renamed parameters
+        this.bulletStats = bulletStats;
+
+        // Default barrel colors
+        fillCol = Graphics.GREY;
+        strokeCol = Graphics.GREY_STROKE;
+
         this.turretWidth = width;
         this.turretLengthOG = turretLength = length;
         this.offset = offset;
+
+        // Calculate recoil animation variables (https://www.desmos.com/calculator/2dgfekbtcw)
+        float recoilDistFactor = (float)(9.51697 * Math.pow(0.767725, bulletStats.recoil) + 0.693587);
+        recoilDist = Math.max(4.8f, 0.6f * recoilDistFactor * bulletStats.recoil);  // Minimum of 4.5 pixels (for small turrets)
+        recoilTime = Math.max(20, (int) Math.round(-44.9793 * Math.pow(0.111316, reload) + 35.0069));
+        recoilFrames = 0;  // Start at 0 (animation done)
 
         // Trapezoid turrets
         this.isTrapezoid = isTrapezoid;
@@ -44,14 +63,6 @@ public class Barrel {
         posOriginal = Graphics.rotatePoint(new Vector2(0, offset), new Vector2(0, 0), radians);
 
         angleRelative = radians;
-
-        // prevAngle = -Math.PI / 2; // spawn pointing upward
-    /*    testRect = rTextures.LoadTexture("SharpRectangle.png");
-        Graphics.rlj.textures.GenTextureMipmaps(testRect);
-        rTextures.SetTextureFilter(testRect, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
-        float aspectRatio = length/width;
-        System.out.println("Aspect Ratio: " + aspectRatio);
-        srcRect = new Rectangle(testRect.width - testRect.height * aspectRatio, 0, testRect.height * aspectRatio, testRect.height);*/
     }
 
     public void initializeDrones(int maxDrones, boolean canControlDrones) {
@@ -61,9 +72,60 @@ public class Barrel {
     }
 
     public void setHost(Tank host) {
+        setHost(host, null);
+    }
+
+    public void setHost(Tank host, Projectile projectileHost) {
         this.host = host;
+        this.hostProjectile = projectileHost;
+
         // Default spawn point, along the x axis with an offset from the origin (0, 0)
-        pos = Graphics.scale(posOriginal, host.scale);
+        pos = Graphics.scale(posOriginal, directHost().scale);
+    }
+
+    public void setColor(Color fillCol, Color strokeCol) {
+        this.fillCol = fillCol;
+        this.strokeCol = strokeCol;
+    }
+
+    /**
+     * Returns the direct host of the barrel
+     * If host is a projectile, return the projectile host
+     * Otherwise, return the tank host
+     * @return The host of the barrel
+     */
+    protected GameObject directHost() {
+        return hostProjectile != null ? hostProjectile : host;
+    }
+
+    // https://www.desmos.com/calculator/uddosuwdt4
+    private float lengthShift(int frame) {
+        return (float) (-Math.abs(recoilDist) * Math.cos((Math.PI / recoilTime) * (frame - recoilTime * 0.5f)));
+    }
+
+    public void update(float xAbs, float yAbs, double tankAngle) {
+        // Calculate turret length
+        if (recoilFrames > 0) {
+            turretLength = turretLengthOG + lengthShift(recoilFrames);
+        } else {
+            turretLength = turretLengthOG;
+        }
+
+        // Redraw Turret in new position
+        xAbsolute = xAbs;
+        yAbsolute = yAbs;
+
+        // Calculate relative position by rotating xOriginal and yOriginal (scaled) around 0, 0
+        pos = Graphics.rotatePoint(Graphics.scale(posOriginal, directHost().scale), new Vector2(0, 0), tankAngle);
+
+        // Update absolute tank angle
+        angleAbsolute = tankAngle + angleRelative;
+        scatterDegrees = Graphics.randf(-5, 5);  // -5 to 5 degrees times scatter rate, not multiplied by bullet stats scatter rate yet
+
+        recoilFrames--;
+        if (recoilFrames < 0) {
+            recoilFrames = 0;
+        }
     }
 
     public void draw() {
@@ -81,42 +143,11 @@ public class Barrel {
         //rTextures.DrawTexturePro(testRect, srcRect, new Rectangle(xleft, ycenter, length, width), new Vector2(0, width/2.f), (float)(theta * 180/Math.PI), Main.strokeCol);
         //Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, width - 2 * Graphics.strokeWidth), new Vector2(Graphics.strokeWidth, (width - 2 * Graphics.strokeWidth)/2.f), (float)theta, color);
         if (isTrapezoid) {
-            Graphics.drawTurretTrapezoid(xleft, ycenter, length, width, radians, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float)Math.pow(host.opacity,4), flippedTrapezoid);
+            Graphics.drawTurretTrapezoid(xleft, ycenter, length, width, radians, Graphics.strokeWidth, directHost().getDamageLerpColor(this.fillCol), directHost().getDamageLerpColor(this.strokeCol), (float)Math.pow(directHost().opacity, 5), flippedTrapezoid);
         } else if (isTrapper) {
-            Graphics.drawTrapperTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4));  // Square host.opacity for a steeper curve (x^4)
+            Graphics.drawTrapperTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, directHost().getDamageLerpColor(this.fillCol), directHost().getDamageLerpColor(this.strokeCol), (float) Math.pow(directHost().opacity, 5));  // Square getHost().opacity for a steeper curve (x^5)
         } else {
-            Graphics.drawTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4));  // Square host.opacity for a steeper curve (x^4)
-        }
-    }
-
-    // https://www.desmos.com/calculator/uddosuwdt4
-    private float lengthShift(int frame) {
-        float dist = recoilLengthFactor * (turretWidth * host.scale);  // Even though its length shift, base on width because more width = stronger turret
-        return (float) (-Math.abs(dist) * Math.cos((Math.PI / recoilTime) * (frame - recoilTime * 0.5f)));
-    }
-
-    public void update(float xAbs, float yAbs, double tankAngle) {
-        // Calculate turret length
-        if (recoilFrames > 0) {
-            turretLength = turretLengthOG + lengthShift(recoilFrames);
-        } else {
-            turretLength = turretLengthOG;
-        }
-
-        // Redraw Turret in new position
-        xAbsolute = xAbs;
-        yAbsolute = yAbs;
-
-        // Calculate relative position by rotating xOriginal and yOriginal (scaled) around 0, 0
-        pos = Graphics.rotatePoint(Graphics.scale(posOriginal, host.scale), new Vector2(0, 0), tankAngle);
-
-        // Update absolute tank angle
-        angleAbsolute = tankAngle + angleRelative;
-        scatterDegrees = Graphics.randf(-5, 5);  // -5 to 5 degrees times scatter rate, not multiplied by bullet stats scatter rate yet
-
-        recoilFrames--;
-        if (recoilFrames < 0) {
-            recoilFrames = 0;
+            Graphics.drawTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, directHost().getDamageLerpColor(this.fillCol), directHost().getDamageLerpColor(this.strokeCol), (float) Math.pow(directHost().opacity, 5));  // Square host.opacity for a steeper curve (x^5)
         }
     }
 
@@ -125,34 +156,36 @@ public class Barrel {
      * recoil magnitude is just 2 * bullet recoil (see tankdef.json)
      * @return
      */
-    public Vector2 shoot(BulletStats bulletStats) {
-        return shoot(bulletStats, DrawPool.BOTTOM);
+    public Vector2 shoot() {
+        return shoot(DrawPool.BOTTOM);
     }
 
 
-    public Vector2 shoot(BulletStats bulletStats, int drawLayer) {
+    public Vector2 shoot(int drawLayer) {
         double scatterRadians = Math.toRadians(bulletStats.scatterRate * scatterDegrees);  // Multiply by scatter rate and convert to radians
         float finalAngle = (float)(angleAbsolute + scatterRadians);  // Add scatter to angle
 
         // Enhanced switch for bullet type (runs lambda expressions)
         switch (bulletStats.type) {
             case "bullet" ->
-                    new Bullet(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, host.fillCol, host.strokeCol, drawLayer);  // swapped width with length
+                    new Bullet(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, directHost().fillCol, directHost().strokeCol, drawLayer);  // swapped width with length
             case "drone" -> {
                 if (droneCount == maxDrones) {
                     return new Vector2(0, 0);  // Do not fire if max drones are spawned
                 }
-                new Drone(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+                new Drone(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, directHost().fillCol, directHost().strokeCol);  // swapped width with length
 
                 incrementDroneCount();  // Increment drone count
             }
             case "trap" ->
-                    new Trap(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, host.fillCol, host.strokeCol);  // swapped width with length
+                    new Trap(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, directHost().fillCol, directHost().strokeCol);  // swapped width with length
+            case "skimmer" ->
+                    new Skimmer(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, directHost().fillCol, directHost().strokeCol, drawLayer);  // swapped width with length
         }
 
         recoilFrames = recoilTime;  // Set to max recoil time (animation)
 
-        final float recoilMagnitude = 2 * bulletStats.recoil * (1-host.friction) * 10;  // (1-host.friction)/(1-0.9) = 10 * (1-host.friction), conversion from 25 fps to 120 fps
+        final float recoilMagnitude = 2 * bulletStats.recoil * (1- directHost().friction) * 10;  // (1-getHost().friction)/(1-0.9) = 10 * (1-getHost().friction), conversion from 25 fps to 120 fps
         final Vector2 recoilDirection = new Vector2((float) (-Math.cos(finalAngle)), (float) (-Math.sin(finalAngle))); // Return recoil direction, opposite of bullet direction
         return Graphics.scale(recoilDirection, recoilMagnitude);  // Scale the recoil direction
     }
@@ -171,10 +204,10 @@ public class Barrel {
         return offset;
     }
     public float getTurretWidth() {
-        return turretWidth * host.scale;
+        return turretWidth * directHost().scale;
     }
     public float getTurretLength() {
-        return turretLength * host.scale;
+        return turretLength * directHost().scale;
     }
     public Vector2 getSpawnPoint() {
         float turretLength = getTurretLength();

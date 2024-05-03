@@ -71,7 +71,7 @@ public class TankBuild
         fireManager.setFiring(isFiring);
 
         for (int i : fireManager.getFireIndices()) {
-            pendingRecoil[i] = barrels[i].shoot(bulletStats[i]);
+            pendingRecoil[i] = barrels[i].shoot();
         }
     }
 
@@ -189,13 +189,11 @@ public class TankBuild
 
         for (int i = 0; i < jsonBarrels.length(); i++) {  // Loop through each barrel object
             JSONObject jsonBarrel = jsonBarrels.getJSONObject(i);
-            barrels[i] = new Barrel(jsonBarrel.getFloat("width"), jsonBarrel.getFloat("size"), jsonBarrel.getFloat("offset"), jsonBarrel.getDouble("angle"), jsonBarrel.getBoolean("isTrapezoid"), jsonBarrel.getDouble("trapezoidDirection") != 0, !jsonBarrel.isNull("addon") && jsonBarrel.getString("addon").equals("trapLauncher"));
-
-            reloadData[i] = new double[] {jsonBarrel.getDouble("delay"), jsonBarrel.getDouble("reload")};
-
             JSONObject jsonBullet = jsonBarrel.getJSONObject("bullet");
 
             bulletStats[i] = new BulletStats(jsonBullet.getString("type"), jsonBullet.getFloat("sizeRatio"), jsonBullet.getFloat("health"), jsonBullet.getFloat("damage"), jsonBullet.getFloat("speed"), jsonBullet.getFloat("scatterRate"), jsonBullet.getFloat("lifeLength"), jsonBullet.getFloat("absorbtionFactor"), jsonBarrel.getFloat("recoil"));
+            reloadData[i] = new double[] {jsonBarrel.getDouble("delay"), jsonBarrel.getDouble("reload")};
+            barrels[i] = new Barrel(bulletStats[i], jsonBarrel.getFloat("width"), jsonBarrel.getFloat("size"), (float) reloadData[i][1], jsonBarrel.getFloat("offset"), jsonBarrel.getDouble("angle"), jsonBarrel.getBoolean("isTrapezoid"), jsonBarrel.getDouble("trapezoidDirection") != 0, !jsonBarrel.isNull("addon") && jsonBarrel.getString("addon").equals("trapLauncher"));
 
             // If drone
             if (bulletStats[i].type.equals("drone")) {
@@ -218,56 +216,6 @@ public class TankBuild
         ArrayList<String> keyList = new ArrayList<>(keys);
         // Generate a random build until a valid one is found
         return (keyList.get((int)(Math.random() * keyList.size())));
-    }
-
-
-
-    public static float getRand(float maxV) {
-        return (float)Math.random() * maxV;
-    }
-
-    public static TankBuild customRandomBuild() {
-        int barrelAmount = (int)(Math.random() * 20);
-
-        Barrel[] barrels = new Barrel[barrelAmount];
-        BulletStats[] bulletStats = new BulletStats[barrelAmount];
-        double[][] reloadData = new double[barrelAmount][2];  // array of {delay percent, reload percent}
-
-        for (int i = 0; i < barrelAmount; i++) {  // Loop through each barrel object
-            
-            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false, false, false);
-
-            reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
-
-            bulletStats[i] = new BulletStats("bullet", getRand(1)+0.5f, 1, 1, getRand(3.f), getRand(10), getRand(2), 1, getRand(15));
-        }
-
-        FireManager fireManager = new FireManager(reloadData);
-        float fieldFactor = 1f;
-
-        return new TankBuild("custom", null, barrels, fireManager, bulletStats, fieldFactor);
-    }
-    
-    public static TankBuild createNewRandomBuild() {
-        int barrelAmount = (int)(Math.random() * 10);
-
-        Barrel[] barrels = new Barrel[barrelAmount];
-        BulletStats[] bulletStats = new BulletStats[barrelAmount];
-        double[][] reloadData = new double[barrelAmount][2];  // array of {delay percent, reload percent}
-
-        for (int i = 0; i < barrelAmount; i++) {  // Loop through each barrel object
-            
-            barrels[i] = new Barrel(getRand(100), getRand(200), getRand(60), getRand((float)(2*Math.PI)), false, false, false);
-
-            reloadData[i] = new double[] {getRand(1), getRand(1.5f)+0.5};
-
-            bulletStats[i] = new BulletStats("bullet", getRand(1)+0.5f, 1, 1, getRand(3.f), getRand(10), getRand(2), 1, getRand(15));
-        }
-
-        FireManager fireManager = new FireManager(reloadData);
-        float fieldFactor = 1f;
-
-        return new TankBuild("custom", null, barrels, fireManager, bulletStats, fieldFactor);
     }
 }
 

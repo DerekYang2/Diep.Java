@@ -21,6 +21,7 @@ public abstract class AddOn {
             case "auto5" -> new AutoNAddOn(5);
             case "auto3" -> new AutoNAddOn(3);
             case "pronounced" -> new PronouncedAddOn();
+            case "launcher" -> new LauncherAddOn();
             default -> null;
         };
     }
@@ -160,16 +161,16 @@ class AutoTurretAddOn extends AddOn {
     @Override
     public void setHost(Tank tank) {
         this.host = tank;
+        final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
 
-        Barrel barrel = new Barrel(42 * 0.8f, 55, 0, tank.direction, false, false, false);
+        Barrel barrel = new Barrel(BULLET_STATS, 42 * 0.8f, 55, 1, 0, tank.direction, false, false, false);
         barrel.setHost(tank);
 
         FireManager fireManager = new FireManager(new double[][]{{0, 1}});
         fireManager.setHost(tank);
 
-        final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
 
-        autoTurret = new AutoTurret(tank, barrel, fireManager, BULLET_STATS);
+        autoTurret = new AutoTurret(tank, barrel, fireManager);
         autoTurret.setOffset(new Vector2(0, 0), 2 * Math.PI);  // No offset
     }
 
@@ -236,16 +237,17 @@ class AutoNAddOn extends AddOn {
     @Override
     public void setHost(Tank tank) {
         this.host = tank;
+        final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.4f, 1.2f, 1, 1, 1, 0.3f);
         for (int i = 0; i < numTurrets; i++) {
-            Barrel barrel = new Barrel(42 * 0.8f, 55, 0, tank.direction, false, false, false);
+
+            Barrel barrel = new Barrel(BULLET_STATS, 42 * 0.8f, 55, 1,0, tank.direction, false, false, false);
             barrel.setHost(tank);
 
             FireManager fireManager = new FireManager(new double[][]{{0.01, 1}});
             fireManager.setHost(tank);
 
-            final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.4f, 1.2f, 1, 1, 1, 0.3f);
 
-            autoTurrets[i] = new AutoTurret(tank, barrel, fireManager, BULLET_STATS);
+            autoTurrets[i] = new AutoTurret(tank, barrel, fireManager);
         }
     }
 
@@ -295,4 +297,22 @@ class PronouncedAddOn extends AddOn {
     }
     @Override
     public void drawAfter() {}
+}
+
+class LauncherAddOn extends AddOn {
+    public LauncherAddOn() {}
+    @Override
+    public void update() {}
+    @Override
+    public void drawBefore() {
+        float radius = host.radius * host.scale;
+        float offsetDist = (host.radius * host.scale) * 3.1f / 5;
+        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), radius * 1.2f, 0.72f * radius, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4), false);
+    }
+    @Override
+    public void drawMiddle() {}
+    @Override
+    public void drawAfter() {
+        //drawBefore();
+    }
 }

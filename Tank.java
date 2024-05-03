@@ -1,6 +1,4 @@
 import com.raylib.java.raymath.Vector2;
-
-import com.raylib.java.core.Color;
 import com.raylib.java.shapes.Rectangle;
 
 /**
@@ -25,11 +23,6 @@ public class Tank extends GameObject {
 
     boolean autoFire = false;
     Stopwatch autoFireWatch = new Stopwatch();
-
-    // Colors
-    Color fillCol = Graphics.RED;
-    Color strokeCol = Graphics.RED_STROKE;
-
 
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats) {
@@ -84,11 +77,6 @@ public class Tank extends GameObject {
 
     protected void setDirection(double radians) {
         direction = (float) radians;
-    }
-
-    protected void setColor(Color fillCol, Color strokeCol) {
-        this.fillCol = fillCol;
-        this.strokeCol = strokeCol;
     }
 
     @Override

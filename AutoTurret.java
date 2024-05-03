@@ -5,7 +5,6 @@ public class AutoTurret {
     Tank host;
     FireManager fireManager;
     Barrel barrel;
-    BulletStats bulletStats;
     protected final static float PASSIVE_ROTATION = 0.01f * 25/120;
     protected final static float VIEW_RADIUS = 1700;
     float targetDirection, direction;
@@ -14,11 +13,10 @@ public class AutoTurret {
     Vector2 pos, offset;
     Vector2 lastTargetPos;
 
-    public AutoTurret(Tank host, Barrel barrel, FireManager fireManager, BulletStats bulletStats) {
+    public AutoTurret(Tank host, Barrel barrel, FireManager fireManager) {
         this.host = host;
         this.barrel = barrel;
         this.fireManager = fireManager;
-        this.bulletStats = bulletStats;
 
         targetDirection = direction = 0;
         fireManager.setFiring(true);
@@ -37,7 +35,7 @@ public class AutoTurret {
         this.pos = pos;
         Vector2 absPos = getAbsPos();
         double baseAngle = Math.atan2(offset.y, offset.x);
-        float projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
+        float projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * barrel.bulletStats.speed * 25.f/120;
 
         Vector2 closestTarget = AutoAim.getAdjustedTarget(getAbsPos(), barrel.getSpawnPoint(), VIEW_RADIUS * host.scale, host.group, baseAngle, range, projectile_speed);  // Get closest target
 
@@ -62,7 +60,7 @@ public class AutoTurret {
 
     public void shoot(int drawLayer) {
         if (!fireManager.getFireIndices().isEmpty()) {  // If index in fire queue
-            host.addForce(barrel.shoot(bulletStats, drawLayer));  // Shoot at top layer and apply recoil
+            host.addForce(barrel.shoot(drawLayer));  // Shoot at top layer and apply recoil
         }
     }
 

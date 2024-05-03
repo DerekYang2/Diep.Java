@@ -14,8 +14,8 @@ public class Skimmer extends Bullet {
 
         fireManager = new FireManager(new double[][] {{0, 0.35}, {0, 0.35}});  // Reload factor of 0.35
         barrels = new Barrel[] {
-                new Barrel(BULLET_STAT, 32 * host.scale, 50 * host.scale, 0.35f, 0, 0, false, false, false),
-                new Barrel(BULLET_STAT,32 * host.scale, 50 * host.scale, 0.35f,0, Math.PI, false, false, false),
+                new Barrel(BULLET_STAT, 31.5f * host.scale, 48.5f * host.scale, 0.35f, 0, 0, false, false, false),
+                new Barrel(BULLET_STAT,31.5f * host.scale, 48.5f * host.scale, 0.35f,0, Math.PI, false, false, false),
         };
 
         // Set host
@@ -58,6 +58,11 @@ public class Skimmer extends Bullet {
         super.draw();  // Draw bullet
     }
 
+    /**
+     * Projectiles do not have a damage animation
+     * @param col The color to lerp
+     * @return The same color
+     */
     @Override
     public Color getDamageLerpColor(Color col) {
         return col;

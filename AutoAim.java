@@ -104,14 +104,6 @@ public class AutoAim {
                 continue;
             }
             Rectangle boundingBox = obj.boundingBox();
-
-            // Increase obj bounding box because of barrel length TODO: assumes obj is a tank
-            float turretLength = ((Tank)obj).tankBuild.maxBarrelLength();
-            boundingBox.x -= turretLength;
-            boundingBox.y -= turretLength;
-            boundingBox.width += 2 * turretLength;
-            boundingBox.height += 2 * turretLength;
-
             float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
             if (Graphics.isIntersecting(boundingBox, view) && distSquared < minDistSquared) {  // New closest target
                 minDistSquared = distSquared;
@@ -120,5 +112,66 @@ public class AutoAim {
         }
 
         return closestTarget;
+    }
+
+    /**
+     * Get the closest target within the view (in a different group)
+     * @param sourcePos The position of the source
+     * @param radius The radius of the view
+     * @param group The group of the source
+     * @return The closest target position
+     */
+    public static Vector2 getClosestTarget(Vector2 sourcePos, float radius, int group) {
+        Rectangle view = new Rectangle(sourcePos.x - radius, sourcePos.y - radius, 2*radius, 2*radius);
+        HashSet<Integer> targets = CollisionManager.queryBoundingBox(view);
+        // Get the closest target
+        float minDistSquared = Float.MAX_VALUE;
+        Vector2 closestTarget = null;  // Set to null if no target found
+
+        for (int id : targets) {
+            GameObject obj = Main.gameObjectPool.getObj(id);
+
+            float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
+
+            if (obj.group == group || obj.isProjectile || Graphics.distanceSq(sourcePos, obj.pos) > radius * radius) {  // If same group or projectile OR too far, skip
+                continue;
+            }
+
+            if (distSquared < minDistSquared) {  // Potential closest target
+                minDistSquared = distSquared;
+                closestTarget = obj.pos;  // Update closest target
+            }
+        }
+
+        return closestTarget;
+    }
+
+    /**
+     * Get the closest target id within the view (in a different group)
+     * @param sourcePos The position of the source
+     * @param view The view rectangle
+     * @param group The group of the source
+     * @return The closest target position
+     */
+    public static Integer getClosestTargetId(Vector2 sourcePos, Rectangle view, int group) {
+        HashSet<Integer> targets = CollisionManager.queryBoundingBox(view);
+        // Get the closest target
+        float minDistSquared = Float.MAX_VALUE;
+        Integer closestId = null;  // Set to null if no target found
+        for (int id : targets) {
+            GameObject obj = Main.gameObjectPool.getObj(id);
+            if (obj.group == group || obj.isProjectile) {  // If same group or projectile OR not in view, skip
+                continue;
+            }
+            Rectangle boundingBox = obj.boundingBox();
+            float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
+
+            if (Graphics.isIntersecting(boundingBox, view) && distSquared < minDistSquared) {  // New closest target
+                minDistSquared = distSquared;
+                closestId = obj.id;  // Update the closest target (adjusted)
+            }
+        }
+
+        return closestId;
     }
 }

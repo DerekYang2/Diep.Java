@@ -58,9 +58,9 @@ public class Drone extends Projectile {
 
         // Get the target
         if (aiOn) {
-            Integer closestTarget = CollisionManager.getClosestTarget(host.pos, Drone.VIEW_RADIUS * host.scale, group);
+            Vector2 closestTarget = AutoAim.getClosestTarget(host.pos, Drone.VIEW_RADIUS * host.scale, group);
             if (closestTarget != null) {  // If there is a closest target
-                target = Main.gameObjectPool.getObj(closestTarget).pos;
+                target = closestTarget;
             } else {  // If no target in range, set target to the tank pos
                 float scaleFactor = (12 - 17) / 7.f * host.stats.getStat(Stats.BULLET_SPEED) + 17;  // Linear regression, stat 0: 17, stat 7: 12
 

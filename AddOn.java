@@ -138,10 +138,12 @@ class DominatorAddOn extends AddOn {
 
     @Override
     public void drawMiddle() {
-        float offsetDist = host.radius * host.scale * 4.f/5;
-        float length = host.radius * host.scale * 2.1f/5;
-        float width = 35 * host.scale * 0.94f;
-        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float)Math.pow(host.opacity,4), true);
+        float offsetDist = host.radius * host.scale * 4.f / 5;
+        float length = host.radius * host.scale * 2.1f / 5;
+        if (Main.onScreen(host.pos, offsetDist + length)) {
+            float width = 35 * host.scale * 0.94f;
+            Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4), true);
+        }
     }
 
     @Override
@@ -284,10 +286,12 @@ class PronouncedAddOn extends AddOn {
     public void drawBefore() {}
     @Override
     public void drawMiddle() {
-        float offsetDist = (host.radius * host.scale) * 3.1f/5;
-        float length = (host.radius * host.scale) * 3.3f/5;
-        float width = host.tankBuild.getBarrel(0).getTurretWidth() * 0.94f;
-        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float)Math.pow(host.opacity,4), true);
+        float offsetDist = (host.radius * host.scale) * 3.1f / 5;
+        float length = (host.radius * host.scale) * 3.3f / 5;
+        if (Main.onScreen(host.pos, offsetDist + length)) {
+            float width = host.tankBuild.getBarrel(0).getTurretWidth() * 0.94f;
+            Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4), true);
+        }
     }
     @Override
     public void drawAfter() {}

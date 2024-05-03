@@ -38,8 +38,23 @@ public class BotController implements Controller {
     public void update() {
         if (frontBarrel != null) {
             safetyFireFrames = Math.max(0, safetyFireFrames - 1);  // Decrement safety fire frames
-            // TODO: drone target pos should only be adjusted at close range
-            targetPos = AutoAim.getAdjustedTarget(host.pos, frontBarrel.getSpawnPoint(), host.getView(), host.group, frontBulletSpeed);  // Get closest target
+
+            if (frontBarrel.canControlDrones) {
+                Integer targId = AutoAim.getClosestTargetId(host.pos, host.getView(), host.group);  // Get closest target unadjusted
+
+                if (targId != null) {
+                    GameObject targObj = Main.gameObjectPool.getObj(targId);
+                    if (Graphics.distanceSq(host.pos, targObj.pos) < 1500*1500)  // If target is close enough
+                        targetPos = AutoAim.getAdjustedTarget(targObj, frontBarrel.getSpawnPoint(), frontBulletSpeed);  // Adjust target position
+                    else
+                        targetPos = targObj.pos;  // Do not adjust target position
+                } else {
+                    targetPos = null;  // No target
+                }
+            } else {
+                targetPos = AutoAim.getAdjustedTarget(host.pos, frontBarrel.getSpawnPoint(), host.getView(), host.group, frontBulletSpeed);  // Get closest target
+            }
+
             if (targetPos != null) {  // If there is a closest target
                 if (reactionWatch.ms() > reactionTime) {  // If reaction time has passed
                     targetDirection = (float) Math.atan2(targetPos.y - host.pos.y, targetPos.x - host.pos.x);
@@ -76,8 +91,8 @@ public class BotController implements Controller {
      */
     @Override
     public Vector2 getTarget() {
-        if (targetPos == null) {  // Return host position plus some direction vector
-            float vel = 20*Graphics.length(host.vel);  // Multiply by some amount so drones stay in front
+        if (targetPos == null) {  // Return host position plus its direction vector
+            float vel = host.radius * host.scale + 10*Graphics.length(host.vel);  // Multiply by some amount so drones stay in front
             return new Vector2(host.pos.x + vel * (float) Math.cos(moveDir), host.pos.y + vel * (float) Math.sin(moveDir));
         }
         return targetPos;

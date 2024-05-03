@@ -432,7 +432,6 @@ public class Graphics extends Raylib {
         float trapperHeight = height * (3.f/1.81f);  // Longer side of the trapezoid
         float trapperLength = trapperHead.width * (trapperHeight / trapperHead.height);  // Length of the trapper head, maintain texture aspect ratio
         //length -= trapperLength;  // Subtract the length of the trapper head
-        float aspectRatio = length/height;
 
         rTextures.DrawTexturePro(trapperHead, new Rectangle(0, 0, trapperHead.width, trapperHead.height), new Rectangle(xleft, ycenter, trapperLength, trapperHeight), new Vector2(-(length-strokeWidth), trapperHeight/2), (float)(radians * 180/Math.PI), strokeCol);
         float k = (trapperLength - strokeWidth)/trapperLength;

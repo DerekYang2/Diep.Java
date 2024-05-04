@@ -55,7 +55,7 @@ public class Main {
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2);
         // new TestObj();
-        player = new Player(new Vector2(0,0), "skimmer");
+        player = new Player(new Vector2(0,0), "rocketeer");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
            buildName = "skimmer";

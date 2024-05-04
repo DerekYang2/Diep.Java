@@ -2,6 +2,7 @@ import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 
 public class Glider extends Bullet{
+    // Speed is around 7.08 units per frame (850 units per second)
     // TODO: verify big glider bullet velocity, small glider bullet velocity
     protected static BulletStats BULLET_STAT = new BulletStats("bullet", 1, 0.6f, 0.6f, 0.5f, 1, 0.5f, 1, 2.5f);
     Barrel[] barrels;

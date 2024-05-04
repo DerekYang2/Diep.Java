@@ -300,6 +300,8 @@ class PronouncedAddOn extends AddOn {
     public void drawAfter() {}
 }
 
+// TODO: add culling to add-ons below
+
 class LauncherAddOn extends AddOn {
     public LauncherAddOn() {}
     @Override
@@ -326,7 +328,7 @@ class GliderAddOn extends AddOn {
     public void drawBefore() {
         float radius = host.radius * host.scale;
         float offsetDist = (host.radius * host.scale) * 3.1f / 5;
-        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), radius * 1.2f, 0.74f * radius, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4), true);
+        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), radius * 1.2f, 0.707f * radius, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4), true);
     }
     @Override
     public void drawMiddle() {}

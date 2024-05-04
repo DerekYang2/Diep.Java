@@ -3,7 +3,7 @@ import com.raylib.java.raymath.Vector2;
 
 public class Skimmer extends Bullet {
     protected static float BASE_ROTATION = 0.1f * 25/120;
-    protected static BulletStats BULLET_STAT = new BulletStats("bullet", 1, 0.3f, 0.6f, 1f, 1, 0.25f, 1, 0);
+    protected static BulletStats BULLET_STAT = new BulletStats("bullet", 1, 0.3f, 0.6f, 0.7f, 1, 0.25f, 1, 0);
     Barrel[] barrels;
     FireManager fireManager;
     float bulletRotation;
@@ -14,8 +14,8 @@ public class Skimmer extends Bullet {
 
         fireManager = new FireManager(new double[][] {{0, 0.35}, {0, 0.35}});  // Reload factor of 0.35
         barrels = new Barrel[] {
-                new Barrel(BULLET_STAT, 49, 48.5f * host.scale, 0.35f, 0, 0, false, false, false),
-                new Barrel(BULLET_STAT,49, 48.5f * host.scale, 0.35f,0, Math.PI, false, false, false),
+                new Barrel(BULLET_STAT, 48, 48.5f * host.scale, 0.35f, 0, 0, false, false, false),
+                new Barrel(BULLET_STAT,48, 48.5f * host.scale, 0.35f,0, Math.PI, false, false, false),
         };
 
         // Set host

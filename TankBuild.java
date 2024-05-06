@@ -23,6 +23,13 @@ public class TankBuild
     // AddOn object
     AddOn addOn;
 
+    // Invisibility variables
+    float min_movement = 0.23f * 25/120;  // Minimum movement speed to be visible
+    boolean isInvisible;  // Whether the tank can turn invisible
+    float visibilityRateShooting;  // Rate of visibility increase when shooting
+    float visibilityRateMoving;  // Rate of visibility increase when moving
+    float invisibilityRate;  // Constant rate of invisibility decrease
+
     public TankBuild(String name, AddOn addOn, Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats, float fieldFactor) {
         this.name = name;
         this.barrels = barrels;
@@ -55,6 +62,13 @@ public class TankBuild
         }
     }
 
+    public void setInvisibilityVariables(boolean isInvisible, float visibilityRateShooting, float visibilityRateMoving, float invisibilityRate) {
+        this.isInvisible = isInvisible;
+        this.visibilityRateShooting = visibilityRateShooting;
+        this.visibilityRateMoving = visibilityRateMoving;
+        this.invisibilityRate = invisibilityRate;
+    }
+
     public void update() {
         for (int i = 0; i < barrels.length; i++) {
             barrels[i].update(host.pos.x, host.pos.y, host.direction);
@@ -69,8 +83,11 @@ public class TankBuild
 
     public void updateFire(boolean isFiring) {
         fireManager.setFiring(isFiring);
-
-        for (int i : fireManager.getFireIndices()) {
+        ArrayList<Integer> fireIndices = fireManager.getFireIndices();
+        if (!fireIndices.isEmpty()) {
+            host.addOpacity(visibilityRateShooting);  // Increase opacity if shooting
+        }
+        for (int i : fireIndices) {
             pendingRecoil[i] = barrels[i].shoot();
         }
     }
@@ -204,7 +221,12 @@ public class TankBuild
         FireManager fireManager = new FireManager(reloadData);
         float fieldFactor = jsonTank.getFloat("fieldFactor");
 
-        return new TankBuild(name, addOn, barrels, fireManager, bulletStats, fieldFactor);
+        TankBuild build = new TankBuild(name, addOn, barrels, fireManager, bulletStats, fieldFactor);
+
+        JSONObject jsonFlags = jsonTank.getJSONObject("flags");
+        build.setInvisibilityVariables(jsonFlags.getBoolean("invisibility"), jsonTank.getFloat("visibilityRateShooting"), jsonTank.getFloat("visibilityRateMoving"), jsonTank.getFloat("invisibilityRate"));
+
+        return build;
     }
 
     /**

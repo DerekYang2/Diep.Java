@@ -12,7 +12,7 @@ public class Glider extends Bullet{
         super(hostBarrel, spawnPos, direction, diameter * 1.05f, bulletStats, fillCol, strokeCol, drawLayer);  // Increase diameter by 5% due to trapezoid size inaccuracies
         setColor(host.fillCol, host.strokeCol);  // Set color to host color
 
-        initHealthBar();
+        // initHealthBar();
 
         fireManager = new FireManager(new double[][] {{0, 0.8}, {0, 0.8}});  // Reload factor of 0.35
         barrels = new Barrel[] {

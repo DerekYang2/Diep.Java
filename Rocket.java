@@ -13,7 +13,7 @@ public class Rocket extends Bullet {
         super(hostBarrel, spawnPos, direction, diameter * 1.05f, bulletStats, fillCol, strokeCol, drawLayer);
         setColor(host.fillCol, host.strokeCol);  // Set color to host color
 
-        initHealthBar();
+        // initHealthBar();
 
         fireManager = new FireManager(new double[][] {{0, 0.15}});  // Reload factor of 0.15
         barrels = new Barrel[] {

@@ -109,7 +109,7 @@ class LandmineAddOn extends AddOn {
     public void drawBefore() {
         final float sideLen = (host.radius * host.scale) * 1.15f;
         if (Main.onScreen(host.pos, sideLen)) {
-            final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(host.opacity, 4));
+            final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity);
             Graphics.drawHexagon(host.pos, sideLen, offset1, col);
             Graphics.drawHexagon(host.pos, sideLen, offset2, col);
         }

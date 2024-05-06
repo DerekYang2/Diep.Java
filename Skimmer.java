@@ -12,7 +12,7 @@ public class Skimmer extends Bullet {
         super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol, drawLayer);
         setColor(host.fillCol, host.strokeCol);  // Set color to host color
 
-        initHealthBar();
+        // initHealthBar();
 
         fireManager = new FireManager(new double[][] {{0, 0.35}, {0, 0.35}});  // Reload factor of 0.35
         barrels = new Barrel[] {

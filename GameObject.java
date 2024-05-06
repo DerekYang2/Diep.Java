@@ -118,13 +118,13 @@ public abstract class GameObject implements Updatable, Drawable {
 
         // Update health bar
         if (healthBar != null) {
-            healthBar.triggerHidden(health >= maxHealth);
             if (!healthBar.isHidden()) {
                 float healthBarWidth = radius * scale * 2;
                 float healthBarX = pos.x - healthBarWidth / 2;
                 float healthBarY = pos.y + radius * scale + 40 - HEALTH_BAR_HEIGHT;
                 healthBar.update(new Vector2(healthBarX, healthBarY), health / maxHealth);
             }
+            healthBar.triggerHidden(health >= maxHealth);
         }
 
         /*

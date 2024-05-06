@@ -20,7 +20,6 @@ public class Tank extends GameObject {
     // Objects that control the tank
     TankBuild tankBuild;
     Controller controller;
-
     boolean autoFire = false;
     Stopwatch autoFireWatch = new Stopwatch();
 
@@ -88,6 +87,16 @@ public class Tank extends GameObject {
             return;
         }
 
+        // Update invisibility opacity
+        if (tankBuild.isInvisible) {  // If tank can turn invisible
+            addOpacity(-tankBuild.invisibilityRate);  // Decrease opacity
+            addOpacity((Graphics.length(vel) > tankBuild.min_movement || damageAnimationFrames > 0) ? tankBuild.visibilityRateMoving : 0);  // Increase opacity if moving or taking damage
+            if (healthBar != null) {
+                // If between invisible and visible, hide health bar
+                healthBar.triggerHidden(opacity < 1 || health >= maxHealth);
+            }
+        }
+
         // Health updates
         if (Main.counter - lastDamageFrame > 30 * 120) {  // After 30 seconds, hyper-regen
             health += maxHealth / (120 * 10);  // 10 percent HP per second
@@ -131,6 +140,11 @@ public class Tank extends GameObject {
         }
 
         tankBuild.addOnDrawAfter();
+    }
+
+    public void addOpacity(float opacityChange) {
+        opacity += opacityChange * (25.f/120);  // Convert from 25 fps to 120 fps
+        opacity = Math.min(1, Math.max(0, opacity));
     }
 
     public boolean isFiring() {

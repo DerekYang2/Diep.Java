@@ -16,6 +16,8 @@ public class Bullet extends Projectile {
      */
     public Bullet(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol, int drawLayer) {
         super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol, drawLayer);
+/*        if (diameter > 50)
+            initHealthBar();*/
     }
 
     @Override

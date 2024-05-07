@@ -6,7 +6,7 @@ public class Drone extends Projectile {
     Vector2 target;
     Barrel hostBarrel;
     boolean aiOn = false;  // Default to off
-    protected static final float VIEW_RADIUS = 850;
+    protected float VIEW_RADIUS = 850;
 
     public Drone(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
         // super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f, DrawPool.TOP_PROJECTILE);
@@ -32,7 +32,7 @@ public class Drone extends Projectile {
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 
         // Life length
-        lifeFrames = Integer.MAX_VALUE;  // Set life length to infinity
+        lifeFrames = (bulletStats.lifeLength == -1) ? Integer.MAX_VALUE : Math.round(bulletStats.lifeLength * 72 * (120.f / 25));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class Drone extends Projectile {
 
         // Get the target
         if (aiOn) {
-            Vector2 closestTarget = AutoAim.getClosestTarget(host.pos, Drone.VIEW_RADIUS * host.scale, group);
+            Vector2 closestTarget = AutoAim.getClosestTarget(host.pos, this.VIEW_RADIUS * host.scale, group);
             if (closestTarget != null) {  // If there is a closest target
                 target = closestTarget;
             } else {  // If no target in range, set target to the tank pos

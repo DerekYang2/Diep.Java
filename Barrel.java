@@ -178,6 +178,8 @@ public class Barrel {
 
                 incrementDroneCount();  // Increment drone count
             }
+            case "swarm" ->
+                new Swarm(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, directHost().fillCol, directHost().strokeCol);  // swapped width with length
             case "trap" ->
                     new Trap(this, getSpawnPoint(), finalAngle, getTurretWidth(), bulletStats, directHost().fillCol, directHost().strokeCol);  // swapped width with length
             case "skimmer" ->

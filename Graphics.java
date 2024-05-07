@@ -29,8 +29,7 @@ public class Graphics extends Raylib {
 
     public static Raylib rlj;
     public static Camera2D camera;
-    private static RenderTexture target;
-
+    private static RenderTexture target, tankTex;
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
@@ -89,6 +88,10 @@ public class Graphics extends Raylib {
         target = rlj.textures.LoadRenderTexture(cameraWidth, cameraHeight);
         rTextures.SetTextureFilter(target.texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
         rlj.core.SetTargetFPS(FPS);
+
+        // Tank render texture
+        tankTex = rlj.textures.LoadRenderTexture(532, 532);
+        rTextures.SetTextureFilter(tankTex.texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
 
         // Camera
         camera = new Camera2D();
@@ -496,28 +499,22 @@ public class Graphics extends Raylib {
         rlj.text.DrawText(text, x, y, fontSize, color);
     }
 
+    // 531.26
     public static Texture2D createTankTexture(String buildName, Color fillCol, Color strokeCol) {
         TankImage tank = new TankImage(0, 0, buildName, fillCol, strokeCol);
-        // Get max barrel length
-        float textureSize = (int) (2 * (tank.radius*tank.scale + tank.tankBuild.maxBarrelLength()));
-        if (tank.tankBuild.addOn != null) {
-            textureSize = Math.max(textureSize, 2 * tank.tankBuild.addOn.maxRadius());
-        }
-        textureSize *= 1.01f;  // Add some padding
 
-        RenderTexture tankTex = rlj.textures.LoadRenderTexture((int) textureSize, (int) textureSize);
-
-        tank.setPos(new Vector2(textureSize * 0.5f, textureSize * 0.5f));
+        tank.setPos(new Vector2(tankTex.texture.getWidth() * 0.5f, tankTex.texture.getHeight() * 0.5f));
         tank.tankBuild.update();  // Still update after death so turret positions are updated
 
         rlj.core.BeginDrawing();
-        rlj.core.ClearBackground(rgba(0, 0, 0, 0));
         rlj.core.BeginTextureMode(tankTex);
+        rlj.core.ClearBackground(rgba(0, 0, 0, 0));
         tank.draw();
         rlj.core.EndTextureMode();
         rlj.core.EndDrawing();
         tank.delete();
-        return tankTex.texture;
+
+        return rTextures.LoadTextureFromImage(rTextures.LoadImageFromTexture(tankTex.texture));
     }
 
     public static Texture2D createTankTexture(Tank tank) {

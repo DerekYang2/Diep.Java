@@ -6,6 +6,7 @@ public class Player extends Tank {
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         setTankBuild(TankBuild.createTankBuild(buildName));
         Graphics.setZoom(this.tankBuild.fieldFactor, level);  // Set zoom level, remember to call on level and tank build change
+        Main.pendingTankTexture.add(this);
     }
 
     // For timing speed

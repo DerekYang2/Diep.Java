@@ -5,6 +5,7 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.textures.Texture2D;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
@@ -19,6 +20,7 @@ public class Main {
     public static IdServer idServer;
     public static Stopwatch globalClock;
     public static HashMap<Color, HashMap<String, Texture2D>> tankTextures;
+    public static ArrayList<Tank> pendingTankTexture = new ArrayList<>();
     static Tank player;
 
     // Variables for game reset
@@ -42,6 +44,7 @@ public class Main {
         drawablePool = new DrawPool();
         gameObjectPool = new HashPool<>();
         idServer = new IdServer();
+        tankTextures = new HashMap<>();
         lastReset.start();
         startGame();
     }
@@ -52,16 +55,22 @@ public class Main {
         globalClock.start();
         drawablePool.clear();
         gameObjectPool.clear();
+
+        tankTextures.clear();
+        tankTextures.put(Graphics.BLUE, new HashMap<>());
+        tankTextures.put(Graphics.RED, new HashMap<>());
+
+        pendingTankTexture.clear();
         idServer.reset();
 
         int spawn = 1;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2);
         // new TestObj();
-        player = new Player(new Vector2(0,0), "stalker");
+        player = new Player(new Vector2(0,0), "battleship");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
-            buildName = "overlord";
+            buildName = "tank";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
             t.group = -1;
         }
@@ -184,22 +193,22 @@ public class Main {
         drawablePool.drawAll();
     }
 
-
-    public static void initializeTankTextures() {
-        tankTextures = new HashMap<>();
-        tankTextures.put(Graphics.BLUE, new HashMap<>());
-        tankTextures.put(Graphics.RED, new HashMap<>());
-        for (String tankName : TankBuild.tankDefinitions.keySet()) {
-            tankName = tankName.toLowerCase();
-            tankTextures.get(Graphics.BLUE).put(tankName, Graphics.createTankTexture(tankName, Graphics.BLUE, Graphics.BLUE_STROKE));
-            tankTextures.get(Graphics.RED).put(tankName, Graphics.createTankTexture(tankName, Graphics.RED, Graphics.RED_STROKE));
+    public static void refreshTankTextures() {
+        for (Tank tank : pendingTankTexture) {
+            String buildName = tank.tankBuild.name;
+            if (buildName.equals("auto trapper")) {
+                tankTextures.get(tank.fillCol).put("trapper", Graphics.createTankTexture("trapper", tank.fillCol, tank.strokeCol));
+            } else if (buildName.equals("auto gunner")) {
+                tankTextures.get(tank.fillCol).put("gunner", Graphics.createTankTexture("gunner", tank.fillCol, tank.strokeCol));
+            }
+            tankTextures.get(tank.fillCol).put(buildName, Graphics.createTankTexture(buildName, tank.fillCol, tank.strokeCol));
         }
+        pendingTankTexture.clear();
     }
 
 
     public static void main(String[] args) {
         initialize();
-        initializeTankTextures();
 
         //--------------------------------------------------------------------------------------
         // Main game loop
@@ -207,6 +216,7 @@ public class Main {
         {
             // Update
             //----------------------------------------------------------------------------------
+            refreshTankTextures();
             if (pendingReset) {
                 startGame();
                 pendingReset = false;

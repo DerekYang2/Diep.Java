@@ -219,7 +219,7 @@ public class TankBuild
             barrels[i] = new Barrel(bulletStats[i], jsonBarrel.getFloat("width"), jsonBarrel.getFloat("size"), (float) reloadData[i][1], jsonBarrel.getFloat("offset"), jsonBarrel.getDouble("angle"), jsonBarrel.getBoolean("isTrapezoid"), jsonBarrel.getDouble("trapezoidDirection") != 0, !jsonBarrel.isNull("addon") && jsonBarrel.getString("addon").equals("trapLauncher"));
 
             // If drone
-            if (bulletStats[i].type.equals("drone")) {
+            if (bulletStats[i].type.equals("drone") || bulletStats[i].type.equals("swarm")) {
                 barrels[i].initializeDrones(jsonBarrel.getInt("droneCount"), jsonBarrel.getBoolean("canControlDrones"));
             }
         }

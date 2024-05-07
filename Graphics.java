@@ -499,6 +499,10 @@ public class Graphics extends Raylib {
         rlj.text.DrawText(text, x, y, fontSize, color);
     }
 
+    public static void unloadTexture(Texture2D texture) {
+        rlj.textures.UnloadTexture(texture);
+    }
+
     // 531.26
     public static Texture2D createTankTexture(String buildName, Color fillCol, Color strokeCol) {
         TankImage tank = new TankImage(0, 0, buildName, fillCol, strokeCol);
@@ -506,16 +510,15 @@ public class Graphics extends Raylib {
         tank.setPos(new Vector2(tankTex.texture.getWidth() * 0.5f, tankTex.texture.getHeight() * 0.5f));
         tank.tankBuild.update();  // Still update after death so turret positions are updated
 
-        rlj.core.BeginDrawing();
         rlj.core.BeginTextureMode(tankTex);
         rlj.core.ClearBackground(rgba(0, 0, 0, 0));
         tank.draw();
         rlj.core.EndTextureMode();
-        rlj.core.EndDrawing();
         tank.delete();
 
         return rTextures.LoadTextureFromImage(rTextures.LoadImageFromTexture(tankTex.texture));
     }
+
 
     public static Texture2D createTankTexture(Tank tank) {
         // Get max barrel length

@@ -147,14 +147,17 @@ public class Tank extends GameObject {
         } else {
             float originalScale = (float)Math.pow(1.01, (level - 1));
             if (Main.onScreen(pos, radius*scale)) {
-                if (tankName.equals("auto gunner")) {
-                    Graphics.drawTextureCentered(Main.tankTextures.get(fillCol).get("gunner"), pos, direction, scale/originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
-                    tankBuild.addOnDrawAfter();
-                } else if (tankName.equals("auto trapper")) {
-                  Graphics.drawTextureCentered(Main.tankTextures.get(fillCol).get("trapper"), pos, direction, scale/originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
-                    tankBuild.addOnDrawAfter();
-                } else {
-                    Graphics.drawTextureCentered(Main.tankTextures.get(fillCol).get(tankName), pos, direction, scale / originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
+                switch (tankName) {
+                    case "auto gunner" -> {
+                        Graphics.drawTextureCentered(Main.tankTextures.get(fillCol).get("gunner"), pos, direction, scale / originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
+                        tankBuild.addOnDrawBefore();
+                    }
+                    case "auto trapper" -> {
+                        Graphics.drawTextureCentered(Main.tankTextures.get(fillCol).get("trapper"), pos, direction, scale / originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
+                        tankBuild.addOnDrawBefore();
+                    }
+                    default ->
+                        Graphics.drawTextureCentered(Main.tankTextures.get(fillCol).get(tankName), pos, direction, scale / originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
                 }
             }
         }

@@ -39,9 +39,9 @@ public class TankBuild
         this.addOn = addOn;
         pendingRecoil = new Vector2[barrels.length];
 
-        // Set whether barrels are drone barrels
+        // Set whether barrels are drone barrels, which are always on fire regardless of controller
         for (int idx = 0; idx < barrels.length; idx++) {
-            if (barrels[idx].getMaxDrones() > 0) {
+            if (bulletStats[idx].type.equals("drone")) {
                 fireManager.setDroneBarrel(idx);
             }
         }

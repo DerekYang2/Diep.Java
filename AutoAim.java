@@ -116,13 +116,14 @@ public class AutoAim {
 
     /**
      * Get the closest target within the view (in a different group)
-     * @param sourcePos The position of the source
+     * @param currentPos The position of the object in question (closest to this position)
+     * @param viewOrigin The position of the center of the view radius
      * @param radius The radius of the view
      * @param group The group of the source
      * @return The closest target position
      */
-    public static Vector2 getClosestTarget(Vector2 sourcePos, float radius, int group) {
-        Rectangle view = new Rectangle(sourcePos.x - radius, sourcePos.y - radius, 2*radius, 2*radius);
+    public static Vector2 getClosestTarget(Vector2 currentPos, Vector2 viewOrigin, float radius, int group) {
+        Rectangle view = new Rectangle(viewOrigin.x - radius, viewOrigin.y - radius, 2*radius, 2*radius);
         HashSet<Integer> targets = CollisionManager.queryBoundingBox(view);
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;
@@ -131,14 +132,14 @@ public class AutoAim {
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
 
-            float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
-
-            if (obj.group == group || obj.isProjectile || Graphics.distanceSq(sourcePos, obj.pos) > radius * radius || obj.isInvisible()) {  // If same group or projectile OR too far, skip
+            if (obj.group == group || obj.isProjectile || Graphics.distanceSq(viewOrigin, obj.pos) > radius * radius || obj.isInvisible()) {  // If same group or projectile OR too far, skip
                 continue;
             }
 
-            if (distSquared < minDistSquared) {  // Potential closest target
-                minDistSquared = distSquared;
+            float distToCurrent = Graphics.distanceSq(currentPos, obj.pos);
+
+            if (distToCurrent < minDistSquared) {  // Potential closest target
+                minDistSquared = distToCurrent;
                 closestTarget = obj.pos;  // Update closest target
             }
         }

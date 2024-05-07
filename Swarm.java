@@ -3,7 +3,7 @@ import com.raylib.java.raymath.Vector2;
 
 public class Swarm extends Drone {
     public Swarm(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
-        super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol, 0.955f);
+        super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol, 0.96f);
         VIEW_RADIUS *= 2;  // Increase view radius to 2 * 850
     }
 

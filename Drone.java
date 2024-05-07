@@ -66,7 +66,7 @@ public class Drone extends Projectile {
 
         // Get the target
         if (aiOn) {
-            Vector2 closestTarget = AutoAim.getClosestTarget(host.pos, this.VIEW_RADIUS * host.scale, group);
+            Vector2 closestTarget = AutoAim.getClosestTarget(pos, host.pos, this.VIEW_RADIUS * host.scale, group);
             if (closestTarget != null) {  // If there is a closest target
                 target = closestTarget;
             } else {  // If no target in range, set target to the tank pos

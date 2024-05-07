@@ -20,7 +20,7 @@ public class Main {
     public static IdServer idServer;
     public static Stopwatch globalClock;
     public static HashMap<Color, HashMap<String, Texture2D>> tankTextures;
-    public static ArrayList<Tank> pendingTankTexture = new ArrayList<>();
+    public static ArrayList<Tank> pendingTankTexture = new ArrayList<>();  // TODO: move to new class
     static Tank player;
 
     // Variables for game reset
@@ -56,21 +56,19 @@ public class Main {
         drawablePool.clear();
         gameObjectPool.clear();
 
-        tankTextures.clear();
-        tankTextures.put(Graphics.BLUE, new HashMap<>());
-        tankTextures.put(Graphics.RED, new HashMap<>());
-
         pendingTankTexture.clear();
+        clearTextures();
+        
         idServer.reset();
 
-        int spawn = 0;
+        int spawn = 30;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "battleship");
+        player = new Player(new Vector2(0,0), "overlord");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
-            //buildName = "tank";
+            //buildName = "auto gunner";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
             t.group = -1;
         }
@@ -193,19 +191,35 @@ public class Main {
         drawablePool.drawAll();
     }
 
+    private static void insertTankTexture(String buildName, Color fillCol, Color strokeCol) {
+        if (!tankTextures.containsKey(fillCol)) {  // If fill color not in map, add it
+            tankTextures.put(fillCol, new HashMap<>());
+        }
+        if (!tankTextures.get(fillCol).containsKey(buildName)) {  // If build name not in sub-map, add it
+            tankTextures.get(fillCol).put(buildName, Graphics.createTankTexture(buildName, fillCol, strokeCol));
+        }
+    }
+
     public static void refreshTankTextures() {
         for (Tank tank : pendingTankTexture) {
             String buildName = tank.tankBuild.name;
-            if (buildName.equals("auto trapper")) {
-                tankTextures.get(tank.fillCol).put("trapper", Graphics.createTankTexture("trapper", tank.fillCol, tank.strokeCol));
-            } else if (buildName.equals("auto gunner")) {
-                tankTextures.get(tank.fillCol).put("gunner", Graphics.createTankTexture("gunner", tank.fillCol, tank.strokeCol));
+            switch (buildName) {
+                case "auto gunner" -> insertTankTexture("gunner", tank.fillCol, tank.strokeCol);
+                case "auto trapper" -> insertTankTexture("trapper", tank.fillCol, tank.strokeCol);
+                default -> insertTankTexture(buildName, tank.fillCol, tank.strokeCol);
             }
-            tankTextures.get(tank.fillCol).put(buildName, Graphics.createTankTexture(buildName, tank.fillCol, tank.strokeCol));
         }
         pendingTankTexture.clear();
     }
 
+    public static void clearTextures() {
+        for (HashMap<String, Texture2D> map : tankTextures.values()) {
+            for (Texture2D texture : map.values()) {
+                Graphics.unloadTexture(texture);
+            }
+        }
+        tankTextures.clear();
+    }
 
     public static void main(String[] args) {
         initialize();

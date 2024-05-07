@@ -20,18 +20,33 @@ public abstract class Projectile extends GameObject {
      * @param strokeCol The stroke color of the projectile
      * @param drawLayer The draw layer of the projectile
      */
+    public Projectile(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol, int drawLayer, float friction) {
+        super(spawnPos, (int) (diameter * 0.5f), 1f, drawLayer);
+        this.direction = direction;  // Calculate direction (scatter angle already applied by Barrel.java)
+        this.bulletStats = bulletStats;
+        this.host = hostBarrel.host;
+        this.group = host.group;  // Set group to host group (TODO: make a collision and damage group)
+        this.friction = friction;
+        updateStats();
+
+        // Drawing variables
+        this.fillCol = fillCol;
+        
+        this.strokeCol = strokeCol;
+        radius = diameter * 0.5f * bulletStats.sizeRatio;  // Multiply radius by bullet stats size ratio
+    }
+
     public Projectile(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol, int drawLayer) {
         super(spawnPos, (int) (diameter * 0.5f), 1f, drawLayer);
         this.direction = direction;  // Calculate direction (scatter angle already applied by Barrel.java)
         this.bulletStats = bulletStats;
         this.host = hostBarrel.host;
         this.group = host.group;  // Set group to host group (TODO: make a collision and damage group)
-
         updateStats();
 
         // Drawing variables
         this.fillCol = fillCol;
-        
+
         this.strokeCol = strokeCol;
         radius = diameter * 0.5f * bulletStats.sizeRatio;  // Multiply radius by bullet stats size ratio
     }

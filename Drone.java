@@ -8,9 +8,17 @@ public class Drone extends Projectile {
     boolean aiOn = false;  // Default to off
     protected float VIEW_RADIUS = 850;
 
+    // Drone with default friction
     public Drone(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
         // super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f, DrawPool.TOP_PROJECTILE);
-        super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol, DrawPool.TOP);
+        super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol, DrawPool.TOP, 0.968f);
+        this.hostBarrel = hostBarrel;  // Set the host barrel object
+        this.targetDirection = this.direction = direction;  // Set direction to normalized angle
+    }
+
+    public Drone(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol, float friction) {
+        // super(new Vector2(centerX + cannonLength * (float) Math.cos(direction), centerY + cannonLength * (float) Math.sin(direction)), (int) (diameter * 0.5f), bulletStats.absorbtionFactor, 4, 1f, DrawPool.TOP_PROJECTILE);
+        super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol, DrawPool.TOP, friction);
         this.hostBarrel = hostBarrel;  // Set the host barrel object
         this.targetDirection = this.direction = direction;  // Set direction to normalized angle
     }
@@ -62,12 +70,18 @@ public class Drone extends Projectile {
             if (closestTarget != null) {  // If there is a closest target
                 target = closestTarget;
             } else {  // If no target in range, set target to the tank pos
-                float scaleFactor = (12 - 17) / 7.f * host.stats.getStat(Stats.BULLET_SPEED) + 17;  // Linear regression, stat 0: 17, stat 7: 12
 
-                double radians = (scaleFactor) * acceleration * Math.toRadians(Main.counter) + id;  // Add id for a random offset
-                float rotationRadius = host.radius * host.scale * 2;
+                float velMax = getMaxSpeed();
+                float rotationRadius = host.radius * host.scale * (3f + velMax/15);  // When velocity is higher, increase rotation radius slightly
+                Vector2 circleCenter = new Vector2(host.pos.x + 60 * host.vel.x, host.pos.y + 60 * host.vel.y);
 
-                target = new Vector2(host.pos.x + rotationRadius * (float) Math.cos(radians), host.pos.y + rotationRadius * (float) Math.sin(radians));
+                // If drone is outside the rotation radius, set target to center first
+                if (Graphics.distance(pos, circleCenter) > rotationRadius) {
+                    target = circleCenter;
+                } else {
+                    double radians = (velMax / rotationRadius) * Main.counter + id;
+                    target = new Vector2(circleCenter.x + rotationRadius * (float) Math.cos(radians), circleCenter.y + rotationRadius * (float) Math.sin(radians));
+                }
             }
         } else {
             target = host.getTarget();
@@ -90,6 +104,15 @@ public class Drone extends Projectile {
         if (Main.onScreen(pos, radius * scale)) {  // Use larger radius for culling
             Graphics.drawTriangleRounded(pos, scaledRadius, direction, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(fillCol), opacity), Graphics.colAlpha(getDamageLerpColor(strokeCol), opacity));
         }
+
+        /*
+        float velMax = getMaxSpeed();
+        float rotationRadius = host.radius * host.scale * (3f);
+        // Debug for target circles
+        double radians = (velMax / rotationRadius) * Main.counter + id;
+        Vector2 circleCenter = new Vector2(host.pos.x + 60 * host.vel.x, host.pos.y + 60 * host.vel.y);
+        Graphics.drawCircle(circleCenter.x + rotationRadius * (float) Math.cos(radians), circleCenter.y + rotationRadius * (float) Math.sin(radians), 5, Color.RED, 1);
+        */
     }
 
     @Override

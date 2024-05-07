@@ -6013,7 +6013,7 @@
                     "sizeRatio": 0.7,
                     "health": 1,
                     "damage": 0.15,
-                    "speed": 1.33,
+                    "speed": 1,
                     "scatterRate": 1,
                     "lifeLength": 1.33,
                     "absorbtionFactor": 1
@@ -6037,7 +6037,7 @@
                     "sizeRatio": 0.7,
                     "health": 1,
                     "damage": 0.15,
-                    "speed": 1.33,
+                    "speed": 1,
                     "scatterRate": 1,
                     "lifeLength": 1.33,
                     "absorbtionFactor": 1
@@ -6061,7 +6061,7 @@
                     "sizeRatio": 0.7,
                     "health": 1,
                     "damage": 0.15,
-                    "speed": 1.33,
+                    "speed": 1,
                     "scatterRate": 1,
                     "lifeLength": 1.33,
                     "absorbtionFactor": 1
@@ -6085,7 +6085,7 @@
                     "sizeRatio": 0.7,
                     "health": 1,
                     "damage": 0.15,
-                    "speed": 1.33,
+                    "speed": 1,
                     "scatterRate": 1,
                     "lifeLength": 1.33,
                     "absorbtionFactor": 1

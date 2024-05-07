@@ -3,8 +3,8 @@ import com.raylib.java.raymath.Vector2;
 
 public class Swarm extends Drone {
     public Swarm(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol) {
-        super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol);
-        VIEW_RADIUS *= 2;
+        super(hostBarrel, spawnPos, direction, diameter, bulletStats, fillCol, strokeCol, 0.955f);
+        VIEW_RADIUS *= 2;  // Increase view radius to 2 * 850
     }
 
     @Override
@@ -22,15 +22,14 @@ public class Swarm extends Drone {
         float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
-
         // Calculate acceleration to converge to max speed
         this.acceleration = getMaxSpeed() * (1-friction);
-        float initialSpeed = getMaxSpeed() * 0.6f + (0 + Graphics.randf(-bulletStats.scatterRate, bulletStats.scatterRate)) * (1-friction)/(1-0.9f);
+        float initialSpeed = getMaxSpeed() + (15 + Graphics.randf(-bulletStats.scatterRate, bulletStats.scatterRate)) * (1-friction)/(1-0.9f);
         initialSpeed /= 3;
         vel = new Vector2(initialSpeed * (float) Math.cos(this.direction), initialSpeed * (float) Math.sin(this.direction));
 
         // Life length
-        lifeFrames = (bulletStats.lifeLength == -1) ? Integer.MAX_VALUE : Math.round(bulletStats.lifeLength * 72 * (120.f / 25));
+        lifeFrames = Math.round(bulletStats.lifeLength * 72 * (120.f / 25));
     }
 
 }

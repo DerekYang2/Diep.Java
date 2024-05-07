@@ -208,8 +208,10 @@ public abstract class GameObject implements Updatable, Drawable {
         if (isDead || other.isDead) {
             return;
         }
-        // https://www.desmos.com/calculator/p9tyewb18m
-        float knockbackMagnitude = absorptionFactor * other.pushFactor * 0.0245f;
+        // https://www.desmos.com/calculator/p9tyewb18m and https://www.desmos.com/calculator/julb0fev5e
+        float scaleFactor = -1.96251f * friction + 1.96557f;
+
+        float knockbackMagnitude = absorptionFactor * other.pushFactor * scaleFactor;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
         if (diffX == 0 && diffY == 0) {  // If objects are perfectly stacked
             diffX = (float)Math.random() + 0.1f;  // Randomize

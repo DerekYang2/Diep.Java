@@ -3,10 +3,6 @@ import com.raylib.java.core.input.Keyboard;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
-import com.raylib.java.textures.Texture2D;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Main {
     final public static float GRID_SIZE = 50;
@@ -19,8 +15,6 @@ public class Main {
     public static HashPool<GameObject> gameObjectPool;
     public static IdServer idServer;
     public static Stopwatch globalClock;
-    public static HashMap<Color, HashMap<String, Texture2D>> tankTextures;
-    public static ArrayList<Tank> pendingTankTexture = new ArrayList<>();  // TODO: move to new class
     static Tank player;
 
     // Variables for game reset
@@ -44,7 +38,6 @@ public class Main {
         drawablePool = new DrawPool();
         gameObjectPool = new HashPool<>();
         idServer = new IdServer();
-        tankTextures = new HashMap<>();
         lastReset.start();
         startGame();
     }
@@ -55,11 +48,8 @@ public class Main {
         globalClock.start();
         drawablePool.clear();
         gameObjectPool.clear();
-
-        pendingTankTexture.clear();
-        clearTextures();
-        
         idServer.reset();
+        TextureLoader.clear();
 
         int spawn = 30;
         // Set arena size
@@ -191,36 +181,6 @@ public class Main {
         drawablePool.drawAll();
     }
 
-    private static void insertTankTexture(String buildName, Color fillCol, Color strokeCol) {
-        if (!tankTextures.containsKey(fillCol)) {  // If fill color not in map, add it
-            tankTextures.put(fillCol, new HashMap<>());
-        }
-        if (!tankTextures.get(fillCol).containsKey(buildName)) {  // If build name not in sub-map, add it
-            tankTextures.get(fillCol).put(buildName, Graphics.createTankTexture(buildName, fillCol, strokeCol));
-        }
-    }
-
-    public static void refreshTankTextures() {
-        for (Tank tank : pendingTankTexture) {
-            String buildName = tank.tankBuild.name;
-            switch (buildName) {
-                case "auto gunner" -> insertTankTexture("gunner", tank.fillCol, tank.strokeCol);
-                case "auto trapper" -> insertTankTexture("trapper", tank.fillCol, tank.strokeCol);
-                default -> insertTankTexture(buildName, tank.fillCol, tank.strokeCol);
-            }
-        }
-        pendingTankTexture.clear();
-    }
-
-    public static void clearTextures() {
-        for (HashMap<String, Texture2D> map : tankTextures.values()) {
-            for (Texture2D texture : map.values()) {
-                Graphics.unloadTexture(texture);
-            }
-        }
-        tankTextures.clear();
-    }
-
     public static void main(String[] args) {
         initialize();
 
@@ -230,7 +190,6 @@ public class Main {
         {
             // Update
             //----------------------------------------------------------------------------------
-            refreshTankTextures();
             if (pendingReset) {
                 startGame();
                 pendingReset = false;
@@ -240,6 +199,7 @@ public class Main {
                 Graphics.updateMouse();
                 update();
             }
+            TextureLoader.refreshTankTextures();
             // Draw
             //----------------------------------------------------------------------------------
             Graphics.beginDrawMode();
@@ -259,6 +219,7 @@ public class Main {
 
         // De-Initialization
         //--------------------------------------------------------------------------------------
+        TextureLoader.clear();
         Graphics.close();
     }
 }

@@ -12,8 +12,10 @@ public class TankImage extends Tank {
     public void addToPools() {}
 
     @Override
+    public void createId() {}
+
+    @Override
     public void delete() {
-        Main.idServer.returnId(this.getId());
         if (healthBar != null) healthBar.delete();
     }
 }

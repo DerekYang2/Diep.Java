@@ -146,9 +146,9 @@ public class Barrel {
         if (isTrapezoid) {
             Graphics.drawTurretTrapezoid(xleft, ycenter, length, width, radians, Graphics.strokeWidth, directHost().getDamageLerpColor(this.fillCol), directHost().getDamageLerpColor(this.strokeCol), (float)Math.pow(directHost().opacity, 4), flippedTrapezoid);
         } else if (isTrapper) {
-            Graphics.drawTrapperTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, directHost().getDamageLerpColor(this.fillCol), directHost().getDamageLerpColor(this.strokeCol), (float) Math.pow(directHost().opacity, 4));  // Square getHost().opacity for a steeper curve (x^4)
+            Graphics.drawTrapperTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, directHost().getDamageLerpColor(this.fillCol), directHost().getDamageLerpColor(this.strokeCol), (float)Math.pow(directHost().opacity, 4));  // Square getHost().opacity for a steeper curve (x^4)
         } else {
-            Graphics.drawTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, directHost().getDamageLerpColor(this.fillCol), directHost().getDamageLerpColor(this.strokeCol), (float) Math.pow(directHost().opacity, 4));  // Square host.opacity for a steeper curve (x^4)
+            Graphics.drawTurret(xleft, ycenter, length, width, radians, Graphics.strokeWidth, directHost().getDamageLerpColor(this.fillCol), directHost().getDamageLerpColor(this.strokeCol), (float)Math.pow(directHost().opacity, 4));  // Square host.opacity for a steeper curve (x^4)
         }
     }
 
@@ -224,4 +224,9 @@ public class Barrel {
         return new Vector2((float) (pos.x + xAbsolute + Math.cos(angleAbsolute) * turretLength), (float) (pos.y + yAbsolute + Math.sin(angleAbsolute) * turretLength));
     }
 
+    public void setPos(Vector2 pos) {
+        // Redraw Turret in new position
+        xAbsolute = pos.x;
+        yAbsolute = pos.y;
+    }
 }

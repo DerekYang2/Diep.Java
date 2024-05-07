@@ -24,7 +24,7 @@ public class TankBuild
     AddOn addOn;
 
     // Invisibility variables
-    float min_movement = 0.23f * 25/120;  // Minimum movement speed to be visible
+    float min_movement = 0.4f;  // Minimum movement speed to be visible
     boolean isInvisible;  // Whether the tank can turn invisible
     float visibilityRateShooting;  // Rate of visibility increase when shooting
     float visibilityRateMoving;  // Rate of visibility increase when moving
@@ -84,9 +84,6 @@ public class TankBuild
     public void updateFire(boolean isFiring) {
         fireManager.setFiring(isFiring);
         ArrayList<Integer> fireIndices = fireManager.getFireIndices();
-        if (!fireIndices.isEmpty()) {
-            host.addOpacity(visibilityRateShooting);  // Increase opacity if shooting
-        }
         for (int i : fireIndices) {
             pendingRecoil[i] = barrels[i].shoot();
         }
@@ -113,6 +110,15 @@ public class TankBuild
     public void addOnDrawAfter() {
         if (addOn != null) {
             addOn.drawAfter();
+        }
+    }
+
+    public void setPos(Vector2 pos) {
+        for (Barrel barrel : barrels) {
+            barrel.setPos(pos);
+        }
+        if (addOn != null) {
+            addOn.setPos(pos);
         }
     }
 

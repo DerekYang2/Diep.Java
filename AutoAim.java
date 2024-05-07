@@ -2,7 +2,7 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 import java.util.HashSet;
-
+// TODO: when fighting manager or just drones in general, if not tank targets in sight, should shoot drones
 public class AutoAim {
     // AI Functions Below
 
@@ -61,7 +61,7 @@ public class AutoAim {
             GameObject obj = Main.gameObjectPool.getObj(id);
             float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
 
-            if (obj.group == group || obj.isProjectile || distSquared > radius * radius) {  // If same group or projectile OR too far, skip
+            if (obj.group == group || obj.isProjectile || distSquared > radius * radius || obj.isInvisible()) {  // If same group or projectile OR too far, skip
                 continue;
             }
 
@@ -100,7 +100,7 @@ public class AutoAim {
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
 
-            if (obj.group == group || obj.isProjectile) {  // If same group or projectile OR not in view, skip
+            if (obj.group == group || obj.isProjectile || obj.isInvisible()) {  // If same group or projectile OR not in view, skip
                 continue;
             }
             Rectangle boundingBox = obj.boundingBox();
@@ -133,7 +133,7 @@ public class AutoAim {
 
             float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
 
-            if (obj.group == group || obj.isProjectile || Graphics.distanceSq(sourcePos, obj.pos) > radius * radius) {  // If same group or projectile OR too far, skip
+            if (obj.group == group || obj.isProjectile || Graphics.distanceSq(sourcePos, obj.pos) > radius * radius || obj.isInvisible()) {  // If same group or projectile OR too far, skip
                 continue;
             }
 
@@ -160,7 +160,7 @@ public class AutoAim {
         Integer closestId = null;  // Set to null if no target found
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
-            if (obj.group == group || obj.isProjectile) {  // If same group or projectile OR not in view, skip
+            if (obj.group == group || obj.isProjectile || obj.isInvisible()) {  // If same group or projectile OR not in view, skip
                 continue;
             }
             Rectangle boundingBox = obj.boundingBox();

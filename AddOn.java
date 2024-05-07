@@ -10,6 +10,10 @@ public abstract class AddOn {
     public abstract void drawBefore();
     public abstract void drawMiddle();
     public abstract void drawAfter();
+    public abstract float maxRadius();  // Maximum radius of add-on
+    public void setPos(Vector2 pos) {
+
+    }
     public static AddOn createAddOn(String name) {
         return switch (name) {
             case "spike" -> new SpikeAddOn();
@@ -22,7 +26,7 @@ public abstract class AddOn {
             case "auto3" -> new AutoNAddOn(3);
             case "pronounced" -> new PronouncedAddOn();
             case "launcher" -> new LauncherAddOn();
-            case "glider" -> new GliderAddOn();
+            case "glider" -> new InvertedLauncherAddOn();
             default -> null;
         };
     }
@@ -43,7 +47,7 @@ class SpikeAddOn extends AddOn {
     @Override
     public void drawBefore() {
         final float radius = host.radius * host.scale, scaledRadius = radius * 0.707f * 0.92f;  // scale is always 1 until death animation
-        if (Main.onScreen(host.pos, radius * 1.1f)) {  // Use larger radius for culling
+        if (Main.onScreen(host.pos, maxRadius())) {  // Use larger radius for culling
             final Color fillCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY), (float) Math.pow(host.opacity, 4)), strokeCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(host.opacity, 4));
             Graphics.drawTriangleRounded(host.pos, scaledRadius, offsetRadians, Graphics.strokeWidth, fillCol, strokeCol);
             Graphics.drawTriangleRounded(host.pos, scaledRadius, offsetRadians + (float) (Math.PI/3), Graphics.strokeWidth, fillCol, strokeCol);
@@ -60,6 +64,12 @@ class SpikeAddOn extends AddOn {
         //final float radius = tank.radius * tank.scale, scaledRadius = radius * 0.707f * 0.92f;  // scale is always 1 until death animation
         //final Color fillCol = Graphics.colAlpha(tank.getDamageLerpColor(Graphics.DARK_GREY), (float) Math.pow(tank.opacity, 4)), strokeCol = Graphics.colAlpha(tank.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(tank.opacity, 4));
         //Graphics.drawTriangleRounded(tank.pos, scaledRadius, 0, Graphics.strokeWidth, fillCol, strokeCol);
+    }
+
+    // From circumcenter to vertex of equilateral triangle
+    @Override
+    public float maxRadius() {
+        return 2 * (host.radius * host.scale * 0.707f * 0.92f);
     }
 }
 
@@ -89,6 +99,11 @@ class SmasherAddOn extends AddOn {
 
     @Override
     public void drawAfter() {}
+
+    @Override
+    public float maxRadius() {
+        return (host.radius * host.scale) * 1.15f;
+    }
 }
 
 class LandmineAddOn extends AddOn {
@@ -120,6 +135,11 @@ class LandmineAddOn extends AddOn {
 
     @Override
     public void drawAfter() {}
+
+    @Override
+    public float maxRadius() {
+        return (host.radius * host.scale) * 1.15f;
+    }
 }
 
 class DominatorAddOn extends AddOn {
@@ -150,6 +170,11 @@ class DominatorAddOn extends AddOn {
 
     @Override
     public void drawAfter() {}
+
+    @Override
+    public float maxRadius() {
+        return (host.radius * host.scale) * 1.24f;
+    }
 }
 
 class AutoTurretAddOn extends AddOn {
@@ -192,6 +217,16 @@ class AutoTurretAddOn extends AddOn {
     public void drawAfter() {
         autoTurret.draw();
     }
+
+    @Override
+    public float maxRadius() {
+        return host.scale * host.radius + autoTurret.barrel.getTurretLength();
+    }
+
+    @Override
+    public void setPos(Vector2 pos) {
+        autoTurret.setPos(pos);
+    }
 }
 
 class AutoSmasherAddOn extends AutoTurretAddOn {
@@ -227,7 +262,7 @@ class AutoNAddOn extends AddOn {
     int numTurrets;
     float offsetRadians;
     final float radPerTick = 0.01f * 25/120;  // Rotation of turret, 0.01 radian per tick (25 ticks per second)
-    final double rangeRad = Math.toRadians(175);  // Range of turret
+    final double rangeRad = Math.toRadians(170);  // Range of turret
 
     public AutoNAddOn(int numTurrets) {
         this.numTurrets = numTurrets;
@@ -250,6 +285,17 @@ class AutoNAddOn extends AddOn {
 
             autoTurrets[i] = new AutoTurret(tank, barrel, fireManager);
         }
+
+        offsetRadians = 0;
+        // Set relative positions
+        float radiusScaled = host.radius * host.scale * 0.8f;
+        for (int i = 0; i < numTurrets; i++) {
+            double angle = offsetRadians + (2*Math.PI/numTurrets) * i;
+            float offsetX = (float) (radiusScaled * Math.cos(angle));
+            float offsetY = (float) (radiusScaled * Math.sin(angle));
+            autoTurrets[i].setOffset(new Vector2(offsetX, offsetY), rangeRad);
+            autoTurrets[i].direction = (float)Math.atan2(offsetY, offsetX);
+        }
     }
 
     @Override
@@ -265,7 +311,7 @@ class AutoNAddOn extends AddOn {
 
         // Update and shoot
         for (AutoTurret autoTurret : autoTurrets) {
-            autoTurret.update(host.pos);  // Call update function and set absoulte position
+            autoTurret.update(host.pos);  // Call update function and set absolute position
             autoTurret.shoot(DrawPool.BOTTOM);  // Shoot at bottom layer
         }
     }
@@ -279,6 +325,18 @@ class AutoNAddOn extends AddOn {
     public void drawMiddle() {}
     @Override
     public void drawAfter() {}
+
+    @Override
+    public float maxRadius() {
+        return host.scale * host.radius + autoTurrets[0].barrel.getTurretLength();
+    }
+
+    @Override
+    public void setPos(Vector2 pos) {
+        for (AutoTurret autoTurret : autoTurrets) {
+            autoTurret.setPos(pos);
+        }
+    }
 }
 
 class PronouncedAddOn extends AddOn {
@@ -298,6 +356,11 @@ class PronouncedAddOn extends AddOn {
     }
     @Override
     public void drawAfter() {}
+
+    @Override
+    public float maxRadius() {
+        return (host.radius * host.scale);
+    }
 }
 
 // TODO: add culling to add-ons below
@@ -318,10 +381,18 @@ class LauncherAddOn extends AddOn {
     public void drawAfter() {
         //drawBefore();
     }
+
+    @Override
+    public float maxRadius() {
+        return (host.radius * host.scale) * (3.1f / 5 + 1.2f);
+    }
+
+    @Override
+    public void setPos(Vector2 pos) {}
 }
 
-class GliderAddOn extends AddOn {
-    public GliderAddOn() {}
+class InvertedLauncherAddOn extends AddOn {
+    public InvertedLauncherAddOn() {}
     @Override
     public void update() {}
     @Override
@@ -335,5 +406,10 @@ class GliderAddOn extends AddOn {
     @Override
     public void drawAfter() {
         //drawBefore();
+    }
+
+    @Override
+    public float maxRadius() {
+        return (host.radius * host.scale) * (3.1f / 5 + 1.2f);
     }
 }

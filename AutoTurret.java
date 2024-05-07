@@ -24,6 +24,8 @@ public class AutoTurret {
         offset = new Vector2(0, 0);
         range = 2 * Math.PI; // Default range is 360 degrees
         // bulletStats.scatterRate = 0; // Test for accuracy
+
+        this.pos = host.pos;
     }
 
     public void setOffset(Vector2 offset, double range) {
@@ -76,5 +78,10 @@ public class AutoTurret {
 
     public Vector2 getAbsPos() {
         return new Vector2(pos.x + offset.x, pos.y + offset.y);
+    }
+
+    public void setPos(Vector2 pos) {
+        this.pos = pos;
+        barrel.setPos(getAbsPos());
     }
 }

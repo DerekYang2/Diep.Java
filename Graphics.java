@@ -56,6 +56,7 @@ public class Graphics extends Raylib {
         return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
     }
 
+
     public static void initialize(String title) {
         // First get environment setup
         getEnvironmentVariables();
@@ -332,16 +333,20 @@ public class Graphics extends Raylib {
         rlj.text.DrawText(rCore.GetFPS() + " FPS", x, y, fontSize, color);
     }
 
-    public static void drawTextureCentered(Texture2D texture, Vector2 position, float width, float height) {
+/*    private static void drawTextureCenteredHelper(Texture2D texture, Vector2 position, float width, float height) {
         float scale = Math.min(width / texture.width, height / texture.height);
         float tWidth = texture.width * scale, tHeight = texture.height * scale;
         rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), 0, scale, Color.WHITE);
-    }
+    }*/
 
-    public static void drawTextureCentered(Texture2D texture, Vector2 position, float width, float height, Color tint) {
+    private static void drawTextureCenteredHelper(Texture2D texture, Vector2 position, float width, float height, Color tint) {
         float scale = Math.min(width / texture.width, height / texture.height);
         float tWidth = texture.width * scale, tHeight = texture.height * scale;
         rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), 0, scale, tint);
+    }
+
+    public static void drawTextureCentered(Texture2D texture, Vector2 position, double radians, float scale, Color tint) {
+        rTextures.DrawTexturePro(texture, new Rectangle(0, 0, texture.width, texture.height), new Rectangle(position.x, position.y, texture.width * scale, texture.height * scale), new Vector2(texture.width * scale * 0.5f, texture.height * scale * 0.5f), (float)Math.toDegrees(radians), tint);
     }
 
     public static void drawRectangle(Rectangle rect, Color color) {
@@ -475,14 +480,13 @@ public class Graphics extends Raylib {
 
     public static void drawCircleTexture(float x, float y, float radius, float stroke, Color color, Color strokeColor, float opacity) {
         if (ANTIALIASING == 1) {
-            Graphics.drawTextureCentered(circle, new Vector2(x, y), (radius) * 2, (radius) * 2, colAlpha(strokeColor, opacity));
-            Graphics.drawTextureCentered(circleNoAA, new Vector2(x, y), (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, colAlpha(color, opacity));
+            Graphics.drawTextureCenteredHelper(circle, new Vector2(x, y), (radius) * 2, (radius) * 2, colAlpha(strokeColor, opacity));
+            Graphics.drawTextureCenteredHelper(circleNoAA, new Vector2(x, y), (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, colAlpha(color, opacity));
         } else {
             // drawCircle(x, y, radius, stroke, lerpColorGrid(color, opacity), lerpColorGrid(strokeColor, opacity), 1);  // For lerp
             drawCircle(x, y, radius, stroke, color, strokeColor, opacity);
         }
     }
-
 
     public static void drawLine(float x1, float y1, float x2, float y2, float stroke, Color color) {
         rlj.shapes.DrawLineEx(new Vector2(x1, y1), new Vector2(x2, y2), stroke, color);
@@ -491,6 +495,56 @@ public class Graphics extends Raylib {
     public static void drawText(String text, int x, int y, int fontSize, Color color) {
         rlj.text.DrawText(text, x, y, fontSize, color);
     }
+
+    public static Texture2D createTankTexture(String buildName, Color fillCol, Color strokeCol) {
+        TankImage tank = new TankImage(0, 0, buildName, fillCol, strokeCol);
+        // Get max barrel length
+        float textureSize = (int) (2 * (tank.radius*tank.scale + tank.tankBuild.maxBarrelLength()));
+        if (tank.tankBuild.addOn != null) {
+            textureSize = Math.max(textureSize, 2 * tank.tankBuild.addOn.maxRadius());
+        }
+        textureSize *= 1.01f;  // Add some padding
+
+        RenderTexture tankTex = rlj.textures.LoadRenderTexture((int) textureSize, (int) textureSize);
+
+        tank.setPos(new Vector2(textureSize * 0.5f, textureSize * 0.5f));
+        tank.tankBuild.update();  // Still update after death so turret positions are updated
+
+        rlj.core.BeginDrawing();
+        rlj.core.ClearBackground(rgba(0, 0, 0, 0));
+        rlj.core.BeginTextureMode(tankTex);
+        tank.draw();
+        rlj.core.EndTextureMode();
+        rlj.core.EndDrawing();
+        tank.delete();
+        return tankTex.texture;
+    }
+
+    public static Texture2D createTankTexture(Tank tank) {
+        // Get max barrel length
+        float textureSize = (int) (2 * (tank.radius*tank.scale + tank.tankBuild.maxBarrelLength()));
+        if (tank.tankBuild.addOn != null) {
+            textureSize = Math.max(textureSize, 2 * tank.tankBuild.addOn.maxRadius());
+        }
+        textureSize *= 1.05f;  // Add some padding
+
+        RenderTexture tankTex = rlj.textures.LoadRenderTexture((int) textureSize, (int) textureSize);
+
+        Vector2 originalPos = tank.pos;
+        tank.setPos(new Vector2(textureSize * 0.5f, textureSize * 0.5f));
+
+        rlj.core.BeginDrawing();
+        rlj.core.BeginTextureMode(tankTex);
+        tank.draw();
+        rlj.core.EndTextureMode();
+        rlj.core.EndDrawing();
+
+        tank.setPos(originalPos);
+        Texture2D tankTexture = tankTex.texture;
+        rlj.textures.UnloadRenderTexture(tankTex);
+        return tankTexture;
+    }
+
 
     // Math -------------------------------------------------------------------------------------------
     private static void ClampValue(Vector2 value, Vector2 min, Vector2 max) {

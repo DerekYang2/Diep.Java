@@ -1,3 +1,4 @@
+import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
@@ -91,10 +92,7 @@ public class Tank extends GameObject {
         if (tankBuild.isInvisible) {  // If tank can turn invisible
             addOpacity(-tankBuild.invisibilityRate);  // Decrease opacity
             addOpacity((Graphics.length(vel) > tankBuild.min_movement || damageAnimationFrames > 0) ? tankBuild.visibilityRateMoving : 0);  // Increase opacity if moving or taking damage
-            if (healthBar != null) {
-                // If between invisible and visible, hide health bar
-                healthBar.triggerHidden(opacity < 1 || health >= maxHealth);
-            }
+            addOpacity(isFiring() ? tankBuild.visibilityRateShooting : 0);  // Increase opacity if shooting
         }
 
         // Health updates
@@ -126,20 +124,40 @@ public class Tank extends GameObject {
         tankBuild.updateFire(isFiring());
     }
 
+    public void setPos(Vector2 pos) {
+        this.pos = pos;
+        tankBuild.setPos(pos);
+    }
+
     @Override
     public void draw() {
-        tankBuild.addOnDrawBefore();
-        tankBuild.draw(); // Draw Turrets
-        tankBuild.addOnDrawMiddle();
+        String tankName = tankBuild.name;
+        // If landmine or auto, do not use texture to draw transparent tank
+        if (opacity >= 0.98 || tankName.equals("landmine") || tankName.equals("auto 3") || tankName.equals("auto 5") || tankName.equals("auto smasher")) {
+            tankBuild.addOnDrawBefore();
+            tankBuild.draw(); // Draw Turrets
+            tankBuild.addOnDrawMiddle();
 
-//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
-//        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
-
-        if (Main.onScreen(pos, radius*scale)) {
-            Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
+    //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
+    //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
+            if (Main.onScreen(pos, radius*scale)) {
+                Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
+            }
+            tankBuild.addOnDrawAfter();
+        } else {
+            float originalScale = (float)Math.pow(1.01, (level - 1));
+            if (Main.onScreen(pos, radius*scale)) {
+                if (tankName.equals("auto gunner")) {
+                    Graphics.drawTextureCentered(Main.tankTextures.get(fillCol).get("gunner"), pos, direction, scale/originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
+                    tankBuild.addOnDrawAfter();
+                } else if (tankName.equals("auto trapper")) {
+                  Graphics.drawTextureCentered(Main.tankTextures.get(fillCol).get("trapper"), pos, direction, scale/originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
+                    tankBuild.addOnDrawAfter();
+                } else {
+                    Graphics.drawTextureCentered(Main.tankTextures.get(fillCol).get(tankName), pos, direction, scale / originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
+                }
+            }
         }
-
-        tankBuild.addOnDrawAfter();
     }
 
     public void addOpacity(float opacityChange) {

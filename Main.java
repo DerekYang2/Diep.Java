@@ -3,6 +3,9 @@ import com.raylib.java.core.input.Keyboard;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
+import com.raylib.java.textures.Texture2D;
+
+import java.util.HashMap;
 
 public class Main {
     final public static float GRID_SIZE = 50;
@@ -15,7 +18,7 @@ public class Main {
     public static HashPool<GameObject> gameObjectPool;
     public static IdServer idServer;
     public static Stopwatch globalClock;
-
+    public static HashMap<Color, HashMap<String, Texture2D>> tankTextures;
     static Tank player;
 
     // Variables for game reset
@@ -55,14 +58,15 @@ public class Main {
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2);
         // new TestObj();
-        player = new Player(new Vector2(0,0), "manager");
+        player = new Player(new Vector2(0,0), "stalker");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
-            buildName = "streamliner";
+            buildName = "overlord";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
             t.group = -1;
         }
         Graphics.setCameraTarget(player.pos);
+        cameraBox = Graphics.getCameraWorld();
         counter = 0;
     }
 
@@ -180,8 +184,23 @@ public class Main {
         drawablePool.drawAll();
     }
 
+
+    public static void initializeTankTextures() {
+        tankTextures = new HashMap<>();
+        tankTextures.put(Graphics.BLUE, new HashMap<>());
+        tankTextures.put(Graphics.RED, new HashMap<>());
+        for (String tankName : TankBuild.tankDefinitions.keySet()) {
+            tankName = tankName.toLowerCase();
+            tankTextures.get(Graphics.BLUE).put(tankName, Graphics.createTankTexture(tankName, Graphics.BLUE, Graphics.BLUE_STROKE));
+            tankTextures.get(Graphics.RED).put(tankName, Graphics.createTankTexture(tankName, Graphics.RED, Graphics.RED_STROKE));
+        }
+    }
+
+
     public static void main(String[] args) {
         initialize();
+        initializeTankTextures();
+
         //--------------------------------------------------------------------------------------
         // Main game loop
         while (!Graphics.shouldWindowClose())    // Detect window close button or ESC key
@@ -201,7 +220,6 @@ public class Main {
             //----------------------------------------------------------------------------------
             Graphics.beginDrawMode();
             Graphics.drawBackground(Graphics.GRID);
-
             Graphics.drawFPS(10, 10, 20, Color.BLACK);
             // Graphics.drawText("Number of objects: " + gameObjectPool.getObjects().size(), 10, 25, 20, Color.BLACK);
             Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
@@ -210,7 +228,7 @@ public class Main {
             Graphics.beginCameraMode();
 
             draw();  // Main draw function
-
+            //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(0, 0), Math.PI/4, 1, Color.WHITE);
             Graphics.endCameraMode();
             Graphics.endDrawMode();
         }

@@ -33,6 +33,7 @@ public class Main {
 
     public static void initialize() {
         Graphics.initialize("DiepJava");
+        ScoreHandler.initialize();
         TankBuild.loadTankDefinitions();  // Load tank definitions from TankDefinitions.json
         globalClock = new Stopwatch();
         drawablePool = new DrawPool();

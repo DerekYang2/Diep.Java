@@ -13,6 +13,7 @@ public abstract class GameObject implements Updatable, Drawable {
     boolean keepInArena = true;  // Object does not go out of the arena
     boolean isProjectile;  // If object is projectile, used for collision cases
 
+    // Technical physics
     protected Vector2 pos, vel;
     float friction = 0.988f;  // default: 0.9^(25/120)
     protected int id;
@@ -326,6 +327,8 @@ public abstract class GameObject implements Updatable, Drawable {
     protected boolean sameGroupCollision(GameObject other) {
         return false;
     }
+
+    protected abstract float getScoreReward();
 
     @Override
     public void createId() {

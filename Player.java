@@ -1,5 +1,7 @@
 import com.raylib.java.raymath.Vector2;
 
+import static com.raylib.java.core.input.Keyboard.KEY_K;
+
 public class Player extends Tank {
     public Player(Vector2 spawn, String buildName) {
         super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5));
@@ -15,6 +17,12 @@ public class Player extends Tank {
     boolean crossedFinish = false;
 
     @Override
+    public void updateLevel() {
+        super.updateLevel();
+        Graphics.setZoom(this.tankBuild.fieldFactor, level);
+    }
+
+    @Override
     public void update() {
         super.update();
 
@@ -27,6 +35,12 @@ public class Player extends Tank {
         if (pos.x > Main.arenaWidth - Main.ARENA_PADDING && !crossedFinish) {
             System.out.format("Time: %.2f\n", debug.s());
             crossedFinish = true;
+        }
+
+        if (Graphics.isKeyDown(KEY_K)) {
+            score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) - score, 23000.f/(2 * 120)));  // 2 seconds
+            score = Math.min(score, ScoreHandler.levelToScore(45));
+            System.out.println(score);
         }
     }
 

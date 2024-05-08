@@ -79,4 +79,9 @@ public abstract class Projectile extends GameObject {
             triggerDelete();
         }
     }
+
+    @Override
+    protected float getScoreReward() {
+        return 0;
+    }
 }

@@ -8,7 +8,8 @@ import com.raylib.java.shapes.Rectangle;
  */
 
 public class Tank extends GameObject {
-    int level = 45;
+    float score = 0;
+    int level = 0;
     // 54.7766480515
     public Stats stats;
     float direction = 0;
@@ -75,6 +76,10 @@ public class Tank extends GameObject {
         healthBar.setWidth(radius * scale * 2);
     }
 
+    public void updateLevel() {
+        updateStats();
+    }
+
     protected void setDirection(double radians) {
         direction = (float) radians;
     }
@@ -122,6 +127,17 @@ public class Tank extends GameObject {
         // Update all turrets
         tankBuild.update();
         tankBuild.updateFire(isFiring());
+
+        // Update level
+        int newLevel = level;
+        while (level < ScoreHandler.maxPlayerLevel && score > ScoreHandler.levelToScore(newLevel + 1)) {  // If score is enough to level up
+            newLevel++;
+        }
+
+        if (newLevel != level) {
+            level = newLevel;
+            updateLevel();
+        }
     }
 
     public void setPos(Vector2 pos) {
@@ -184,6 +200,11 @@ public class Tank extends GameObject {
     public void receiveDamage(float damage) {
         super.receiveDamage(damage);
         lastDamageFrame = Main.counter;
+    }
+
+    @Override
+    protected float getScoreReward() {
+        return score;
     }
 
     public Vector2 getTarget() {

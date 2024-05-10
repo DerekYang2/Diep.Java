@@ -51,8 +51,7 @@ public class Player extends Tank {
         }
 
         if (Graphics.isKeyDown(KEY_K)) {
-            score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) - score, 23000.f/(2 * 120)));  // 2 seconds
-            score = Math.min(score, ScoreHandler.levelToScore(45));
+            score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) + 0.01f - score, 23000.f/(2 * 120)));  // 2 seconds
         }
     }
 

@@ -281,6 +281,13 @@ public abstract class GameObject implements Updatable, Drawable {
             a.receiveDamage(bDamage);
             b.receiveDamage(aDamage);
         }
+
+        if (a.isDead) {  // B killed A
+            b.updateVictim(a);
+        }
+        if (b.isDead) {  // A killed B
+            a.updateVictim(b);
+        }
     }
 
     /**
@@ -317,6 +324,8 @@ public abstract class GameObject implements Updatable, Drawable {
             b.receiveDamage(scaleDown * aDamage);
         }
     }
+
+    public void updateVictim(GameObject victim) {}
 
     /**
      * A custom method to override

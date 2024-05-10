@@ -8,8 +8,8 @@ import com.raylib.java.shapes.Rectangle;
  */
 
 public class Tank extends GameObject {
-    float score = 0;
-    int level = 0;
+    float score;
+    int level;
     // 54.7766480515
     public Stats stats;
     float direction = 0;
@@ -26,8 +26,10 @@ public class Tank extends GameObject {
     Stopwatch autoFireWatch = new Stopwatch();
 
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
-    public Tank(Vector2 pos, Controller controller, Stats stats) {
+    public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
         super(pos, 50, 1.f, DrawPool.MIDDLE);
+        this.level = level;
+        score = ScoreHandler.levelToScore(level);
         setCollisionFactors(1, 8);
         initHealthBar();  // Initialize health bar object
 
@@ -77,7 +79,16 @@ public class Tank extends GameObject {
     }
 
     public void updateLevel() {
-        updateStats();
+        // Update level
+        int newLevel = level;
+        while (newLevel < ScoreHandler.maxPlayerLevel && score > ScoreHandler.levelToScore(newLevel + 1)) {  // If score is enough to level up
+            newLevel++;
+        }
+
+        if (newLevel != level) {
+            level = newLevel;
+            updateStats();
+        }
     }
 
     protected void setDirection(double radians) {
@@ -129,15 +140,7 @@ public class Tank extends GameObject {
         tankBuild.updateFire(isFiring());
 
         // Update level
-        int newLevel = level;
-        while (level < ScoreHandler.maxPlayerLevel && score > ScoreHandler.levelToScore(newLevel + 1)) {  // If score is enough to level up
-            newLevel++;
-        }
-
-        if (newLevel != level) {
-            level = newLevel;
-            updateLevel();
-        }
+        updateLevel();
     }
 
     public void setPos(Vector2 pos) {
@@ -161,7 +164,7 @@ public class Tank extends GameObject {
             }
             tankBuild.addOnDrawAfter();
         } else {
-            float originalScale = (float)Math.pow(1.01, (level - 1));
+            float originalScale = (float)Math.pow(1.01, (45 - 1));
             if (Main.onScreen(pos, radius*scale)) {
                 switch (tankName) {
                     case "auto gunner" -> {
@@ -205,6 +208,11 @@ public class Tank extends GameObject {
     @Override
     protected float getScoreReward() {
         return score;
+    }
+
+    @Override
+    public void updateVictim(GameObject victim) {
+        score += victim.getScoreReward();
     }
 
     public Vector2 getTarget() {

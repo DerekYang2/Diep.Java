@@ -84,4 +84,9 @@ public abstract class Projectile extends GameObject {
     protected float getScoreReward() {
         return 0;
     }
+
+    @Override
+    public void updateVictim(GameObject victim) {
+        host.updateVictim(victim);
+    }
 }

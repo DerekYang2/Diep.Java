@@ -208,6 +208,7 @@ public class Main {
             Graphics.drawFPS(10, 10, 20, Color.BLACK);
             // Graphics.drawText("Number of objects: " + gameObjectPool.getObjects().size(), 10, 25, 20, Color.BLACK);
             Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
+            Graphics.drawText(String.format("Score: %d\tLevel: %d", (int)player.score, (int)player.level), 10, 60, 20, Color.BLACK);
 
             drawGrid();
             Graphics.beginCameraMode();

@@ -3,12 +3,16 @@ import com.raylib.java.raymath.Vector2;
 import static com.raylib.java.core.input.Keyboard.KEY_K;
 
 public class Player extends Tank {
+    float currentZoom;
+    float targetZoom;
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5));
+        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5), 20);
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         setTankBuild(TankBuild.createTankBuild(buildName));
-        Graphics.setZoom(this.tankBuild.fieldFactor, level);  // Set zoom level, remember to call on level and tank build change
         TextureLoader.pendingAdd(this);
+
+        currentZoom = targetZoom = getZoom();
+        Graphics.setZoom(currentZoom);
     }
 
     // For timing speed
@@ -19,12 +23,21 @@ public class Player extends Tank {
     @Override
     public void updateLevel() {
         super.updateLevel();
-        Graphics.setZoom(this.tankBuild.fieldFactor, level);
+        targetZoom = getZoom();
+    }
+
+    protected float getZoom() {
+        return (float) ((.55f * this.tankBuild.fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f));
     }
 
     @Override
     public void update() {
         super.update();
+
+        if (Math.abs(targetZoom - currentZoom) > 1e-3) {
+            currentZoom += (targetZoom - currentZoom) * 0.1f;
+            Graphics.setZoom(currentZoom);
+        }
 
         if (pos.x > Main.ARENA_PADDING && !startedRace) {
             System.out.println("Started");
@@ -40,7 +53,6 @@ public class Player extends Tank {
         if (Graphics.isKeyDown(KEY_K)) {
             score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) - score, 23000.f/(2 * 120)));  // 2 seconds
             score = Math.min(score, ScoreHandler.levelToScore(45));
-            System.out.println(score);
         }
     }
 

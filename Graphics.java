@@ -264,6 +264,10 @@ public class Graphics extends Raylib {
         camera.setZoom((float) ((.55f * fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f)));
     }
 
+    public static void setZoom(float zoom) {
+        camera.setZoom(zoom);
+    }
+
     // Get the camera bounds
     public static Rectangle getCameraWorld() {
         float xLeft = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).x;

@@ -132,7 +132,12 @@ public class BotController implements Controller {
     }
 
     @Override
-    public boolean special() {
+    public boolean holdSpecial() {
+        return false;
+    }
+
+    @Override
+    public boolean pressSpecial() {
         return false;
     }
 }

@@ -1,6 +1,5 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.core.input.Keyboard;
-import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
@@ -56,7 +55,7 @@ public class Main {
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "tank");
+        player = new Player(new Vector2(0,0), "predator");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
             //buildName = "auto gunner";
@@ -66,20 +65,6 @@ public class Main {
         Graphics.setCameraTarget(player.pos);
         cameraBox = Graphics.getCameraWorld();
         counter = 0;
-    }
-
-    private static void updateCamera() {
-        Vector2 difference = Raymath.Vector2Subtract(player.pos, Graphics.getCameraTarget());
-        Graphics.shiftCameraTarget(Graphics.scale(difference, 0.05f));
-        float delta = Graphics.getCameraZoom()/100;
-        if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() - delta);
-        }
-        if (Graphics.isKeyDown(Keyboard.KEY_UP)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() + delta);
-        }
-        // Cap the zoom level
-        Graphics.setCameraZoom(Math.max(0.1f, Math.min(10f, Graphics.getCameraZoom())));
     }
 
     private static void update() {
@@ -94,14 +79,11 @@ public class Main {
             stopwatch.start();
         }
 
-        cameraBox = Graphics.getCameraWorld();
-
         // Handle the pending operations
         Main.drawablePool.refresh();
         Main.gameObjectPool.refresh();
         Main.idServer.refresh();
 
-        updateCamera();
         CollisionManager.updateCollision();
 
         // Update all the game objects
@@ -112,6 +94,8 @@ public class Main {
         if (Main.counter % 120 == 0) {
             percentage = 100 * (float) stopwatch.ms() / (1000.f/120);  // Time taken / max time allowed
         }
+
+        cameraBox = Graphics.getCameraWorld();
     }
 
     private static void drawGrid() {

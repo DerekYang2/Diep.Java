@@ -125,7 +125,12 @@ public class PlayerController implements Controller {
     }
 
     @Override
-    public boolean special() {
+    public boolean holdSpecial() {
         return Graphics.isRightMouseDown();
+    }
+
+    @Override
+    public boolean pressSpecial() {
+        return Graphics.isRightMousePressed();
     }
 }

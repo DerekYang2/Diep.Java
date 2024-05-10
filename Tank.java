@@ -203,7 +203,7 @@ public class Tank extends GameObject {
     }
 
     public boolean specialControl() {
-        return controller.special();
+        return controller.holdSpecial();
     }
 
     @Override

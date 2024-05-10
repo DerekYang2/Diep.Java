@@ -24,6 +24,9 @@ public class TankBuild
     // AddOn object
     AddOn addOn;
 
+    // Predator-like zoom
+    boolean zoomAbility;
+
     // Invisibility variables
     float min_movement = 0.4f;  // Minimum movement speed to be visible
     boolean isInvisible;  // Whether the tank can turn invisible
@@ -63,11 +66,12 @@ public class TankBuild
         }
     }
 
-    public void setInvisibilityVariables(boolean isInvisible, float visibilityRateShooting, float visibilityRateMoving, float invisibilityRate) {
+    public void setFlags(boolean isInvisible, float visibilityRateShooting, float visibilityRateMoving, float invisibilityRate, boolean zoomAbility) {
         this.isInvisible = isInvisible;
         this.visibilityRateShooting = visibilityRateShooting;
         this.visibilityRateMoving = visibilityRateMoving;
         this.invisibilityRate = invisibilityRate;
+        this.zoomAbility = zoomAbility;
     }
 
     public void update() {
@@ -231,7 +235,7 @@ public class TankBuild
         TankBuild build = new TankBuild(name, addOn, barrels, fireManager, bulletStats, fieldFactor);
 
         JSONObject jsonFlags = jsonTank.getJSONObject("flags");
-        build.setInvisibilityVariables(jsonFlags.getBoolean("invisibility"), jsonTank.getFloat("visibilityRateShooting"), jsonTank.getFloat("visibilityRateMoving"), jsonTank.getFloat("invisibilityRate"));
+        build.setFlags(jsonFlags.getBoolean("invisibility"), jsonTank.getFloat("visibilityRateShooting"), jsonTank.getFloat("visibilityRateMoving"), jsonTank.getFloat("invisibilityRate"), jsonFlags.getBoolean("zoomAbility"));
 
         return build;
     }

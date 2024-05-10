@@ -9,5 +9,6 @@ public interface Controller {
     Vector2 getTarget();
     public float moveDirection();
     public boolean fire();
-    public boolean special();  // Right click (repel drones, zoom in, etc.)
+    public boolean holdSpecial();  // Right click (repel drones, zoom in, etc.)
+    public boolean pressSpecial();
 }

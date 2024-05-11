@@ -31,8 +31,8 @@ public class TextureLoader {
             switch (buildName) {
                 case "auto gunner" -> createAndInsertTexture("gunner", tank.fillCol, tank.strokeCol);
                 case "auto trapper" -> createAndInsertTexture("trapper", tank.fillCol, tank.strokeCol);
-                default -> createAndInsertTexture(buildName, tank.fillCol, tank.strokeCol);
             }
+            createAndInsertTexture(buildName, tank.fillCol, tank.strokeCol);
         }
         pendingTankTexture.clear();
     }

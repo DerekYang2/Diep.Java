@@ -6015,7 +6015,7 @@
                     "damage": 0.15,
                     "speed": 1,
                     "scatterRate": 1,
-                    "lifeLength": 1.33,
+                    "lifeLength": 1.2,
                     "absorbtionFactor": 1
                 }
             },
@@ -6039,7 +6039,7 @@
                     "damage": 0.15,
                     "speed": 1,
                     "scatterRate": 1,
-                    "lifeLength": 1.33,
+                    "lifeLength": 1.2,
                     "absorbtionFactor": 1
                 }
             },
@@ -6063,7 +6063,7 @@
                     "damage": 0.15,
                     "speed": 1,
                     "scatterRate": 1,
-                    "lifeLength": 1.33,
+                    "lifeLength": 1.2,
                     "absorbtionFactor": 1
                 }
             },
@@ -6087,7 +6087,7 @@
                     "damage": 0.15,
                     "speed": 1,
                     "scatterRate": 1,
-                    "lifeLength": 1.33,
+                    "lifeLength": 1.2,
                     "absorbtionFactor": 1
                 }
             }

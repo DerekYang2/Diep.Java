@@ -10,7 +10,7 @@ public class Player extends Tank {
     Vector2 cameraTarget;
 
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5), 20);
+        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5), 45);
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         setTankBuild(TankBuild.createTankBuild(buildName));
         TextureLoader.pendingAdd(this);

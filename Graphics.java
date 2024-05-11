@@ -8,6 +8,7 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.rlgl.RLGL;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.shapes.rShapes;
+import com.raylib.java.text.rText;
 import com.raylib.java.textures.Image;
 import com.raylib.java.textures.RenderTexture;
 import com.raylib.java.textures.Texture2D;
@@ -270,11 +271,15 @@ public class Graphics extends Raylib {
 
     // Get the camera bounds
     public static Rectangle getCameraWorld() {
-        float xLeft = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).x;
-        float xRight = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(Graphics.cameraWidth, 0), Graphics.camera).x;
-        float yTop = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, 0), Graphics.camera).y;
-        float yBottom = Graphics.rlj.core.GetScreenToWorld2D(new Vector2(0, Graphics.cameraHeight), Graphics.camera).y;
+        float xLeft = getScreenToWorld2D(new Vector2(0, 0), Graphics.camera).x;
+        float xRight = getScreenToWorld2D(new Vector2(Graphics.cameraWidth, 0), Graphics.camera).x;
+        float yTop = getScreenToWorld2D(new Vector2(0, 0), Graphics.camera).y;
+        float yBottom = getScreenToWorld2D(new Vector2(0, Graphics.cameraHeight), Graphics.camera).y;
         return new Rectangle(xLeft, yTop, xRight - xLeft, yBottom - yTop);
+    }
+
+    public static Vector2 getScreenToWorld2D(Vector2 position, Camera2D camera) {
+        return rlj.core.GetScreenToWorld2D(position, camera);
     }
 
     // IO --------------------------------------------------------------------------------------------
@@ -503,12 +508,20 @@ public class Graphics extends Raylib {
         rlj.text.DrawText(text, x, y, fontSize, color);
     }
 
+    public static void drawTextCentered(String text, int xLeft, int yCenter, int fontSize, Color color) {
+        rlj.text.DrawTextEx(rText.GetFontDefault(), text, new Vector2(xLeft, yCenter - fontSize * 0.5f), fontSize, (float) fontSize /10, color);
+    }
+
     public static void unloadTexture(Texture2D texture) {
         rlj.textures.UnloadTexture(texture);
     }
 
+    public static Texture2D loadTextureFromImage(Image image) {
+        return rTextures.LoadTextureFromImage(image);
+    }
+
     // 531.26
-    public static Texture2D createTankTexture(String buildName, Color fillCol, Color strokeCol) {
+    public static Image createTankImage(String buildName, Color fillCol, Color strokeCol) {
         TankImage tank = new TankImage(0, 0, buildName, fillCol, strokeCol);
 
         tank.setPos(new Vector2(tankTex.texture.getWidth() * 0.5f, tankTex.texture.getHeight() * 0.5f));
@@ -520,33 +533,11 @@ public class Graphics extends Raylib {
         rlj.core.EndTextureMode();
         tank.delete();
 
-        return rTextures.LoadTextureFromImage(rTextures.LoadImageFromTexture(tankTex.texture));
+        return rTextures.LoadImageFromTexture(tankTex.texture);
     }
 
-
-    public static Texture2D createTankTexture(Tank tank) {
-        // Get max barrel length
-        float textureSize = (int) (2 * (tank.radius*tank.scale + tank.tankBuild.maxBarrelLength()));
-        if (tank.tankBuild.addOn != null) {
-            textureSize = Math.max(textureSize, 2 * tank.tankBuild.addOn.maxRadius());
-        }
-        textureSize *= 1.05f;  // Add some padding
-
-        RenderTexture tankTex = rlj.textures.LoadRenderTexture((int) textureSize, (int) textureSize);
-
-        Vector2 originalPos = tank.pos;
-        tank.setPos(new Vector2(textureSize * 0.5f, textureSize * 0.5f));
-
-        rlj.core.BeginDrawing();
-        rlj.core.BeginTextureMode(tankTex);
-        tank.draw();
-        rlj.core.EndTextureMode();
-        rlj.core.EndDrawing();
-
-        tank.setPos(originalPos);
-        Texture2D tankTexture = tankTex.texture;
-        rlj.textures.UnloadRenderTexture(tankTex);
-        return tankTexture;
+    public static void imageResize(Image img, float scale) {
+        rlj.textures.ImageResize(img, (int) (img.width * scale), (int) (img.height * scale));
     }
 
 
@@ -703,5 +694,4 @@ public class Graphics extends Raylib {
     public static boolean isIntersecting(Rectangle rect1, Rectangle rect2) {
         return rect1.x <= rect2.x + rect2.width && rect1.x + rect1.width >= rect2.x && rect1.y <= rect2.y + rect2.height && rect1.y + rect1.height >= rect2.y;
     }
-
 }

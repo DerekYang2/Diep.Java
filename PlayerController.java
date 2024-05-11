@@ -8,6 +8,8 @@ import static com.raylib.java.core.input.Keyboard.KEY_D;
 public class PlayerController implements Controller {
     ArrayList<Integer> keyQueue;
     Tank host;
+    boolean autoFire;
+    Stopwatch autoFireWatch = new Stopwatch();
 
     public PlayerController() {
         keyQueue = new ArrayList<>();
@@ -16,6 +18,7 @@ public class PlayerController implements Controller {
     @Override
     public void setHost(Tank host) {
         this.host = host;
+        autoFire = false;
     }
 
     @Override
@@ -55,6 +58,11 @@ public class PlayerController implements Controller {
         if (Graphics.isKeyReleased(KEY_D)) {
             keyQueue.remove((Integer) KEY_D);
         }
+
+        if (autoFireWatch.ms() > 100 && Graphics.isKeyPressed(KEY_E)) {
+            autoFire = !autoFire;
+            autoFireWatch.start();
+        }
     }
 
     @Override
@@ -63,8 +71,8 @@ public class PlayerController implements Controller {
     }
 
     @Override
-    public boolean toggleAutoFire() {
-        return Graphics.isKeyPressed(KEY_E);
+    public boolean autoFire() {
+        return autoFire;
     }
 
     @Override

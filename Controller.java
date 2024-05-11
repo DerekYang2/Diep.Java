@@ -4,7 +4,7 @@ public interface Controller {
     public void setHost(Tank host);
     public void update();  // Updates the key strokes
     public void updateTankBuild();  // Call when tank changes or initializes build
-    public boolean toggleAutoFire();
+    public boolean autoFire();
     public float barrelDirection();
     Vector2 getTarget();
     public float moveDirection();

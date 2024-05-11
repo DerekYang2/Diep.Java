@@ -22,7 +22,7 @@ public class Leaderboard {
     }
 
     public static void draw() {
-        if (Main.counter % 10 == 0) {
+        if (Main.counter % 60 == 0) {
             ArrayList<Tank> tankList = new ArrayList<>();
             tankIds.forEach(id -> tankList.add((Tank) Main.gameObjectPool.getObj(id)));
             tankList.sort((tankA, tankB) -> Float.compare(tankB.score, tankA.score));
@@ -33,15 +33,29 @@ public class Leaderboard {
 
             for (int i = 0; i < Math.min(tankIds.size(), LEADERBOARD_SIZE); i++) {
                 Tank tank = tankList.get(i);
-                tankBuilds[i] = TextureLoader.getTankTexture(tank.tankBuild.name, tank.fillCol);
-                leaderboard[i] = String.format("%s : %.1fk", tank.tankBuild.name, tank.score/1000);
+                tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
+                leaderboard[i] = String.format("%s : %.1fk", tank.tankBuild.name, tank.score / 1000);
             }
         }
+        final float leaderboardGap = 25;
+
+/*        float reverseZoom = 1.f / Graphics.getCameraZoom();
+        Vector2 cornerPos = Graphics.getScreenToWorld2D(new Vector2(1675, leaderboardGap), Graphics.camera);
 
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
+            int cornerX = (int) cornerPos.x;
+            int cornerY = (int) (cornerPos.y + i * leaderboardGap * reverseZoom);
+
             if (leaderboard[i] != null && tankBuilds[i] != null) {
-                Graphics.drawTextureCentered(tankBuilds[i], new Vector2(1675, 20 + i * 20), 0, 0.1f, Color.WHITE);
-                Graphics.drawText(leaderboard[i], 1700, 10 + i * 20, 20, Color.BLACK);
+                Graphics.drawTextureCentered(tankBuilds[i], new Vector2(cornerX, cornerY), 0, reverseZoom, Graphics.rgb(255, 255, 255));
+                Graphics.drawTextCentered(leaderboard[i], (int) (cornerX + 25f * reverseZoom), cornerY, (int) (leaderboardGap * 0.75f * reverseZoom), Graphics.DARK_GREY_STROKE);
+            }
+        }*/
+        for (int i = 0; i < LEADERBOARD_SIZE; i++) {
+            int cornerY = (int)(20 + i * leaderboardGap);
+            if (leaderboard[i] != null && tankBuilds[i] != null) {
+                Graphics.drawTextureCentered(tankBuilds[i], new Vector2(1700, cornerY), 0, 1f, Graphics.rgb(255, 255, 255));
+                Graphics.drawTextCentered(leaderboard[i], 1700 + 25, cornerY, 20, Color.BLACK);
             }
         }
     }

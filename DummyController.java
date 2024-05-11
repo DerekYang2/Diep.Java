@@ -18,7 +18,7 @@ public class DummyController implements Controller {
     }
 
     @Override
-    public boolean toggleAutoFire() {
+    public boolean autoFire() {
         return false;
     }
 

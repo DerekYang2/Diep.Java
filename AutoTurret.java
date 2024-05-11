@@ -37,9 +37,18 @@ public class AutoTurret {
         this.pos = pos;
         Vector2 absPos = getAbsPos();
         double baseAngle = Math.atan2(offset.y, offset.x);
-        float projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * barrel.bulletStats.speed * 25.f/120;
 
-        Vector2 closestTarget = AutoAim.getAdjustedTarget(getAbsPos(), barrel.getSpawnPoint(), VIEW_RADIUS * host.scale, host.group, baseAngle, range, projectile_speed);  // Get closest target
+        Vector2 closestTarget;
+
+        double startAngle = baseAngle - range * 0.5, endAngle = baseAngle + range * 0.5;  // End angle is ccw
+        Vector2 hostTarget = host.getTarget();  // Mouse position, or bot adjusted target position
+
+        if (hostTarget != null && !host.getAutoFire() && Graphics.isAngleBetween(Math.atan2(hostTarget.y - absPos.y, hostTarget.x - absPos.x), startAngle, endAngle)) {  // If direct target is within range
+            closestTarget = hostTarget;
+        } else {
+            float projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * barrel.bulletStats.speed * 25.f / 120;
+            closestTarget = AutoAim.getAdjustedTarget(getAbsPos(), barrel.getSpawnPoint(), VIEW_RADIUS * host.scale, host.group, baseAngle, range, projectile_speed);  // Get closest target
+        }
 
         if (closestTarget != null) {  // If there is a closest target
             idle = false;
@@ -57,7 +66,8 @@ public class AutoTurret {
 
         barrel.update(absPos.x, absPos.y, direction);
 
-        fireManager.setFiring(!idle && Graphics.absAngleDistance(direction, targetDirection) < Math.toRadians(20));  // If not idle and within 10 degrees of target direction, fire
+        // if host is not on auto fire, only fire when host commands fire and conditions are met
+        fireManager.setFiring(host.isFiring() && !idle && Graphics.absAngleDistance(direction, targetDirection) < Math.toRadians(20));  // If not idle and within 10 degrees of target direction, fire
     }
 
     public void shoot(int drawLayer) {

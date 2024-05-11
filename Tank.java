@@ -22,8 +22,6 @@ public class Tank extends GameObject {
     // Objects that control the tank
     TankBuild tankBuild;
     Controller controller;
-    boolean autoFire = false;
-    Stopwatch autoFireWatch = new Stopwatch();
 
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
@@ -136,12 +134,6 @@ public class Tank extends GameObject {
             addForce(baseAcceleration, moveDirection);
         }
 
-        // Update auto fire
-        if (autoFireWatch.ms() > 100 && controller.toggleAutoFire()) {
-            autoFire = !autoFire;  // Flip autoFire
-            autoFireWatch.start();  // Restart the timer
-        }
-
         // Update all turrets
         tankBuild.update();
         tankBuild.updateFire(isFiring());
@@ -195,11 +187,11 @@ public class Tank extends GameObject {
     }
 
     public boolean isFiring() {
-        return autoFire || controller.fire();
+        return getAutoFire() || controller.fire();
     }
 
     public boolean getAutoFire() {
-        return autoFire;
+        return controller.autoFire();
     }
 
     public boolean specialControl() {

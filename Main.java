@@ -56,7 +56,7 @@ public class Main {
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "auto trapper");
+        player = new Player(new Vector2(0,0), "auto gunner");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
             //buildName = "auto gunner";
@@ -160,7 +160,6 @@ public class Main {
 
     static float xt = 0;
     private static void draw() {
-        drawBounds();
         //Graphics.drawCircle(xt, 100, 10, Color.RED, 1);
         //xt += 6.25f;
         // Draw all the drawable objects
@@ -197,10 +196,11 @@ public class Main {
             drawGrid();
             Leaderboard.draw();
             Graphics.beginCameraMode();
-
+            drawBounds();
             draw();  // Main draw function
             //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(0, 0), Math.PI/4, 1, Color.WHITE);
             Graphics.endCameraMode();
+
             Graphics.endDrawMode();
         }
 

@@ -1,5 +1,6 @@
 import com.raylib.java.raymath.Vector2;
 
+// TODO: auto turret should be auto fire mode
 public class BotController implements Controller {
     Tank host;
     float moveDir;
@@ -32,6 +33,11 @@ public class BotController implements Controller {
             BulletStats bulletStats = host.tankBuild.getBarrelBulletStats(frontBarrel);
             frontBulletSpeed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f / 120;
         }
+    }
+
+    @Override
+    public boolean autoFire() {
+        return false;
     }
 
     @Override
@@ -72,12 +78,6 @@ public class BotController implements Controller {
         } else {
             direction = 0;
         }
-    }
-
-
-    @Override
-    public boolean toggleAutoFire() {
-        return false;
     }
 
     @Override

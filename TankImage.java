@@ -7,6 +7,7 @@ public class TankImage extends Tank {
         setColor(fillCol, strokeCol);
         setTankBuild(TankBuild.createTankBuild(buildName));
         updateStats();
+        opacity = 1;
     }
 
     @Override

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-// TODO: Add predator zoom
 public class TankBuild
 {
     String name;
@@ -248,7 +247,11 @@ public class TankBuild
         Set<String> keys = tankDefinitions.keySet();
         ArrayList<String> keyList = new ArrayList<>(keys);
         // Generate a random build until a valid one is found
-        return (keyList.get((int)(Math.random() * keyList.size())));
+        String buildName;
+        do {
+            buildName = keyList.get((int)(Math.random() * keyList.size()));
+        } while (buildName.contains("dominator") || buildName.equals("arena closer") || buildName.equals("mothership"));
+        return buildName;
     }
 }
 

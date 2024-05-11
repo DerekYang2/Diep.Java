@@ -238,4 +238,16 @@ public class Tank extends GameObject {
         float cornerY = pos.y - viewHeight * 0.5f;
         return new Rectangle(cornerX, cornerY, viewWidth, viewHeight);
     }
+
+    @Override
+    public void addToPools() {
+        super.addToPools();
+        Leaderboard.addTank(this);
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        Leaderboard.removeTank(this);
+    }
 }

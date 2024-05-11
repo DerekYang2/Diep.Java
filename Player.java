@@ -10,7 +10,7 @@ public class Player extends Tank {
     Vector2 cameraTarget;
 
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5), 45);
+        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5), 20);
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         setTankBuild(TankBuild.createTankBuild(buildName));
         TextureLoader.pendingAdd(this);
@@ -38,7 +38,8 @@ public class Player extends Tank {
     public void updateCamera() {
         if (tankBuild.zoomAbility && controller.holdSpecial()) {
             if (controller.pressSpecial()) {  // Only update target if the button is pressed
-                cameraTarget = new Vector2((float) (Math.cos(direction) * 1980 + pos.x), (float) (Math.sin(direction) * 1980 + pos.y));
+                // TODO: check if predator zoom amount is right
+                cameraTarget = new Vector2((float) (Math.cos(direction) * 1000 + pos.x), (float) (Math.sin(direction) * 1000 + pos.y));
             }
         } else {
             cameraTarget = pos;
@@ -64,7 +65,7 @@ public class Player extends Tank {
     public void update() {
         super.update();
         if (Math.abs(targetZoom - currentZoom) > 1e-3) {
-            currentZoom += (targetZoom - currentZoom) * 0.1f;
+            currentZoom += (targetZoom - currentZoom) * 0.05f;
             Graphics.setZoom(currentZoom);
         }
         updateCamera();

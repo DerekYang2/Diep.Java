@@ -8,16 +8,20 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.rlgl.RLGL;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.shapes.rShapes;
-import com.raylib.java.text.rText;
+import com.raylib.java.text.Font;
 import com.raylib.java.textures.Image;
 import com.raylib.java.textures.RenderTexture;
 import com.raylib.java.textures.Texture2D;
 import com.raylib.java.textures.rTextures;
 
 import java.awt.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
-import static com.raylib.java.core.input.Mouse.MouseButton.*;
+import static com.raylib.java.core.input.Mouse.MouseButton.MOUSE_BUTTON_LEFT;
+import static com.raylib.java.core.input.Mouse.MouseButton.MOUSE_BUTTON_RIGHT;
 
 public class Graphics extends Raylib {
     public static int ANTIALIASING = 0, PERFORMANCE_MODE = 0;  // Constant environment variables
@@ -31,6 +35,7 @@ public class Graphics extends Raylib {
     public static Raylib rlj;
     public static Camera2D camera;
     private static RenderTexture target, tankTex;
+    public static Font font;
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
@@ -84,6 +89,8 @@ public class Graphics extends Raylib {
         rlj.core.MaximizeWindow();
         rlj.core.SetWindowMinSize(320, 240);
         // rlj.core.SetWindowPosition(0, 0);
+        // Font
+        initFont();
 
         // Render texture
         target = rlj.textures.LoadRenderTexture(cameraWidth, cameraHeight);
@@ -104,6 +111,11 @@ public class Graphics extends Raylib {
         screenScale = Math.min((float) screenWidth / cameraWidth, (float) screenHeight / cameraHeight);
 
         initializeTextures();
+    }
+
+    public static void initFont() {
+        font = rlj.text.LoadFontEx("assets/Ubuntu-Regular.ttf", 64, null, 250);
+        //setTextureAntiAliasing(font.texture);
     }
 
     public static void initializeTextures() {
@@ -505,11 +517,11 @@ public class Graphics extends Raylib {
     }
 
     public static void drawText(String text, int x, int y, int fontSize, Color color) {
-        rlj.text.DrawText(text, x, y, fontSize, color);
+        rlj.text.DrawTextEx(font, text, new Vector2(x, y), fontSize, (float) fontSize / font.getBaseSize(), color);
     }
 
     public static void drawTextCentered(String text, int xLeft, int yCenter, int fontSize, Color color) {
-        rlj.text.DrawTextEx(rText.GetFontDefault(), text, new Vector2(xLeft, yCenter - fontSize * 0.5f), fontSize, (float) fontSize /10, color);
+        rlj.text.DrawTextEx(font, text, new Vector2(xLeft, yCenter - fontSize * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
     }
 
     public static void unloadTexture(Texture2D texture) {

@@ -37,7 +37,7 @@ public class Leaderboard {
                 leaderboard[i] = String.format("%s : %.1fk", tank.tankBuild.name, tank.score / 1000);
             }
         }
-        final float leaderboardGap = 25;
+        final float leaderboardGap = 27;
 
 /*        float reverseZoom = 1.f / Graphics.getCameraZoom();
         Vector2 cornerPos = Graphics.getScreenToWorld2D(new Vector2(1675, leaderboardGap), Graphics.camera);

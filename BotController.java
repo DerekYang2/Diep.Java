@@ -37,7 +37,7 @@ public class BotController implements Controller {
 
     @Override
     public boolean autoFire() {
-        return false;
+        return host.tankBuild.name.contains("auto");
     }
 
     @Override

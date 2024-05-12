@@ -37,7 +37,7 @@ public class Graphics extends Raylib {
     public static Raylib rlj;
     public static Camera2D camera;
     private static RenderTexture target, tankTex, UITex;
-    public static Font outlineFont, font;
+    public static Font outlineFont, font, outlineFontNoAA;  // For large outline, use separate font without anti-aliasing
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
@@ -122,7 +122,12 @@ public class Graphics extends Raylib {
     }
 
     public static void initFont() {
-        outlineFont = rlj.text.LoadFont("assets/UbuntuOutlineBitmap.fnt");
+        outlineFont = rlj.text.LoadFont("assets/UbuntuOutlineBitmap.fnt");  // Load and apply anti-aliasing
+        rTextures.SetTextureFilter(outlineFont.texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        rlj.textures.SetTextureWrap(outlineFont.texture, RLGL.RL_TEXTURE_WRAP_CLAMP);
+
+        outlineFontNoAA = rlj.text.LoadFont("assets/UbuntuOutlineBitmap.fnt");  // No anti-aliasing
+
         font = rlj.text.LoadFontEx("assets/Ubuntu-Regular.ttf", 64, null, 250);
         //font = rText.GetFontDefault();
     }
@@ -144,11 +149,11 @@ public class Graphics extends Raylib {
         sharpRoundTriangle = loadTexture("assets/SharpRoundTriangle.png");
         roundHexagon = loadTexture("assets/RoundHexagon.png");
 
-        setTextureAntiAliasing(circle);
+        setTextureAntiAliasing(roundedRectangle);
 
         if (ANTIALIASING == 1) {
+            setTextureAntiAliasing(circle);
             //setTextureAntiAliasing(sharpRectangle);
-            setTextureAntiAliasing(roundedRectangle);
             setTextureAntiAliasing(roundedTrapezoid);
             setTextureAntiAliasing(roundedTriangle);
             //setTextureAntiAliasing(sharpTriangle);
@@ -557,8 +562,15 @@ public class Graphics extends Raylib {
     }
 
     public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, Color color) {
-        Vector2 textDimensions = rText.MeasureTextEx(outlineFont, text, fontSize, (float) fontSize / font.getBaseSize());
-        rlj.text.DrawTextEx(outlineFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
+        float spacing = -1.5f*fontSize / outlineFont.getBaseSize();
+        Vector2 textDimensions = rText.MeasureTextEx(outlineFont, text, fontSize, spacing);
+        rlj.text.DrawTextEx(outlineFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
+    }
+
+    public static void drawTextCenteredOutlineNoAA(String text, int xCenter, int yCenter, int fontSize, Color color) {
+        float spacing = -1f*fontSize / outlineFontNoAA.getBaseSize();
+        Vector2 textDimensions = rText.MeasureTextEx(outlineFontNoAA, text, fontSize, spacing);
+        rlj.text.DrawTextEx(outlineFontNoAA, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
     }
 
     public static void unloadTexture(Texture2D texture) {

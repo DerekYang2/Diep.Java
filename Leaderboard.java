@@ -11,7 +11,7 @@ public class Leaderboard {
     private static ArrayList<Tank> tankList = new ArrayList<>();
     private static Bar[] scoreBars = new Bar[LEADERBOARD_SIZE];
     private static Texture2D[] tankBuilds = new Texture2D[LEADERBOARD_SIZE];
-    static final float leaderboardGap = 25, leaderboardWidth = 250, leaderboardHeight = 21;
+    static final float leaderboardGap = 25, leaderboardWidth = 275, leaderboardHeight = 21;
     static final float cornerY = leaderboardHeight;
     static final float cornerX = Graphics.cameraWidth - leaderboardWidth - cornerY * 0.5f;
 
@@ -42,7 +42,7 @@ public class Leaderboard {
         for (int i = 0; i < Math.min(tankIds.size(), LEADERBOARD_SIZE); i++) {
             Tank tank = tankList.get(i);
             tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
-            scoreBars[i].setText(String.format("%s - %.1fk", tank.tankBuild.name, tank.score / 1000), 19);
+            scoreBars[i].setText(String.format("%s - %.1fk", tank.username, tank.score / 1000), 19);
             scoreBars[i].update(new Vector2(cornerX, cornerY + i * leaderboardGap - 23 * 0.5f), tankList.get(i).score/maxScore);
         }
 /*        float reverseZoom = 1.f / Graphics.getCameraZoom();

@@ -8,6 +8,8 @@ import com.raylib.java.shapes.Rectangle;
  */
 
 public class Tank extends GameObject {
+    String username;
+
     float score;
     int level;
     // 54.7766480515
@@ -26,6 +28,8 @@ public class Tank extends GameObject {
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
         super(pos, 50, 1.f, DrawPool.MIDDLE);
+        username = NameGenerator.generateUsername();
+
         this.level = level;
         score = ScoreHandler.levelToScore(level) + 0.01f;
         setCollisionFactors(1, 8);

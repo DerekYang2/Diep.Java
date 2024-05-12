@@ -111,22 +111,14 @@ public class Player extends Tank {
 
     }
 
+    public void draw() {
+        super.draw();
+    }
 
     public void drawLevelBar() {
         Vector2 levelBarPos = new Vector2(Graphics.cameraWidth/2 - levelBar.width/2, Graphics.cameraHeight - 2.7f * BAR_HEIGHT);
 
-        StringBuilder tankName = new StringBuilder();
-        tankName.append(Character.toUpperCase(tankBuild.name.charAt(0)));
-
-        for (int i = 1; i < tankBuild.name.length(); i++) {
-            if (tankBuild.name.charAt(i-1) == ' ') {
-                tankName.append(Character.toUpperCase(tankBuild.name.charAt(i)));
-            } else {
-                tankName.append(tankBuild.name.charAt(i));
-            }
-        }
-
-        levelBar.setText("Lvl " + level + " " + tankName, 21);
+        levelBar.setText("Lvl " + level + " " + NameGenerator.formatNameCase(tankBuild.name), 21);
         float levelStartScore = ScoreHandler.levelToScore(level), levelNextScore = ScoreHandler.levelToScore(level+1);
         if (level == ScoreHandler.maxPlayerLevel && levelUpWatch.ms() >= 1000) {
             levelBar.update(levelBarPos, Graphics.clamp((float) (levelUpWatch.ms() - 1600) /1000, 0, 1));
@@ -141,8 +133,8 @@ public class Player extends Tank {
         scoreBar.update(new Vector2((Graphics.cameraWidth - scoreBar.width) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - 3), Graphics.clamp((firstTank == null) ? 0 : score/firstTank.score, 0, 1));
         scoreBar.draw();
 
-        String name = "Test NaME";
-        Graphics.drawTextCenteredOutline(name, Graphics.cameraWidth/2, (int) (levelBarPos.y - 0.8f * BAR_HEIGHT - 3 - 20), 40, Color.WHITE);
+        // Draw username
+        Graphics.drawTextCenteredOutlineNoAA(username, Graphics.cameraWidth/2, (int) (levelBarPos.y - 0.8f * BAR_HEIGHT - 3 - 20), 40, Color.WHITE);
     }
 
     @Override

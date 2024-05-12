@@ -32,6 +32,7 @@ public class Main {
 
     public static void initialize() {
         Graphics.initialize("DiepJava");
+        NameGenerator.initialize();
         ScoreHandler.initialize();
         TankBuild.loadTankDefinitions();  // Load tank definitions from TankDefinitions.json
         globalClock = new Stopwatch();
@@ -42,7 +43,6 @@ public class Main {
         startGame();
     }
 
-    public static Tank randomTank;
     public static void startGame() {
         // Game initialization
         globalClock.start();

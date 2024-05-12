@@ -1,4 +1,3 @@
-import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.textures.Texture2D;
 
@@ -39,7 +38,7 @@ public class Leaderboard {
         }
         final float leaderboardGap = 27;
 
-/*        float reverseZoom = 1.f / Graphics.getCameraZoom();
+        float reverseZoom = 1.f / Graphics.getCameraZoom();
         Vector2 cornerPos = Graphics.getScreenToWorld2D(new Vector2(1675, leaderboardGap), Graphics.camera);
 
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
@@ -48,15 +47,15 @@ public class Leaderboard {
 
             if (leaderboard[i] != null && tankBuilds[i] != null) {
                 Graphics.drawTextureCentered(tankBuilds[i], new Vector2(cornerX, cornerY), 0, reverseZoom, Graphics.rgb(255, 255, 255));
-                Graphics.drawTextCentered(leaderboard[i], (int) (cornerX + 25f * reverseZoom), cornerY, (int) (leaderboardGap * 0.75f * reverseZoom), Graphics.DARK_GREY_STROKE);
+                Graphics.drawTextCenteredY(leaderboard[i], (int) (cornerX + 25f * reverseZoom), cornerY, (int) (leaderboardGap * 0.75f * reverseZoom), Graphics.DARK_GREY_STROKE);
             }
-        }*/
-        for (int i = 0; i < LEADERBOARD_SIZE; i++) {
+        }
+/*        for (int i = 0; i < LEADERBOARD_SIZE; i++) {
             int cornerY = (int)(20 + i * leaderboardGap);
             if (leaderboard[i] != null && tankBuilds[i] != null) {
                 Graphics.drawTextureCentered(tankBuilds[i], new Vector2(1700, cornerY), 0, 1f, Graphics.rgb(255, 255, 255));
-                Graphics.drawTextCentered(leaderboard[i], 1700 + 25, cornerY, 20, Color.BLACK);
+                Graphics.drawTextCenteredY(leaderboard[i], 1700 + 25, cornerY, 20, Color.BLACK);
             }
-        }
+        }*/
     }
 }

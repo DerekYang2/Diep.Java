@@ -27,7 +27,7 @@ public class Tank extends GameObject {
     public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
         super(pos, 50, 1.f, DrawPool.MIDDLE);
         this.level = level;
-        score = ScoreHandler.levelToScore(level);
+        score = ScoreHandler.levelToScore(level) + 0.01f;
         setCollisionFactors(1, 8);
         initHealthBar();  // Initialize health bar object
 

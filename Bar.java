@@ -11,20 +11,33 @@ public class Bar implements Drawable {
     float opacity;
     float lerpFactor;
     boolean isHiding;
+    boolean inGameWorld;
+    String text;
+    int fontSize;
 
-    public Bar(float width, float height, float strokeWidth, Color fillCol, Color strokeCol, float lerpFactor) {
+    public Bar(float width, float height, float strokeWidth, Color fillCol, Color strokeCol, float lerpFactor, float initialPercentage) {
         this.pos = new Vector2(0, 0);
         this.width = (int)Math.ceil(width);
         this.height = Math.round(height);
         this.strokeWidth = Math.round(strokeWidth);
         this.fillCol = fillCol;
         this.strokeCol = strokeCol;
-        this.targetPercentage = this.percentage = 1.f;
+        this.targetPercentage = this.percentage = initialPercentage;
         this.lerpFactor = lerpFactor;
         isHiding = false;
         opacity = 1;
+        inGameWorld = false;
+    }
+
+    public void setText(String text, int fontSize) {
+        this.text = text;
+        this.fontSize = fontSize;
+    }
+
+    public void addToGameWorld() {
         createId();
         addToPools();
+        inGameWorld = true;
     }
 
     /**
@@ -64,14 +77,28 @@ public class Bar implements Drawable {
     @Override
     public void draw() {
         // Culling
-        if (pos.x + width < Main.cameraBox.x || pos.x > Main.cameraBox.x + Main.cameraBox.width || pos.y + height < Main.cameraBox.y || pos.y > Main.cameraBox.y + Main.cameraBox.height) {
+        if (inGameWorld && (pos.x + width < Main.cameraBox.x || pos.x > Main.cameraBox.x + Main.cameraBox.width || pos.y + height < Main.cameraBox.y || pos.y > Main.cameraBox.y + Main.cameraBox.height)) {
             return;
         }
         if (!isHidden()) {
             int xInt = Math.round(pos.x);
             int yInt = Math.round(pos.y);
-            Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, Graphics.colAlpha(strokeCol, opacity));
-            Graphics.drawRectangleRounded(xInt + strokeWidth + 1, yInt + strokeWidth, width * percentage - 2 * (strokeWidth + 1), height - 2 * strokeWidth, 1f, Graphics.colAlpha(fillCol, opacity));
+
+            if (inGameWorld) {
+                Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, Graphics.colAlpha(strokeCol, opacity));
+                float rectWidth = Math.max(width * percentage - 2 * strokeWidth, height - 2 * strokeWidth);
+                Graphics.drawRectangleRounded(xInt + strokeWidth, yInt + strokeWidth, rectWidth, height - 2 * strokeWidth, 1f, Graphics.colAlpha(fillCol, opacity));
+            } else
+            {
+                float reverseZoom = 1.f / Graphics.getCameraZoom();
+                Graphics.drawRectangleRounded(xInt, yInt, width * reverseZoom, height * reverseZoom, 1f, Graphics.colAlpha(strokeCol, opacity));
+                float rectWidth = Math.max(width * percentage - 2 * strokeWidth, height - 2 * strokeWidth) * reverseZoom;
+                Graphics.drawRectangleRounded(xInt + strokeWidth * reverseZoom, yInt + strokeWidth * reverseZoom, rectWidth, (height - 2 * strokeWidth) * reverseZoom, 1f, Graphics.colAlpha(fillCol, opacity));
+
+                if (text != null) {
+                    Graphics.drawTextCenteredOutline(text, (int) (xInt + width * reverseZoom / 2), (int) (yInt + height * reverseZoom / 2), (int) (fontSize * reverseZoom), Color.WHITE);
+                }
+            }
         }
     }
 
@@ -104,7 +131,9 @@ public class Bar implements Drawable {
 
     @Override
     public void delete() {
-        Main.idServer.returnId(this.getId());
-        Main.drawablePool.deleteObj(this.getId(), DrawPool.TOP_UI);
+        if (inGameWorld) {
+            Main.idServer.returnId(this.getId());
+            Main.drawablePool.deleteObj(this.getId(), DrawPool.TOP_UI);
+        }
     }
 }

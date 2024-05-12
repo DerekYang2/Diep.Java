@@ -1,7 +1,7 @@
 import com.raylib.java.Config;
 import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
-import com.raylib.java.core.camera.Camera2D;
+import com.raylib.java.core.rcamera.Camera2D;
 import com.raylib.java.core.rCore;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
@@ -9,6 +9,7 @@ import com.raylib.java.rlgl.RLGL;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.shapes.rShapes;
 import com.raylib.java.text.Font;
+import com.raylib.java.text.rText;
 import com.raylib.java.textures.Image;
 import com.raylib.java.textures.RenderTexture;
 import com.raylib.java.textures.Texture2D;
@@ -35,7 +36,7 @@ public class Graphics extends Raylib {
     public static Raylib rlj;
     public static Camera2D camera;
     private static RenderTexture target, tankTex;
-    public static Font font;
+    public static Font outlineFont, font;
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     // Custom textures
@@ -54,7 +55,8 @@ public class Graphics extends Raylib {
             HEALTH_BAR = rgb(133, 227, 125),
             HEALTH_BAR_STROKE = rgb(85, 85, 85),
             DARK_GREY = rgb(85, 85, 85),
-            DARK_GREY_STROKE = rgb(63, 63, 63);
+            DARK_GREY_STROKE = rgb(63, 63, 63),
+            YELLOW = rgb(241, 217, 117);
 
 
     public static Color getColor(String hexStr) {
@@ -88,6 +90,7 @@ public class Graphics extends Raylib {
         rlj.core.InitWindow(screenWidth, screenHeight, title);
         rlj.core.MaximizeWindow();
         rlj.core.SetWindowMinSize(320, 240);
+
         // rlj.core.SetWindowPosition(0, 0);
         // Font
         initFont();
@@ -114,11 +117,13 @@ public class Graphics extends Raylib {
     }
 
     public static void initFont() {
+        outlineFont = rlj.text.LoadFont("assets/UbuntuCustom.fnt");
         font = rlj.text.LoadFontEx("assets/Ubuntu-Regular.ttf", 64, null, 250);
-        //setTextureAntiAliasing(font.texture);
+        //font = rText.GetFontDefault();
     }
 
     public static void initializeTextures() {
+
         circle = loadTexture("assets/Circle.png");
         circleNoAA = loadTexture("assets/Circle.png");
         sharpRectangle = loadTexture("assets/SharpRectangle.png");
@@ -520,8 +525,17 @@ public class Graphics extends Raylib {
         rlj.text.DrawTextEx(font, text, new Vector2(x, y), fontSize, (float) fontSize / font.getBaseSize(), color);
     }
 
-    public static void drawTextCentered(String text, int xLeft, int yCenter, int fontSize, Color color) {
+    public static void drawTextCenteredY(String text, int xLeft, int yCenter, int fontSize, Color color) {
         rlj.text.DrawTextEx(font, text, new Vector2(xLeft, yCenter - fontSize * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
+    }
+    public static void drawTextCentered(String text, int xCenter, int yCenter, int fontSize, Color color) {
+       Vector2 textDimensions = rText.MeasureTextEx(font, text, fontSize, (float) fontSize / font.getBaseSize());
+        rlj.text.DrawTextEx(font, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
+    }
+
+    public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, Color color) {
+        Vector2 textDimensions = rText.MeasureTextEx(outlineFont, text, fontSize, (float) fontSize / font.getBaseSize());
+        rlj.text.DrawTextEx(outlineFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
     }
 
     public static void unloadTexture(Texture2D texture) {
@@ -559,6 +573,10 @@ public class Graphics extends Raylib {
         value.x = Math.max(value.x, min.x);
         value.y = Math.min(value.y, max.y);
         value.y = Math.max(value.y, min.y);
+    }
+
+    public static float clamp(float value, float min, float max) {
+        return Math.min(Math.max(value, min), max);
     }
 
     public static Vector2 rotatePoint(Vector2 point, Vector2 origin, double radians) {

@@ -14,7 +14,7 @@ public class Main {
     public static HashPool<GameObject> gameObjectPool;
     public static IdServer idServer;
     public static Stopwatch globalClock;
-    static Tank player;
+    static Player player;
 
     // Variables for game reset
     static Stopwatch lastReset = new Stopwatch();  // For resetting the game
@@ -56,7 +56,7 @@ public class Main {
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "battleship");
+        player = new Player(new Vector2(0,0), "overlord");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
             //buildName = "auto gunner";
@@ -194,11 +194,13 @@ public class Main {
             Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
             Graphics.drawText(String.format("Score: %d\tLevel: %d", (int)player.score, (int)player.level), 10, 60, 20, Color.BLACK);
             drawGrid();
-            Leaderboard.draw();
+
             Graphics.beginCameraMode();
             drawBounds();
             draw();  // Main draw function
             //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(0, 0), Math.PI/4, 1, Color.WHITE);
+            Leaderboard.draw();
+            player.drawLevelBar();
             Graphics.endCameraMode();
 
             Graphics.endDrawMode();

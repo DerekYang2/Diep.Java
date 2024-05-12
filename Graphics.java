@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import static com.raylib.java.core.input.Mouse.MouseButton.MOUSE_BUTTON_LEFT;
 import static com.raylib.java.core.input.Mouse.MouseButton.MOUSE_BUTTON_RIGHT;
+import static com.raylib.java.rlgl.RLGL.rlBlendMode.RL_BLEND_CUSTOM;
 
 public class Graphics extends Raylib {
     public static int ANTIALIASING = 0, PERFORMANCE_MODE = 0;  // Constant environment variables
@@ -35,7 +36,7 @@ public class Graphics extends Raylib {
 
     public static Raylib rlj;
     public static Camera2D camera;
-    private static RenderTexture target, tankTex;
+    private static RenderTexture target, tankTex, UITex;
     public static Font outlineFont, font;
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
@@ -56,7 +57,8 @@ public class Graphics extends Raylib {
             HEALTH_BAR_STROKE = rgb(85, 85, 85),
             DARK_GREY = rgb(85, 85, 85),
             DARK_GREY_STROKE = rgb(63, 63, 63),
-            YELLOW = rgb(241, 217, 117);
+            YELLOW = rgb(241, 217, 117),
+            LIGHT_GREEN = rgb(102, 239, 170);
 
 
     public static Color getColor(String hexStr) {
@@ -98,6 +100,9 @@ public class Graphics extends Raylib {
         // Render texture
         target = rlj.textures.LoadRenderTexture(cameraWidth, cameraHeight);
         rTextures.SetTextureFilter(target.texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        UITex = rlj.textures.LoadRenderTexture(cameraWidth, cameraHeight);
+        rTextures.SetTextureFilter(UITex.texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+
         rlj.core.SetTargetFPS(FPS);
 
         // Tank render texture
@@ -117,7 +122,7 @@ public class Graphics extends Raylib {
     }
 
     public static void initFont() {
-        outlineFont = rlj.text.LoadFont("assets/UbuntuCustom.fnt");
+        outlineFont = rlj.text.LoadFont("assets/UbuntuOutlineBitmap.fnt");
         font = rlj.text.LoadFontEx("assets/Ubuntu-Regular.ttf", 64, null, 250);
         //font = rText.GetFontDefault();
     }
@@ -139,8 +144,9 @@ public class Graphics extends Raylib {
         sharpRoundTriangle = loadTexture("assets/SharpRoundTriangle.png");
         roundHexagon = loadTexture("assets/RoundHexagon.png");
 
+        setTextureAntiAliasing(circle);
+
         if (ANTIALIASING == 1) {
-            setTextureAntiAliasing(circle);
             //setTextureAntiAliasing(sharpRectangle);
             setTextureAntiAliasing(roundedRectangle);
             setTextureAntiAliasing(roundedTrapezoid);
@@ -209,6 +215,7 @@ public class Graphics extends Raylib {
     public static void beginDrawMode() {
         rlj.core.BeginDrawing();
         rlj.core.ClearBackground(Color.BLACK);
+        Graphics.rlj.core.BeginBlendMode(RL_BLEND_CUSTOM);
         rlj.core.BeginTextureMode(target);
     }
 
@@ -224,11 +231,26 @@ public class Graphics extends Raylib {
         rlj.core.EndMode2D();
     }
 
-    public static void endDrawMode() {
+    public static void endTargetTexture() {
         rlj.core.EndTextureMode();
+    }
+
+    public static void beginUITexture() {
+        rlj.core.BeginTextureMode(UITex);
+    }
+    public static void endUITexture() {
+        rlj.core.EndTextureMode();
+    }
+
+    public static void endDrawMode() {
+        Graphics.rlj.core.EndBlendMode();
 
         // Draw RenderTexture2D to window, properly scaled
         rTextures.DrawTexturePro(target.texture, new Rectangle(0.0f, 0.0f, (float) target.texture.width, (float) -target.texture.height),
+                new Rectangle((screenWidth - ((float) cameraWidth * screenScale)) * 0.5f, (screenHeight - ((float) cameraHeight * screenScale)) * 0.5f,
+                        (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, Color.WHITE);
+
+        rTextures.DrawTexturePro(UITex.texture, new Rectangle(0.0f, 0.0f, (float) UITex.texture.width, (float) -UITex.texture.height),
                 new Rectangle((screenWidth - ((float) cameraWidth * screenScale)) * 0.5f, (screenHeight - ((float) cameraHeight * screenScale)) * 0.5f,
                         (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, Color.WHITE);
 
@@ -499,21 +521,22 @@ public class Graphics extends Raylib {
         rlj.shapes.DrawRectangleLinesEx(rect, stroke, color);
     }
 
-    public static void drawCircle(float x, float y, float radius, Color color, float opacity) {
-        rlj.shapes.DrawCircle((int) x, (int) y, radius, colAlpha(color, opacity));
+    public static void drawCircle(Vector2 pos, float radius, Color color, float opacity) {
+        rlj.shapes.DrawCircleSector(pos, radius, 0, 360, 16, colAlpha(color, opacity));
+        rlj.shapes.DrawCircleV(pos, radius, colAlpha(color, opacity));
     }
-    public static void drawCircle(float x, float y, float radius, float stroke, Color color, Color strokeColor, float opacity) {
-        drawCircle(x, y, radius, strokeColor, opacity);
-        drawCircle(x, y, radius - stroke, color, opacity);
+    public static void drawCircle(Vector2 pos, float radius, float stroke, Color color, Color strokeColor, float opacity) {
+        drawCircle(pos, radius, strokeColor, opacity);
+        drawCircle(pos, radius - stroke, color, opacity);
     }
 
-    public static void drawCircleTexture(float x, float y, float radius, float stroke, Color color, Color strokeColor, float opacity) {
+    public static void drawCircleTexture(Vector2 pos, float radius, float stroke, Color color, Color strokeColor, float opacity) {
         if (ANTIALIASING == 1) {
-            Graphics.drawTextureCenteredHelper(circle, new Vector2(x, y), (radius) * 2, (radius) * 2, colAlpha(strokeColor, opacity));
-            Graphics.drawTextureCenteredHelper(circleNoAA, new Vector2(x, y), (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, colAlpha(color, opacity));
+            Graphics.drawTextureCenteredHelper(circle, pos, (radius) * 2, (radius) * 2, colAlpha(strokeColor, opacity));
+            Graphics.drawTextureCenteredHelper(circleNoAA, pos, (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, colAlpha(color, opacity));
         } else {
             // drawCircle(x, y, radius, stroke, lerpColorGrid(color, opacity), lerpColorGrid(strokeColor, opacity), 1);  // For lerp
-            drawCircle(x, y, radius, stroke, color, strokeColor, opacity);
+            drawCircle(pos, radius, stroke, color, strokeColor, opacity);
         }
     }
 

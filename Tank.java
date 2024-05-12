@@ -151,7 +151,7 @@ public class Tank extends GameObject {
     public void draw() {
         String tankName = tankBuild.name;
         // If landmine or auto, do not use texture to draw transparent tank
-        if (opacity >= 0.98 || tankName.equals("landmine") || tankName.equals("auto 3") || tankName.equals("auto 5") || tankName.equals("auto smasher")) {
+        if (opacity >= 0.9 || tankName.equals("landmine") || tankName.equals("auto 3") || tankName.equals("auto 5") || tankName.equals("auto smasher")) {
             tankBuild.addOnDrawBefore();
             tankBuild.draw(); // Draw Turrets
             tankBuild.addOnDrawMiddle();
@@ -159,7 +159,7 @@ public class Tank extends GameObject {
     //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
     //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
             if (Main.onScreen(pos, radius*scale)) {
-                Graphics.drawCircleTexture(pos.x, pos.y, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
+                Graphics.drawCircleTexture(pos, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
             }
             tankBuild.addOnDrawAfter();
         } else {
@@ -168,11 +168,11 @@ public class Tank extends GameObject {
                 switch (tankName) {
                     case "auto gunner" -> {
                         Graphics.drawTextureCentered(TextureLoader.getTankTexture("gunner", fillCol), pos, direction, scale / originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
-                        tankBuild.addOnDrawBefore();
+                        tankBuild.addOnDrawAfter();
                     }
                     case "auto trapper" -> {
                         Graphics.drawTextureCentered(TextureLoader.getTankTexture("trapper", fillCol), pos, direction, scale / originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
-                        tankBuild.addOnDrawBefore();
+                        tankBuild.addOnDrawAfter();
                     }
                     default ->
                         Graphics.drawTextureCentered(TextureLoader.getTankTexture(tankBuild.name, fillCol), pos, direction, scale / originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));

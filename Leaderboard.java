@@ -7,11 +7,20 @@ import java.util.HashSet;
 
 public class Leaderboard {
     private static final int LEADERBOARD_SIZE = 10;
-    static HashSet<Integer> tankIds = new HashSet<>();
-    private static String[] leaderboard = new String[LEADERBOARD_SIZE];
+    private static HashSet<Integer> tankIds = new HashSet<>();
+    private static ArrayList<Tank> tankList = new ArrayList<>();
+    private static Bar[] scoreBars = new Bar[LEADERBOARD_SIZE];
     private static Texture2D[] tankBuilds = new Texture2D[LEADERBOARD_SIZE];
+    static final float leaderboardGap = 25, leaderboardWidth = 250, leaderboardHeight = 21;
+    static final float cornerY = leaderboardHeight;
+    static final float cornerX = Graphics.cameraWidth - leaderboardWidth - cornerY * 0.5f;
+
     public static void clear() {
         tankIds.clear();
+        tankList.clear();
+        for (int i = 0; i < LEADERBOARD_SIZE; i++) {
+            scoreBars[i] = new Bar(leaderboardWidth, leaderboardHeight, 2, Graphics.LIGHT_GREEN, Graphics.DARK_GREY_STROKE, 1f, 0);
+        }
     }
     public static void addTank(Tank tank) {
         tankIds.add(tank.getId());
@@ -21,24 +30,22 @@ public class Leaderboard {
     }
 
     public static void draw() {
-        if (Main.counter % 60 == 0) {
-            ArrayList<Tank> tankList = new ArrayList<>();
-            tankIds.forEach(id -> tankList.add((Tank) Main.gameObjectPool.getObj(id)));
-            tankList.sort((tankA, tankB) -> Float.compare(tankB.score, tankA.score));
+        tankList.clear();  // Clear tankList
+        tankIds.forEach(id -> tankList.add((Tank) Main.gameObjectPool.getObj(id)));  // Fill tankList with tanks from tankIds
+        tankList.sort((tankA, tankB) -> Float.compare(tankB.score, tankA.score));  // Sort by greatest to least score
 
-            // Clear leaderboard
-            Arrays.fill(leaderboard, "");
-            Arrays.fill(tankBuilds, null);
+        float maxScore = tankList.get(0).score;
 
-            for (int i = 0; i < Math.min(tankIds.size(), LEADERBOARD_SIZE); i++) {
-                Tank tank = tankList.get(i);
-                tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
-                leaderboard[i] = String.format("%s : %.1fk", tank.tankBuild.name, tank.score / 1000);
-            }
+        // Clear leaderboard
+        Arrays.fill(tankBuilds, null);
+
+        for (int i = 0; i < Math.min(tankIds.size(), LEADERBOARD_SIZE); i++) {
+            Tank tank = tankList.get(i);
+            tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
+            scoreBars[i].setText(String.format("%s - %.1fk", tank.tankBuild.name, tank.score / 1000), 19);
+            scoreBars[i].update(new Vector2(cornerX, cornerY + i * leaderboardGap - 23 * 0.5f), tankList.get(i).score/maxScore);
         }
-        final float leaderboardGap = 27;
-
-        float reverseZoom = 1.f / Graphics.getCameraZoom();
+/*        float reverseZoom = 1.f / Graphics.getCameraZoom();
         Vector2 cornerPos = Graphics.getScreenToWorld2D(new Vector2(1675, leaderboardGap), Graphics.camera);
 
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
@@ -49,13 +56,18 @@ public class Leaderboard {
                 Graphics.drawTextureCentered(tankBuilds[i], new Vector2(cornerX, cornerY), 0, reverseZoom, Graphics.rgb(255, 255, 255));
                 Graphics.drawTextCenteredY(leaderboard[i], (int) (cornerX + 25f * reverseZoom), cornerY, (int) (leaderboardGap * 0.75f * reverseZoom), Graphics.DARK_GREY_STROKE);
             }
-        }
-/*        for (int i = 0; i < LEADERBOARD_SIZE; i++) {
-            int cornerY = (int)(20 + i * leaderboardGap);
-            if (leaderboard[i] != null && tankBuilds[i] != null) {
-                Graphics.drawTextureCentered(tankBuilds[i], new Vector2(1700, cornerY), 0, 1f, Graphics.rgb(255, 255, 255));
-                Graphics.drawTextCenteredY(leaderboard[i], 1700 + 25, cornerY, 20, Color.BLACK);
-            }
         }*/
+
+        for (int i = 0; i < LEADERBOARD_SIZE; i++) {
+            if (tankBuilds[i] != null) {
+                scoreBars[i].draw();
+                Graphics.drawTextureCentered(tankBuilds[i], new Vector2(cornerX + 12, cornerY + i * leaderboardGap), 0, 1f, Graphics.rgb(255, 255, 255));
+            }
+        }
+    }
+
+    public static Tank getTankRank(int rank) {
+        if (rank >= tankList.size() || rank < 0) return null;
+        return tankList.get(rank);
     }
 }

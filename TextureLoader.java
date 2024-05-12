@@ -19,7 +19,7 @@ public class TextureLoader {
             Image tankImage = Graphics.createTankImage(buildName, fillCol, strokeCol);
             tankTextures.get(fillCol).put(buildName, Graphics.loadTextureFromImage(tankImage));
 
-            Graphics.imageResize(tankImage, 0.08f);
+            Graphics.imageResize(tankImage, 0.095f);
             iconTextures.get(fillCol).put(buildName, Graphics.loadTextureFromImage(tankImage));
         }
     }

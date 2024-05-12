@@ -48,7 +48,7 @@ class SpikeAddOn extends AddOn {
     public void drawBefore() {
         final float radius = host.radius * host.scale, scaledRadius = radius * 0.707f * 0.92f;  // scale is always 1 until death animation
         if (Main.onScreen(host.pos, maxRadius())) {  // Use larger radius for culling
-            final Color fillCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY), (float) Math.pow(host.opacity, 4)), strokeCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(host.opacity, 4));
+            final Color fillCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY), host.opacity), strokeCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity * host.opacity);
             Graphics.drawTriangleRounded(host.pos, scaledRadius, offsetRadians, Graphics.strokeWidth, fillCol, strokeCol);
             Graphics.drawTriangleRounded(host.pos, scaledRadius, offsetRadians + (float) (Math.PI/3), Graphics.strokeWidth, fillCol, strokeCol);
             Graphics.drawTriangleRounded(host.pos, scaledRadius, offsetRadians + (float) (Math.PI/6), Graphics.strokeWidth, fillCol, strokeCol);
@@ -89,7 +89,7 @@ class SmasherAddOn extends AddOn {
     public void drawBefore() {
         float sideLen = (host.radius * host.scale) * 1.15f;
         if (Main.onScreen(host.pos, sideLen)) {  // Use larger radius for culling
-            final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(host.opacity, 4));
+            final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity);
             Graphics.drawHexagon(host.pos, sideLen, offsetRadians, col);
         }
     }
@@ -164,7 +164,7 @@ class DominatorAddOn extends AddOn {
         float length = host.radius * host.scale * 2.1f / 5;
         if (Main.onScreen(host.pos, offsetDist + length)) {
             float width = 35 * host.scale * 0.94f;
-            Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4), true);
+            Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), host.opacity, true);
         }
     }
 
@@ -248,7 +248,7 @@ class AutoSmasherAddOn extends AutoTurretAddOn {
     public void drawBefore() {
         float sideLen = (host.radius * host.scale) * 1.15f;
         if (Main.onScreen(host.pos, sideLen)) {  // Use larger radius for culling
-            final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), (float) Math.pow(host.opacity, 4));
+            final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity);
             Graphics.drawHexagon(host.pos, sideLen, offsetRadians, col);
         }
     }
@@ -351,7 +351,7 @@ class PronouncedAddOn extends AddOn {
         float length = (host.radius * host.scale) * 3.3f / 5;
         if (Main.onScreen(host.pos, offsetDist + length)) {
             float width = host.tankBuild.getBarrel(0).getTurretWidth() * 0.94f;
-            Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4), true);
+            Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), host.opacity, true);
         }
     }
     @Override
@@ -373,7 +373,7 @@ class LauncherAddOn extends AddOn {
     public void drawBefore() {
         float radius = host.radius * host.scale;
         float offsetDist = (host.radius * host.scale) * 3.1f / 5;
-        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), radius * 1.2f, 0.74f * radius, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4), false);
+        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), radius * 1.2f, 0.74f * radius, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), host.opacity, false);
     }
     @Override
     public void drawMiddle() {}
@@ -399,7 +399,7 @@ class InvertedLauncherAddOn extends AddOn {
     public void drawBefore() {
         float radius = host.radius * host.scale;
         float offsetDist = (host.radius * host.scale) * 3.1f / 5;
-        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), radius * 1.2f, 0.707f * radius, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), (float) Math.pow(host.opacity, 4), true);
+        Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), radius * 1.2f, 0.707f * radius, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), host.opacity, true);
     }
     @Override
     public void drawMiddle() {}

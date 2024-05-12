@@ -56,7 +56,7 @@ public class Main {
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "overlord");
+        player = new Player(new Vector2(0,0), "battleship");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
             //buildName = "auto gunner";
@@ -191,17 +191,26 @@ public class Main {
             Graphics.drawBackground(Graphics.GRID);
             Graphics.drawFPS(10, 10, 20, Color.BLACK);
             // Graphics.drawText("Number of objects: " + gameObjectPool.getObjects().size(), 10, 25, 20, Color.BLACK);
-            Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
-            Graphics.drawText(String.format("Score: %d\tLevel: %d", (int)player.score, (int)player.level), 10, 60, 20, Color.BLACK);
+            //Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
+            //Graphics.drawText(String.format("Score: %d\tLevel: %d", (int)player.score, (int)player.level), 10, 60, 20, Color.BLACK);
             drawGrid();
-
+            Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
             Graphics.beginCameraMode();
             drawBounds();
             draw();  // Main draw function
             //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(0, 0), Math.PI/4, 1, Color.WHITE);
-            Leaderboard.draw();
-            player.drawLevelBar();
             Graphics.endCameraMode();
+            Graphics.endTargetTexture();
+
+            if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) == 0) {  // Performance mode 1 -> 1, 0 -> 2
+                Graphics.beginUITexture();
+                if (Main.counter % Graphics.FPS == 0) {  // Every second
+                    Graphics.rlj.core.ClearBackground(Graphics.rgba(0 ,0, 0, 0));  // Only clear on leaderboard refresh
+                    Leaderboard.draw();
+                }
+                player.drawLevelBar();
+                Graphics.endUITexture();
+            }
 
             Graphics.endDrawMode();
         }

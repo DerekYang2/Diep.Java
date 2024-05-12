@@ -84,20 +84,13 @@ public class Bar implements Drawable {
             int xInt = Math.round(pos.x);
             int yInt = Math.round(pos.y);
 
-            if (inGameWorld) {
-                Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, Graphics.colAlpha(strokeCol, opacity));
-                float rectWidth = Math.max(width * percentage - 2 * strokeWidth, height - 2 * strokeWidth);
-                Graphics.drawRectangleRounded(xInt + strokeWidth, yInt + strokeWidth, rectWidth, height - 2 * strokeWidth, 1f, Graphics.colAlpha(fillCol, opacity));
-            } else
-            {
-                float reverseZoom = 1.f / Graphics.getCameraZoom();
-                Graphics.drawRectangleRounded(xInt, yInt, width * reverseZoom, height * reverseZoom, 1f, Graphics.colAlpha(strokeCol, opacity));
-                float rectWidth = Math.max(width * percentage - 2 * strokeWidth, height - 2 * strokeWidth) * reverseZoom;
-                Graphics.drawRectangleRounded(xInt + strokeWidth * reverseZoom, yInt + strokeWidth * reverseZoom, rectWidth, (height - 2 * strokeWidth) * reverseZoom, 1f, Graphics.colAlpha(fillCol, opacity));
 
-                if (text != null) {
-                    Graphics.drawTextCenteredOutline(text, (int) (xInt + width * reverseZoom / 2), (int) (yInt + height * reverseZoom / 2), (int) (fontSize * reverseZoom), Color.WHITE);
-                }
+            Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, Graphics.colAlpha(strokeCol, opacity));
+            float rectWidth = Math.max(width * percentage - 2 * strokeWidth, height - 2 * strokeWidth);
+            Graphics.drawRectangleRounded(xInt + strokeWidth, yInt + strokeWidth, rectWidth, height - 2 * strokeWidth, 1f, Graphics.colAlpha(fillCol, opacity));
+
+            if (text != null) {
+                Graphics.drawTextCenteredOutline(text, (int) (xInt + width * 0.5), (int) (yInt + height * 0.5f), fontSize, Color.WHITE);
             }
         }
     }

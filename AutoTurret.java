@@ -66,8 +66,8 @@ public class AutoTurret {
 
         barrel.update(absPos.x, absPos.y, direction);
 
-        // if host is not on auto fire, only fire when host commands fire and conditions are met
-        fireManager.setFiring(host.isFiring() && !idle && Graphics.absAngleDistance(direction, targetDirection) < Math.toRadians(20));  // If not idle and within 10 degrees of target direction, fire
+        // Always fire if there is a target
+        fireManager.setFiring(!idle && Graphics.absAngleDistance(direction, targetDirection) < Math.toRadians(20));  // If not idle and within 10 degrees of target direction, fire
     }
 
     public void shoot(int drawLayer) {
@@ -82,7 +82,7 @@ public class AutoTurret {
         if (Main.onScreen(absPos, barrel.getTurretLength())) {
             barrel.draw();
             final Color fillCol = host.getDamageLerpColor(Graphics.GREY), strokeCol = host.getDamageLerpColor(Graphics.GREY_STROKE);
-            Graphics.drawCircleTexture(absPos.x, absPos.y, scaledRadius * 0.5f, Graphics.strokeWidth, fillCol, strokeCol, host.opacity);
+            Graphics.drawCircleTexture(absPos, scaledRadius * 0.5f, Graphics.strokeWidth, fillCol, strokeCol, host.opacity);
         }
     }
 

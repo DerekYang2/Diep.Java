@@ -1,8 +1,8 @@
 import com.raylib.java.Config;
 import com.raylib.java.Raylib;
 import com.raylib.java.core.Color;
-import com.raylib.java.core.rcamera.Camera2D;
 import com.raylib.java.core.rCore;
+import com.raylib.java.core.rcamera.Camera2D;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.rlgl.RLGL;
@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Random;
 
 import static com.raylib.java.core.input.Mouse.MouseButton.MOUSE_BUTTON_LEFT;
 import static com.raylib.java.core.input.Mouse.MouseButton.MOUSE_BUTTON_RIGHT;
@@ -39,6 +40,8 @@ public class Graphics extends Raylib {
     private static RenderTexture target, tankTex, UITex;
     public static Font outlineFont, font, outlineFontNoAA;  // For large outline, use separate font without anti-aliasing
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
+
+    private static Random random = new Random();
 
     // Custom textures
     public static Texture2D circle, sharpRectangle, circleNoAA, roundedRectangle, roundedTrapezoid, trapezoidNoAA, roundedTriangle, sharpTriangle, trapperHead, innerTrapperHead, roundedTrap, sharpTrap, sharpRoundTriangle, roundHexagon;
@@ -715,6 +718,17 @@ public class Graphics extends Raylib {
 
     public static float randf(double min, double max) {
         return (float) (Math.random() * (max - min) + min);
+    }
+
+    /**
+     * Returns a random integer between min and max (exclusive)
+     * min <= randInt < max
+     * @param min The lower bound
+     * @param max The upper bound (exclusive)
+     * @return A random integer between min and max (exclusive)
+     */
+    public static int randInt(int min, int max) {
+        return random.nextInt(max - min) + min;
     }
 
     public static float distance(Vector2 vec1, Vector2 vec2) {

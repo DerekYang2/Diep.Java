@@ -5,16 +5,23 @@ import java.util.Scanner;
 
 // NOTE: must be called after TankDefinitions.loadTankDefinitions() is called
 public class NameGenerator {
-    private static ArrayList<String> adjList;
+    private static ArrayList<String> adjList, nounList;
 
     public static void initialize() {
-        File adjFile = new File("assets/dictionaries/adjectives.txt");
+        File adjFile = new File("assets/dictionaries/adjectives.txt"), nounFile = new File("assets/dictionaries/english-nouns.txt");
         adjList = new ArrayList<>();
+        nounList = new ArrayList<>();
 
         try {
             Scanner sc = new Scanner(adjFile);
             while (sc.hasNextLine()) {
                 adjList.add(sc.nextLine());
+            }
+            sc.close();
+
+            sc = new Scanner(nounFile);
+            while (sc.hasNextLine()) {
+                nounList.add(sc.nextLine());
             }
             sc.close();
         } catch (FileNotFoundException e) {
@@ -23,9 +30,14 @@ public class NameGenerator {
     }
 
     public static String generateUsername() {
-        String randomBuildName = TankBuild.getRandomBuildName();
-        String randomAdj = adjList.get((int) (Math.random() * adjList.size()));
-        return formatNameCase(randomAdj + " " + randomBuildName);
+        //String randomBuildName = TankBuild.getRandomBuildName();
+        String randomName;
+        do {
+            randomName = adjList.get(Graphics.randInt(0, adjList.size()));
+            String randomNoun = nounList.get(Graphics.randInt(0, nounList.size()));
+            randomName += Character.toUpperCase(randomNoun.charAt(0)) + randomNoun.substring(1);  // Capitalize first letter of noun
+        } while (randomName.length() > 15);
+        return formatNameCase(randomName);
     }
 
     /**

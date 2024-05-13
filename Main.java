@@ -62,7 +62,7 @@ public class Main {
             //buildName = "auto gunner";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
 
-            t.group = -(int)Graphics.randf(0, 4);
+            t.group = -Graphics.randInt(0, 4);
             if (t.group == 0) {
                 t.setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
             } else if (t.group == -1) {
@@ -179,7 +179,9 @@ public class Main {
 
     public static void main(String[] args) {
         initialize();
-
+        for (int i = 0; i < 100; i++) {
+            System.out.println(NameGenerator.generateUsername());
+        }
         //--------------------------------------------------------------------------------------
         // Main game loop
         while (!Graphics.shouldWindowClose())    // Detect window close button or ESC key

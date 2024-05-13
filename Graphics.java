@@ -42,13 +42,40 @@ public class Graphics extends Raylib {
 
     // Custom textures
     public static Texture2D circle, sharpRectangle, circleNoAA, roundedRectangle, roundedTrapezoid, trapezoidNoAA, roundedTriangle, sharpTriangle, trapperHead, innerTrapperHead, roundedTrap, sharpTrap, sharpRoundTriangle, roundHexagon;
+    /*
+    TODO: research
+        export const ColorsHexCode: Record<Color, number> = {
+        [Color.Border]: 0x555555,
+        [Color.Barrel]: 0x999999,
+        [Color.Tank]: 0x00B2E1,
+        [Color.TeamBlue]: 0x00B2E1,
+        [Color.TeamRed]: 0xF14E54,
+        [Color.TeamPurple]: 0xBF7FF5,
+        [Color.TeamGreen]: 0x00E16E,
+        [Color.Shiny]: 0x8AFF69,
+        [Color.EnemySquare]: 0xFFE869,
+        [Color.EnemyTriangle]: 0xFC7677,
+        [Color.EnemyPentagon]: 0x768DFC,
+        [Color.EnemyCrasher]: 0xF177DD,
+        [Color.Neutral]: 0xFFE869,
+        [Color.ScoreboardBar]: 0x43FF91,
+        [Color.Box]: 0xBBBBBB,
+        [Color.EnemyTank]: 0xF14E54,
+        [Color.NecromancerSquare]: 0xFCC376,
+        [Color.Fallen]: 0xC0C0C0,
+        [Color.kMaxColors]: 0x000000
+     */
 
     // Colors
     public static Color RED = rgb(241, 78, 84),
             RED_STROKE = rgb(180, 58, 63),
             BLUE = rgb(0, 178, 225),
             BLUE_STROKE = rgb(0, 133, 168),
+            GREEN = rgb(0, 225, 110),
+            GREEN_STROKE = rgb(0, 168, 82),
             GREY_STROKE = rgb(114, 114, 114),
+            PURPLE = rgb(191, 127, 245),
+            PURPLE_STROKE = rgb(143, 95, 183),
             GREY = rgb(153, 153, 153),
             GRID = rgb(205, 205, 205),
             GRID_STROKE = rgba(0, 0, 0, 6),
@@ -57,8 +84,8 @@ public class Graphics extends Raylib {
             HEALTH_BAR_STROKE = rgb(85, 85, 85),
             DARK_GREY = rgb(85, 85, 85),
             DARK_GREY_STROKE = rgb(63, 63, 63),
-            YELLOW = rgb(241, 217, 117),
-            LIGHT_GREEN = rgb(102, 239, 170);
+            LEVELBAR = rgb(241, 217, 117),
+            SCORE_GREEN = rgb(102, 239, 170);
 
 
     public static Color getColor(String hexStr) {
@@ -149,15 +176,17 @@ public class Graphics extends Raylib {
         sharpRoundTriangle = loadTexture("assets/SharpRoundTriangle.png");
         roundHexagon = loadTexture("assets/RoundHexagon.png");
 
+        // Always set texture anti-aliasing
+        setTextureAntiAliasing(sharpRectangle);
         setTextureAntiAliasing(roundedRectangle);
+        setTextureAntiAliasing(circle);
+        setTextureAntiAliasing(trapperHead);
 
         if (ANTIALIASING == 1) {
-            setTextureAntiAliasing(circle);
             //setTextureAntiAliasing(sharpRectangle);
             setTextureAntiAliasing(roundedTrapezoid);
             setTextureAntiAliasing(roundedTriangle);
             //setTextureAntiAliasing(sharpTriangle);
-            setTextureAntiAliasing(trapperHead);
             // setTextureAntiAliasing(innerTrapperHead);
             // setTextureAntiAliasing(sharpTrap);
             setTextureAntiAliasing(roundedTrap);
@@ -536,11 +565,10 @@ public class Graphics extends Raylib {
     }
 
     public static void drawCircleTexture(Vector2 pos, float radius, float stroke, Color color, Color strokeColor, float opacity) {
-        if (ANTIALIASING == 1) {
+        if (true || ANTIALIASING == 1) {  // Temporary "true ||" - always use anti-aliasing for circles (for now)
             Graphics.drawTextureCenteredHelper(circle, pos, (radius) * 2, (radius) * 2, colAlpha(strokeColor, opacity));
             Graphics.drawTextureCenteredHelper(circleNoAA, pos, (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, colAlpha(color, opacity));
         } else {
-            // drawCircle(x, y, radius, stroke, lerpColorGrid(color, opacity), lerpColorGrid(strokeColor, opacity), 1);  // For lerp
             drawCircle(pos, radius, stroke, color, strokeColor, opacity);
         }
     }
@@ -611,7 +639,9 @@ public class Graphics extends Raylib {
     }
 
     public static float clamp(float value, float min, float max) {
-        return Math.min(Math.max(value, min), max);
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
     }
 
     public static Vector2 rotatePoint(Vector2 point, Vector2 origin, double radians) {

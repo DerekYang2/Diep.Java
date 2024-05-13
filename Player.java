@@ -14,7 +14,7 @@ public class Player extends Tank {
     final float BAR_WIDTH = 500, BAR_HEIGHT = 25;
 
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5), 20);
+        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5), 45);
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         setTankBuild(TankBuild.createTankBuild(buildName));
         TextureLoader.pendingAdd(this);
@@ -29,9 +29,9 @@ public class Player extends Tank {
     public void initBars() {
 
         float levelStartScore = ScoreHandler.levelToScore(level), levelNextScore = ScoreHandler.levelToScore(level+1);
-        levelBar = new Bar(BAR_WIDTH, BAR_HEIGHT, 3, Graphics.YELLOW, Graphics.DARK_GREY_STROKE, 0.08f, (score-levelStartScore)/(levelNextScore-levelStartScore));
-
-        scoreBar = new Bar(BAR_WIDTH*2/3, BAR_HEIGHT*0.8f, 2, Graphics.LIGHT_GREEN, Graphics.DARK_GREY_STROKE, 0.08f, 0);
+        levelBar = new Bar(BAR_WIDTH, BAR_HEIGHT, 3, Graphics.LEVELBAR, Graphics.DARK_GREY_STROKE, 0.08f, (level == ScoreHandler.maxPlayerLevel) ? 1 : (score-levelStartScore)/(levelNextScore-levelStartScore));  // If level max level, prevent division by 0 -> infinity
+        levelUpWatch.start();
+        scoreBar = new Bar(BAR_WIDTH*2/3, BAR_HEIGHT*0.8f, 2, Graphics.SCORE_GREEN, Graphics.DARK_GREY_STROKE, 0.08f, 0);
     }
 
     // For timing speed

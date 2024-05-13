@@ -56,12 +56,23 @@ public class Main {
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "battleship");
+        player = new Player(new Vector2(0,0), "triplet");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
             //buildName = "auto gunner";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
-            //t.group = -1;
+
+            t.group = -(int)Graphics.randf(0, 4);
+            if (t.group == 0) {
+                t.setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
+            } else if (t.group == -1) {
+                t.setColor(Graphics.RED, Graphics.RED_STROKE);
+            } else if (t.group == -2) {
+                t.setColor(Graphics.GREEN, Graphics.GREEN_STROKE);
+            } else {
+                t.setColor(Graphics.PURPLE, Graphics.PURPLE_STROKE);
+            }
+            if (t.group == 0) t.group = player.group;
         }
         Graphics.setCameraTarget(player.pos);
         cameraBox = Graphics.getCameraWorld();

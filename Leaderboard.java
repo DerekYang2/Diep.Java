@@ -19,7 +19,7 @@ public class Leaderboard {
         tankIds.clear();
         tankList.clear();
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
-            scoreBars[i] = new Bar(leaderboardWidth, leaderboardHeight, 2, Graphics.LIGHT_GREEN, Graphics.DARK_GREY_STROKE, 1f, 0);
+            scoreBars[i] = new Bar(leaderboardWidth, leaderboardHeight, 2, Graphics.SCORE_GREEN, Graphics.DARK_GREY_STROKE, 1f, 0);
         }
     }
     public static void addTank(Tank tank) {
@@ -61,7 +61,7 @@ public class Leaderboard {
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
             if (tankBuilds[i] != null) {
                 scoreBars[i].draw();
-                Graphics.drawTextureCentered(tankBuilds[i], new Vector2(cornerX + 12, cornerY + i * leaderboardGap), 0, 1f, Graphics.rgb(255, 255, 255));
+                Graphics.drawTextureCentered(tankBuilds[i], new Vector2(cornerX + 12, cornerY + i * leaderboardGap - 1), 0, 1f, Graphics.rgb(255, 255, 255));
             }
         }
     }

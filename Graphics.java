@@ -589,14 +589,20 @@ public class Graphics extends Raylib {
         rlj.text.DrawTextEx(font, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
     }
 
+    public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, float spacingFactor, Color color) {
+        float spacing = spacingFactor * fontSize / outlineFont.getBaseSize();
+        Vector2 textDimensions = rText.MeasureTextEx(outlineFont, text, fontSize, spacing);
+        rlj.text.DrawTextEx(outlineFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
+    }
+
     public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, Color color) {
-        float spacing = -1.5f*fontSize / outlineFont.getBaseSize();
+        float spacing = -5f*fontSize / outlineFont.getBaseSize();
         Vector2 textDimensions = rText.MeasureTextEx(outlineFont, text, fontSize, spacing);
         rlj.text.DrawTextEx(outlineFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
     }
 
     public static void drawTextCenteredOutlineNoAA(String text, int xCenter, int yCenter, int fontSize, Color color) {
-        float spacing = -1f*fontSize / outlineFontNoAA.getBaseSize();
+        float spacing = -5f*fontSize / outlineFontNoAA.getBaseSize();
         Vector2 textDimensions = rText.MeasureTextEx(outlineFontNoAA, text, fontSize, spacing);
         rlj.text.DrawTextEx(outlineFontNoAA, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
     }

@@ -1,5 +1,8 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
+import com.raylib.java.shapes.Rectangle;
+
+import java.util.function.Consumer;
 
 public class Bar implements Drawable {
     protected int id;
@@ -14,6 +17,7 @@ public class Bar implements Drawable {
     boolean inGameWorld;
     String text;
     int fontSize;
+    Consumer<Rectangle> customDraw = null;
 
     public Bar(float width, float height, float strokeWidth, Color fillCol, Color strokeCol, float lerpFactor, float initialPercentage) {
         this.pos = new Vector2(0, 0);
@@ -32,6 +36,10 @@ public class Bar implements Drawable {
     public void setText(String text, int fontSize) {
         this.text = text;
         this.fontSize = fontSize;
+    }
+
+    public void setCustomDraw(Consumer<Rectangle> customDraw) {
+        this.customDraw = customDraw;
     }
 
     public void addToGameWorld() {
@@ -73,7 +81,6 @@ public class Bar implements Drawable {
             opacity = 1;
         }
     }
-
     @Override
     public void draw() {
         // Culling
@@ -84,13 +91,15 @@ public class Bar implements Drawable {
             int xInt = Math.round(pos.x);
             int yInt = Math.round(pos.y);
 
-
             Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, Graphics.colAlpha(strokeCol, opacity));
             float rectWidth = Math.max(width * percentage - 2 * strokeWidth, height - 2 * strokeWidth);
             Graphics.drawRectangleRounded(xInt + strokeWidth, yInt + strokeWidth, rectWidth, height - 2 * strokeWidth, 1f, Graphics.colAlpha(fillCol, opacity));
 
+            if (customDraw != null) {
+                customDraw.accept(new Rectangle(xInt, yInt, width, height));
+            }
             if (text != null) {
-                Graphics.drawTextCenteredOutline(text, (int) (xInt + width * 0.5), (int) (yInt + height * 0.5f), fontSize, Color.WHITE);
+                Graphics.drawTextCenteredOutline(text, (int) (xInt + width * 0.5), (int) (yInt + height * (0.5f + 0.03f)), fontSize, -8, Color.WHITE);
             }
         }
     }

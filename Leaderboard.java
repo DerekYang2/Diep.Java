@@ -1,4 +1,6 @@
+import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
+import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.textures.Texture2D;
 
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ public class Leaderboard {
     private static ArrayList<Tank> tankList = new ArrayList<>();
     private static Bar[] scoreBars = new Bar[LEADERBOARD_SIZE];
     private static Texture2D[] tankBuilds = new Texture2D[LEADERBOARD_SIZE];
-    static final float leaderboardGap = 25, leaderboardWidth = 275, leaderboardHeight = 21;
+    static final float leaderboardGap = 25, leaderboardWidth = 250, leaderboardHeight = 21;
     static final float cornerY = leaderboardHeight;
     static final float cornerX = Graphics.cameraWidth - leaderboardWidth - cornerY * 0.5f;
 
@@ -44,6 +46,11 @@ public class Leaderboard {
             tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
             scoreBars[i].setText(String.format("%s - %.1fk", tank.username, tank.score / 1000), 19);
             scoreBars[i].update(new Vector2(cornerX, cornerY + i * leaderboardGap - 23 * 0.5f), tankList.get(i).score/maxScore);
+
+            final int finalI = i;
+            scoreBars[i].setCustomDraw((Rectangle rect) -> {
+                Graphics.drawTextureCentered(tankBuilds[finalI], new Vector2(rect.x + 11, rect.y + rect.height * 0.5f), 0, 1f, Color.WHITE);
+            });
         }
 /*        float reverseZoom = 1.f / Graphics.getCameraZoom();
         Vector2 cornerPos = Graphics.getScreenToWorld2D(new Vector2(1675, leaderboardGap), Graphics.camera);
@@ -61,7 +68,7 @@ public class Leaderboard {
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
             if (tankBuilds[i] != null) {
                 scoreBars[i].draw();
-                Graphics.drawTextureCentered(tankBuilds[i], new Vector2(cornerX + 12, cornerY + i * leaderboardGap - 1), 0, 1f, Graphics.rgb(255, 255, 255));
+                //Graphics.drawTextureCentered(tankBuilds[i], new Vector2(cornerX + 12, cornerY + i * leaderboardGap - 1), 0, 1f, Graphics.rgb(255, 255, 255));
             }
         }
     }

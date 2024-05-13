@@ -1,30 +1,31 @@
 package other;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
+import java.util.TreeSet;
 
 public class CarriageReturnRemover {
-    public static void main(String[] args) throws FileNotFoundException {
-        String fileName = "assets/dejavu.fnt";
+    public static void main(String[] args) throws IOException {
+        String fileName = "assets/dictionaries/adjectives.txt";
 
         // Remove all /r from the file
         File file = new File(fileName);
         Scanner scanner = new Scanner(file);
-        StringBuilder newText = new StringBuilder();
+        TreeSet<String> lines = new TreeSet<>();
 
         while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            newText.append(line.replace("\r", ""));
-            newText.append("\n");
+            lines.add(scanner.nextLine().toLowerCase());
         }
+
         scanner.close();
 
-        PrintWriter writer = new PrintWriter(fileName);
-        writer.print(newText);
+        // Rewrite the file
+        FileWriter writer = new FileWriter(fileName);
+        for (String line : lines) {
+            writer.write(line + "\n");
+        }
         writer.close();
-
-        System.out.println("Done");
     }
 }

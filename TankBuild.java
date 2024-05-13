@@ -253,5 +253,9 @@ public class TankBuild
         } while (buildName.contains("dominator") || buildName.equals("arena closer") || buildName.equals("mothership"));
         return buildName;
     }
+
+    public static Set<String> getTankDefinitions() {
+        return tankDefinitions.keySet();
+    }
 }
 

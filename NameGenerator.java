@@ -5,12 +5,13 @@ import java.util.Scanner;
 
 // NOTE: must be called after TankDefinitions.loadTankDefinitions() is called
 public class NameGenerator {
-    private static ArrayList<String> adjList, nounList;
+    private static ArrayList<String> adjList, nounList, agentNounList;
 
     public static void initialize() {
-        File adjFile = new File("assets/dictionaries/adjectives.txt"), nounFile = new File("assets/dictionaries/english-nouns.txt");
+        File adjFile = new File("assets/dictionaries/adjectives.txt"), nounFile = new File("assets/dictionaries/nouns.txt");
         adjList = new ArrayList<>();
         nounList = new ArrayList<>();
+        agentNounList = new ArrayList<>();
 
         try {
             Scanner sc = new Scanner(adjFile);
@@ -24,6 +25,12 @@ public class NameGenerator {
                 nounList.add(sc.nextLine());
             }
             sc.close();
+
+            for (String noun : nounList) {
+                if (noun.endsWith("er")) {
+                    agentNounList.add(noun);
+                }
+            }
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -33,9 +40,26 @@ public class NameGenerator {
         //String randomBuildName = TankBuild.getRandomBuildName();
         String randomName;
         do {
-            randomName = adjList.get(Graphics.randInt(0, adjList.size()));
-            String randomNoun = nounList.get(Graphics.randInt(0, nounList.size()));
-            randomName += Character.toUpperCase(randomNoun.charAt(0)) + randomNoun.substring(1);  // Capitalize first letter of noun
+            double rand = Math.random();
+            if (rand < 0.1) {
+                randomName = nounList.get(Graphics.randInt(0, nounList.size())).toUpperCase();
+            } else if (rand < 0.1 + 0.4) {
+                randomName = adjList.get(Graphics.randInt(0, adjList.size()));
+                String randomNoun = nounList.get(Graphics.randInt(0, nounList.size()));
+                randomName += Character.toUpperCase(randomNoun.charAt(0)) + randomNoun.substring(1);  // Capitalize first letter of noun
+            } else if (rand < 0.1 + 0.4 + 0.1) {
+                randomName = adjList.get(Graphics.randInt(0, adjList.size()));
+                String tankName = TankBuild.getRandomBuildName();
+                randomName += Character.toUpperCase(tankName.charAt(0)) + tankName.substring(1);  // Capitalize first letter of noun
+            } else {
+                randomName = adjList.get(Graphics.randInt(0, adjList.size()));
+                String randomNoun = agentNounList.get(Graphics.randInt(0, agentNounList.size()));
+                randomName += Character.toUpperCase(randomNoun.charAt(0)) + randomNoun.substring(1);  // Capitalize first letter of noun
+            }
+
+            randomName = randomName.replace(" ", "");
+            randomName = randomName.replace("-", "");
+
         } while (randomName.length() > 15);
         return formatNameCase(randomName);
     }

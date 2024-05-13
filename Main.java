@@ -56,7 +56,7 @@ public class Main {
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "triplet");
+        player = new Player(new Vector2(0,0), "predator");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
             //buildName = "auto gunner";
@@ -218,6 +218,7 @@ public class Main {
                 if (Main.counter % Graphics.FPS == 0) {  // Every second
                     Graphics.rlj.core.ClearBackground(Graphics.rgba(0 ,0, 0, 0));  // Only clear on leaderboard refresh
                     Leaderboard.draw();
+                    player.drawUsername();
                 }
                 player.drawLevelBar();
                 Graphics.endUITexture();

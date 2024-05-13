@@ -14,7 +14,7 @@ public class Player extends Tank {
     final float BAR_WIDTH = 500, BAR_HEIGHT = 25;
 
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 3, 5), 45);
+        super(spawn, new PlayerController(), new Stats(0, 7, 7, 7, 7, 0, 0, 5), 45);
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         setTankBuild(TankBuild.createTankBuild(buildName));
         TextureLoader.pendingAdd(this);
@@ -111,9 +111,17 @@ public class Player extends Tank {
 
     }
 
-    public void draw() {
+/*    public void draw() {
         super.draw();
-    }
+        if (!isDead && Main.onScreen(pos, radius*scale)) {
+            float scoreFont = 20 / Graphics.getCameraZoom();
+            float yPos = (pos.y - radius * scale);
+            Graphics.drawTextCenteredOutline(String.format("%.1fk", score/1000), (int) pos.x, (int) (yPos - scoreFont * 0.5f), (int) scoreFont, Color.WHITE);
+            yPos -= scoreFont;
+            float usernameFont = 25 / Graphics.getCameraZoom();
+            Graphics.drawTextCenteredOutline(username, (int) pos.x, (int) (yPos - usernameFont * 0.5f), (int) usernameFont, Color.WHITE);
+        }
+    }*/
 
     public void drawLevelBar() {
         Vector2 levelBarPos = new Vector2(Graphics.cameraWidth/2 - levelBar.width/2, Graphics.cameraHeight - 2.7f * BAR_HEIGHT);
@@ -132,7 +140,10 @@ public class Player extends Tank {
         scoreBar.setText("Score: " + (int) score, 19);
         scoreBar.update(new Vector2((Graphics.cameraWidth - scoreBar.width) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - 3), Graphics.clamp((firstTank == null) ? 0 : score/firstTank.score, 0, 1));
         scoreBar.draw();
+    }
 
+    public void drawUsername() {
+        Vector2 levelBarPos = new Vector2(Graphics.cameraWidth/2 - levelBar.width/2, Graphics.cameraHeight - 2.7f * BAR_HEIGHT);
         // Draw username
         Graphics.drawTextCenteredOutlineNoAA(username, Graphics.cameraWidth/2, (int) (levelBarPos.y - 0.8f * BAR_HEIGHT - 3 - 20), 40, Color.WHITE);
     }

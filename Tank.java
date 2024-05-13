@@ -154,6 +154,7 @@ public class Tank extends GameObject {
     @Override
     public void draw() {
         String tankName = tankBuild.name;
+        boolean isOnScreen = Main.onScreen(pos, radius*scale);
         // If landmine or auto, do not use texture to draw transparent tank
         if (opacity >= 0.9 || tankName.equals("landmine") || tankName.equals("auto 3") || tankName.equals("auto 5") || tankName.equals("auto smasher")) {
             tankBuild.addOnDrawBefore();
@@ -162,13 +163,13 @@ public class Tank extends GameObject {
 
     //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2, (radius*scale) * 2, Graphics.RED_STROKE);
     //        Graphics.drawTextureCentered(whiteCirc, new Vector2(x, y), (radius*scale) * 2 - 2*Graphics.strokeWidth, (radius*scale) * 2 - 2*Graphics.strokeWidth, Graphics.redCol);
-            if (Main.onScreen(pos, radius*scale)) {
+            if (isOnScreen) {
                 Graphics.drawCircleTexture(pos, radius*scale, Graphics.strokeWidth, getDamageLerpColor(fillCol), getDamageLerpColor(strokeCol), opacity);
             }
             tankBuild.addOnDrawAfter();
         } else {
             float originalScale = (float)Math.pow(1.01, (45 - 1));
-            if (Main.onScreen(pos, radius*scale)) {
+            if (isOnScreen) {
                 switch (tankName) {
                     case "auto gunner" -> {
                         Graphics.drawTextureCentered(TextureLoader.getTankTexture("gunner", fillCol), pos, direction, scale / originalScale, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));

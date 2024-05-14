@@ -9,12 +9,15 @@ public class Player extends Tank {
     float currentZoom;
     float targetZoom;
     Vector2 cameraTarget;
+    Vector2 levelBarPos;
     Bar levelBar, scoreBar;
     Stopwatch levelUpWatch = new Stopwatch();
     final float BAR_WIDTH = 500, BAR_HEIGHT = 25;
+    String formattedName;
 
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(0, 7, 7, 7, 7, 0, 0, 5), 45);
+        super(spawn, new PlayerController(), new Stats(0, 7, 7, 7, 7, 0, 0, 5), 1);
+
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         setTankBuild(TankBuild.createTankBuild(buildName));
         TextureLoader.pendingAdd(this);
@@ -23,15 +26,22 @@ public class Player extends Tank {
         currentZoom = targetZoom = getZoom();
         Graphics.setZoom(currentZoom);
 
+        formattedName = NameGenerator.formatNameCase(tankBuild.name);
         initBars();
     }
 
     public void initBars() {
+        levelBarPos = new Vector2(Graphics.cameraWidth/2 - BAR_WIDTH/2, Graphics.cameraHeight - 2.7f * BAR_HEIGHT);
 
         float levelStartScore = ScoreHandler.levelToScore(level), levelNextScore = ScoreHandler.levelToScore(level+1);
-        levelBar = new Bar(BAR_WIDTH, BAR_HEIGHT, 3, Graphics.LEVELBAR, Graphics.DARK_GREY_STROKE, 0.08f, (level == ScoreHandler.maxPlayerLevel) ? 1 : (score-levelStartScore)/(levelNextScore-levelStartScore));  // If level max level, prevent division by 0 -> infinity
+        float initialLevelPercentage = (level == ScoreHandler.maxPlayerLevel) ? 1 : (score-levelStartScore)/(levelNextScore-levelStartScore);
+
+        levelBar = new Bar(levelBarPos, BAR_WIDTH, BAR_HEIGHT, 3, Graphics.LEVELBAR, Graphics.DARK_GREY_STROKE, 0.08f, initialLevelPercentage);  // If level max level, prevent division by 0 -> infinity
+        levelBar.setText("Lvl " + level + " " + formattedName, 21);
         levelUpWatch.start();
-        scoreBar = new Bar(BAR_WIDTH*2/3, BAR_HEIGHT*0.8f, 2, Graphics.SCORE_GREEN, Graphics.DARK_GREY_STROKE, 0.08f, 0);
+
+        final float scoreBarWidth = BAR_WIDTH*2/3, scoreBarHeight = BAR_HEIGHT*0.8f;
+        scoreBar = new Bar(new Vector2((Graphics.cameraWidth - scoreBarWidth) * 0.5f, levelBarPos.y - scoreBarHeight - 3), scoreBarWidth, scoreBarHeight, 2, Graphics.SCORE_GREEN, Graphics.DARK_GREY_STROKE, 0.08f, 0);
     }
 
     // For timing speed
@@ -51,6 +61,7 @@ public class Player extends Tank {
             level = newLevel;
             updateStats();
             levelUpWatch.start();
+            levelBar.setText("Lvl " + level + " " + formattedName, 21);
         }
         targetZoom = getZoom();
     }
@@ -108,7 +119,6 @@ public class Player extends Tank {
         if (Graphics.isKeyDown(KEY_K)) {
             score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) + 0.01f - score, 23000.f/(2 * 120)));  // 2 seconds
         }
-
     }
 
 /*    public void draw() {
@@ -123,27 +133,32 @@ public class Player extends Tank {
         }
     }*/
 
-    public void drawLevelBar() {
-        Vector2 levelBarPos = new Vector2(Graphics.cameraWidth/2 - levelBar.width/2, Graphics.cameraHeight - 2.7f * BAR_HEIGHT);
+    public void updateBars() {
+        if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) != 0) return;  // Only update every other frame
 
-        levelBar.setText("Lvl " + level + " " + NameGenerator.formatNameCase(tankBuild.name), 21);
         float levelStartScore = ScoreHandler.levelToScore(level), levelNextScore = ScoreHandler.levelToScore(level+1);
         if (level == ScoreHandler.maxPlayerLevel && levelUpWatch.ms() >= 1000) {
-            levelBar.update(levelBarPos, Graphics.clamp((float) (levelUpWatch.ms() - 1600) /1000, 0, 1));
+            levelBar.update((float) (levelUpWatch.ms() - 1600) /1000);
         } else {
-            levelBar.update(levelBarPos, Graphics.clamp(levelUpWatch.ms() < 1000? 1 : (score - levelStartScore) / (levelNextScore - levelStartScore), 0, 1));
+            levelBar.update(levelUpWatch.ms() < 1000? 1 : (score - levelStartScore) / (levelNextScore - levelStartScore));
         }
+
+        Tank firstTank = Leaderboard.getTankRank(0);
+        if (Main.counter % 4 == 0) {
+            scoreBar.setText("Score: " + (int) score, 19);
+        }
+        scoreBar.update((firstTank == null) ? 0 : score/firstTank.score);
+    }
+
+    public void drawLevelBar() {
         levelBar.draw();
+
         //float reverseZoom = 1.f / Graphics.getCameraZoom();
         //Graphics.drawTextCenteredOutline("Level " + level, Graphics.screenWidth/2 , (int) (Graphics.screenHeight - 25 * 0.5f), 21, Color.WHITE);
-        Tank firstTank = Leaderboard.getTankRank(0);
-        scoreBar.setText("Score: " + (int) score, 19);
-        scoreBar.update(new Vector2((Graphics.cameraWidth - scoreBar.width) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - 3), Graphics.clamp((firstTank == null) ? 0 : score/firstTank.score, 0, 1));
         scoreBar.draw();
     }
 
     public void drawUsername() {
-        Vector2 levelBarPos = new Vector2(Graphics.cameraWidth/2 - levelBar.width/2, Graphics.cameraHeight - 2.7f * BAR_HEIGHT);
         // Draw username
         Graphics.drawTextCenteredOutlineNoAA(username, Graphics.cameraWidth/2, (int) (levelBarPos.y - 0.8f * BAR_HEIGHT - 3 - 20), 40, Color.WHITE);
     }

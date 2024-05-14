@@ -21,7 +21,7 @@ public class EnemyTank extends Tank {
         if (!isDead && Main.onScreen(pos, radius*scale)) {
             float scoreFont = 20 / Graphics.getCameraZoom();
             float yPos = (pos.y - radius * scale);
-            Graphics.drawTextCenteredOutline(String.format("%.1fk", score/1000), (int) pos.x, (int) (yPos - scoreFont * 0.5f), (int) scoreFont, Color.WHITE);
+            Graphics.drawTextCenteredOutline(Graphics.round(score/1000, 1) + "k", (int) pos.x, (int) (yPos - scoreFont * 0.5f), (int) scoreFont, Color.WHITE);
             yPos -= scoreFont;
             float usernameFont = 25 / Graphics.getCameraZoom();
             Graphics.drawTextCenteredOutline(username, (int) pos.x, (int) (yPos - usernameFont * 0.5f), (int) usernameFont, Color.WHITE);

@@ -31,7 +31,9 @@ public class Leaderboard {
         tankIds.remove(tank.getId());
     }
 
-    public static void draw() {
+
+    public static void update() {
+        if (Main.counter % Graphics.FPS != 0) return;  // Only update every second
         tankList.clear();  // Clear tankList
         tankIds.forEach(id -> tankList.add((Tank) Main.gameObjectPool.getObj(id)));  // Fill tankList with tanks from tankIds
         tankList.sort((tankA, tankB) -> Float.compare(tankB.score, tankA.score));  // Sort by greatest to least score
@@ -44,14 +46,17 @@ public class Leaderboard {
         for (int i = 0; i < Math.min(tankIds.size(), LEADERBOARD_SIZE); i++) {
             Tank tank = tankList.get(i);
             tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
-            scoreBars[i].setText(String.format("%s - %.1fk", tank.username, tank.score / 1000), 19);
+
             scoreBars[i].update(new Vector2(cornerX, cornerY + i * leaderboardGap - 23 * 0.5f), tankList.get(i).score/maxScore);
+            scoreBars[i].setText(tank.username + " - " + Graphics.round(tank.score / 1000, 1) + "k", 19);
 
             final int finalI = i;
             scoreBars[i].setCustomDraw((Rectangle rect) -> {
                 Graphics.drawTextureCentered(tankBuilds[finalI], new Vector2(rect.x + 11, rect.y + rect.height * 0.5f), 0, 1f, Color.WHITE);
             });
         }
+    }
+    public static void draw() {
 /*        float reverseZoom = 1.f / Graphics.getCameraZoom();
         Vector2 cornerPos = Graphics.getScreenToWorld2D(new Vector2(1675, leaderboardGap), Graphics.camera);
 

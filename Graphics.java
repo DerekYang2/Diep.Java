@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Random;
 
 import static com.raylib.java.core.input.Mouse.MouseButton.MOUSE_BUTTON_LEFT;
@@ -87,8 +88,8 @@ public class Graphics extends Raylib {
             HEALTH_BAR_STROKE = rgb(85, 85, 85),
             DARK_GREY = rgb(85, 85, 85),
             DARK_GREY_STROKE = rgb(63, 63, 63),
-            LEVELBAR = rgb(241, 217, 117),
-            SCORE_GREEN = rgb(102, 239, 170);
+            LEVELBAR = rgb(255, 232, 105),
+            SCORE_GREEN = rgb(67, 255, 145);
 
 
     public static Color getColor(String hexStr) {
@@ -97,17 +98,16 @@ public class Graphics extends Raylib {
 
 
     public static void initialize(String title) {
-        // First get environment setup
-        getEnvironmentVariables();
-
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode monitor = gd.getDisplayMode();
         GraphicsConfiguration gc = gd.getDefaultConfiguration();
         Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
-
         if (monitor.getRefreshRate() < 120) {
             PERFORMANCE_MODE = 1;
         }
+
+        // First get environment setup
+        getEnvironmentVariables();
 
         FPS = 60 * (2 - PERFORMANCE_MODE);
         // Screen dimensions (actual monitor pixels)
@@ -117,6 +117,7 @@ public class Graphics extends Raylib {
         // Raylib window
         rlj = new Raylib();
         rCore.SetConfigFlags(Config.ConfigFlag.FLAG_MSAA_4X_HINT | Config.ConfigFlag.FLAG_WINDOW_RESIZABLE | Config.ConfigFlag.FLAG_WINDOW_MAXIMIZED);
+
         rlj.core.SetExitKey(0);  // Disable exit key (not working in raylib java?)
 
         rlj.core.InitWindow(screenWidth, screenHeight, title);
@@ -268,15 +269,12 @@ public class Graphics extends Raylib {
         rlj.core.EndMode2D();
     }
 
-    public static void endTargetTexture() {
+    public static void endTextureMode() {
         rlj.core.EndTextureMode();
     }
 
     public static void beginUITexture() {
         rlj.core.BeginTextureMode(UITex);
-    }
-    public static void endUITexture() {
-        rlj.core.EndTextureMode();
     }
 
     public static void endDrawMode() {
@@ -289,7 +287,7 @@ public class Graphics extends Raylib {
 
         rTextures.DrawTexturePro(UITex.texture, new Rectangle(0.0f, 0.0f, (float) UITex.texture.width, (float) -UITex.texture.height),
                 new Rectangle((screenWidth - ((float) cameraWidth * screenScale)) * 0.5f, (screenHeight - ((float) cameraHeight * screenScale)) * 0.5f,
-                        (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, Color.WHITE);
+                        (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, colAlpha(Color.WHITE, 0.9f));
 
         try {
             rlj.core.EndDrawing();
@@ -604,6 +602,9 @@ public class Graphics extends Raylib {
         rlj.text.DrawTextEx(outlineFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
     }
 
+    public static void drawTextOutline(String text, Vector2 pos, int fontSize, float spacing, Color color) {
+        rlj.text.DrawTextEx(outlineFont, text, pos, fontSize, spacing, color);
+    }
     public static void drawTextCenteredOutlineNoAA(String text, int xCenter, int yCenter, int fontSize, Color color) {
         float spacing = -5f*fontSize / outlineFontNoAA.getBaseSize();
         Vector2 textDimensions = rText.MeasureTextEx(outlineFontNoAA, text, fontSize, spacing);
@@ -808,5 +809,10 @@ public class Graphics extends Raylib {
      */
     public static boolean isIntersecting(Rectangle rect1, Rectangle rect2) {
         return rect1.x <= rect2.x + rect2.width && rect1.x + rect1.width >= rect2.x && rect1.y <= rect2.y + rect2.height && rect1.y + rect1.height >= rect2.y;
+    }
+
+    public static float round(float f, int precision) {
+        int scale = (int) Math.pow(10, precision);
+        return Math.round(f * scale) / scale;
     }
 }

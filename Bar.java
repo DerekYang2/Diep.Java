@@ -1,6 +1,7 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
+import com.raylib.java.text.rText;
 
 import java.util.function.Consumer;
 
@@ -15,9 +16,28 @@ public class Bar implements Drawable {
     float lerpFactor;
     boolean isHiding;
     boolean inGameWorld;
-    String text;
-    int fontSize;
-    Consumer<Rectangle> customDraw = null;
+
+    // Text variables
+    private String text;
+    private int fontSize;
+    private float spacing;
+    private Vector2 drawPos;
+    // Custom draw
+    private Consumer<Rectangle> customDraw = null;
+
+    public Bar(Vector2 pos, float width, float height, float strokeWidth, Color fillCol, Color strokeCol, float lerpFactor, float initialPercentage) {
+        this.pos = pos;
+        this.width = (int)Math.ceil(width);
+        this.height = Math.round(height);
+        this.strokeWidth = Math.round(strokeWidth);
+        this.fillCol = fillCol;
+        this.strokeCol = strokeCol;
+        this.targetPercentage = this.percentage = initialPercentage;
+        this.lerpFactor = lerpFactor;
+        isHiding = false;
+        opacity = 1;
+        inGameWorld = false;
+    }
 
     public Bar(float width, float height, float strokeWidth, Color fillCol, Color strokeCol, float lerpFactor, float initialPercentage) {
         this.pos = new Vector2(0, 0);
@@ -36,6 +56,9 @@ public class Bar implements Drawable {
     public void setText(String text, int fontSize) {
         this.text = text;
         this.fontSize = fontSize;
+        spacing = -8.f * fontSize / Graphics.outlineFont.getBaseSize();
+        Vector2 textDimensions = rText.MeasureTextEx(Graphics.outlineFont, text, fontSize, spacing);
+        drawPos = new Vector2(pos.x + width * 0.5f - textDimensions.x * 0.5f, pos.y + height * 0.5f - textDimensions.y * 0.5f);
     }
 
     public void setCustomDraw(Consumer<Rectangle> customDraw) {
@@ -48,14 +71,8 @@ public class Bar implements Drawable {
         inGameWorld = true;
     }
 
-    /**
-     * Update the bar's position and percentage filled
-     * @param pos The coordinate of the top-left corner of the bar
-     * @param percentage The percentage of the bar filled
-     */
-    public void update(Vector2 pos, float percentage) {
-        this.pos = pos;
-        this.targetPercentage = percentage;
+    public void update(float percentage) {
+        this.targetPercentage = Graphics.clamp(percentage, 0, 1);
 
         // Animate the bar (LERP)
         this.percentage += (this.targetPercentage - this.percentage) * lerpFactor;
@@ -67,6 +84,16 @@ public class Bar implements Drawable {
             opacity += 1.f/12;
             opacity = Math.min(opacity, 1);  // Keep less than 1
         }
+    }
+
+    /**
+     * Update the bar's position and percentage filled
+     * @param pos The coordinate of the top-left corner of the bar
+     * @param percentage The percentage of the bar filled
+     */
+    public void update(Vector2 pos, float percentage) {
+        this.pos = pos;
+        update(percentage);
     }
 
     public void triggerHidden(boolean isHidden) {
@@ -99,7 +126,7 @@ public class Bar implements Drawable {
                 customDraw.accept(new Rectangle(xInt, yInt, width, height));
             }
             if (text != null) {
-                Graphics.drawTextCenteredOutline(text, (int) (xInt + width * 0.5), (int) (yInt + height * (0.5f + 0.03f)), fontSize, -8, Color.WHITE);
+                Graphics.drawTextOutline(text, drawPos, fontSize, spacing, Color.WHITE);
             }
         }
     }

@@ -117,10 +117,10 @@ public class Bar implements Drawable {
         if (!isHidden()) {
             int xInt = Math.round(pos.x);
             int yInt = Math.round(pos.y);
-
-            Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, Graphics.colAlpha(strokeCol, opacity));
+            int segments = (int)(height  * 0.7);
+            Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, segments, Graphics.colAlpha(strokeCol, opacity));
             float rectWidth = Math.max(width * percentage - 2 * strokeWidth, height - 2 * strokeWidth);
-            Graphics.drawRectangleRounded(xInt + strokeWidth, yInt + strokeWidth, rectWidth, height - 2 * strokeWidth, 1f, Graphics.colAlpha(fillCol, opacity));
+            Graphics.drawRectangleRounded(xInt + strokeWidth, yInt + strokeWidth, rectWidth, height - 2 * strokeWidth, 1f, segments, Graphics.colAlpha(fillCol, opacity));
 
             if (customDraw != null) {
                 customDraw.accept(new Rectangle(xInt, yInt, width, height));

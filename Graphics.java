@@ -287,7 +287,7 @@ public class Graphics extends Raylib {
 
         rTextures.DrawTexturePro(UITex.texture, new Rectangle(0.0f, 0.0f, (float) UITex.texture.width, (float) -UITex.texture.height),
                 new Rectangle((screenWidth - ((float) cameraWidth * screenScale)) * 0.5f, (screenHeight - ((float) cameraHeight * screenScale)) * 0.5f,
-                        (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, colAlpha(Color.WHITE, 0.9f));
+                        (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, colAlpha(Color.WHITE, 0.81f));
 
         try {
             rlj.core.EndDrawing();
@@ -447,8 +447,8 @@ public class Graphics extends Raylib {
         rShapes.DrawRectanglePro(rectangle, origin, radians * 180.f / (float) Math.PI, color);
     }
 
-    public static void drawRectangleRounded(float x, float y, float width, float height, float roundness, Color color) {
-        rlj.shapes.DrawRectangleRounded(new Rectangle(x, y, width, height), roundness, 7, color);
+    public static void drawRectangleRounded(float x, float y, float width, float height, float roundness, int segments, Color color) {
+        rlj.shapes.DrawRectangleRounded(new Rectangle(x, y, width, height), roundness, segments, color);
     }
 
     // https://www.desmos.com/calculator/odkmazouws

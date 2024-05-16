@@ -3,7 +3,7 @@ import com.raylib.java.core.input.Keyboard;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 
-import static com.raylib.java.core.input.Keyboard.KEY_K;
+import static com.raylib.java.core.input.Keyboard.*;
 
 public class Player extends Tank {
     float currentZoom;
@@ -13,20 +13,16 @@ public class Player extends Tank {
     Bar levelBar, scoreBar;
     Stopwatch levelUpWatch = new Stopwatch();
     final float BAR_WIDTH = 500, BAR_HEIGHT = 25;
-    String formattedName;
+    String formattedBuildName;
 
     public Player(Vector2 spawn, String buildName) {
         super(spawn, new PlayerController(), new Stats(0, 7, 7, 7, 7, 0, 0, 5), 1);
 
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         setTankBuild(TankBuild.createTankBuild(buildName));
-        TextureLoader.pendingAdd(this);
-
         cameraTarget = pos;
-        currentZoom = targetZoom = getZoom();
+        currentZoom = targetZoom;
         Graphics.setZoom(currentZoom);
-
-        formattedName = NameGenerator.formatNameCase(tankBuild.name);
         initBars();
     }
 
@@ -37,11 +33,23 @@ public class Player extends Tank {
         float initialLevelPercentage = (level == ScoreHandler.maxPlayerLevel) ? 1 : (score-levelStartScore)/(levelNextScore-levelStartScore);
 
         levelBar = new Bar(levelBarPos, BAR_WIDTH, BAR_HEIGHT, 3, Graphics.LEVELBAR, Graphics.DARK_GREY_STROKE, 0.08f, initialLevelPercentage);  // If level max level, prevent division by 0 -> infinity
-        levelBar.setText("Lvl " + level + " " + formattedName, 21);
+        levelBar.setText("Lvl " + level + " " + formattedBuildName, 21);
         levelUpWatch.start();
 
         final float scoreBarWidth = BAR_WIDTH*2/3, scoreBarHeight = BAR_HEIGHT*0.8f;
         scoreBar = new Bar(new Vector2((Graphics.cameraWidth - scoreBarWidth) * 0.5f, levelBarPos.y - scoreBarHeight - 3), scoreBarWidth, scoreBarHeight, 2, Graphics.SCORE_GREEN, Graphics.DARK_GREY_STROKE, 0.08f, 0);
+    }
+
+    @Override
+    public void setTankBuild(TankBuild tankBuild) {
+        super.setTankBuild(tankBuild);
+        TextureLoader.pendingAdd(this);
+        formattedBuildName = NameGenerator.formatNameCase(tankBuild.name);
+        if (levelBar != null) {  // Null on first initialization
+            levelBar.setText("Lvl " + level + " " + formattedBuildName, 21);
+        }
+        targetZoom = getZoom();
+        tankBuild.update();  // In order to have correct position and rotation right away
     }
 
     // For timing speed
@@ -61,7 +69,7 @@ public class Player extends Tank {
             level = newLevel;
             updateStats();
             levelUpWatch.start();
-            levelBar.setText("Lvl " + level + " " + formattedName, 21);
+            levelBar.setText("Lvl " + level + " " + formattedBuildName, 21);
         }
         targetZoom = getZoom();
     }
@@ -69,7 +77,7 @@ public class Player extends Tank {
     protected float getZoom() {
         return (float) ((.55f * this.tankBuild.fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f));
     }
-
+    boolean testFlag = false;
     public void updateCamera() {
         if (tankBuild.zoomAbility && controller.holdSpecial()) {
             if (controller.pressSpecial()) {  // Only update target if the button is pressed
@@ -91,7 +99,6 @@ public class Player extends Tank {
         if (Graphics.isKeyDown(Keyboard.KEY_UP)) {
             Graphics.setCameraZoom(Graphics.getCameraZoom() + delta);
         }
-
         // Cap the zoom level
         Graphics.setCameraZoom(Math.max(0.1f, Math.min(10f, Graphics.getCameraZoom())));
     }
@@ -118,6 +125,11 @@ public class Player extends Tank {
 
         if (Graphics.isKeyDown(KEY_K)) {
             score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) + 0.01f - score, 23000.f/(2 * 120)));  // 2 seconds
+        }
+
+        if (Graphics.isKeyPressed(Keyboard.KEY_T)) {  // Test
+            setTankBuild(TankBuild.createTankBuild(testFlag?"sniper":"machine gun"));
+            testFlag = !testFlag;
         }
     }
 

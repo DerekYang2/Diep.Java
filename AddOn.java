@@ -189,7 +189,7 @@ class AutoTurretAddOn extends AddOn {
         this.host = tank;
         final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
 
-        Barrel barrel = new Barrel(BULLET_STATS, 42 * 0.8f, 55, 1, 0, tank.direction, false, false, false);
+        Barrel barrel = new Barrel(BULLET_STATS, 42 * 0.8f, 55, 1, 0, 0, false, false, false);
         barrel.setHost(tank);
 
         FireManager fireManager = new FireManager(new double[][]{{0, 1}});
@@ -275,17 +275,14 @@ class AutoNAddOn extends AddOn {
         this.host = tank;
         final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.4f, 1.2f, 1, 1, 1, 0.3f);
         for (int i = 0; i < numTurrets; i++) {
-
-            Barrel barrel = new Barrel(BULLET_STATS, 42 * 0.8f, 55, 1,0, tank.direction, false, false, false);
+            Barrel barrel = new Barrel(BULLET_STATS, 42 * 0.8f, 55, 1,0, 0, false, false, false);
             barrel.setHost(tank);
 
             FireManager fireManager = new FireManager(new double[][]{{0.01, 1}});
             fireManager.setHost(tank);
 
-
             autoTurrets[i] = new AutoTurret(tank, barrel, fireManager);
         }
-
         offsetRadians = 0;
         // Set relative positions
         float radiusScaled = host.radius * host.scale * 0.8f;

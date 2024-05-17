@@ -105,7 +105,9 @@ public class Player extends Tank {
 
     @Override
     public void update() {
+
         super.update();
+
         if (Math.abs(targetZoom - currentZoom) > 1e-3) {
             currentZoom += (targetZoom - currentZoom) * 0.05f;
             Graphics.setZoom(currentZoom);
@@ -126,9 +128,8 @@ public class Player extends Tank {
         if (Graphics.isKeyDown(KEY_K)) {
             score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) + 0.01f - score, 23000.f/(2 * 120)));  // 2 seconds
         }
-
-        if (Graphics.isKeyPressed(Keyboard.KEY_T)) {  // Test
-            setTankBuild(TankBuild.createTankBuild(testFlag?"sniper":"machine gun"));
+        if (Graphics.isKeyPressed(Keyboard.KEY_T) && Main.counter % 2 == 0) {  // Test
+            setTankBuild(TankBuild.createTankBuild(testFlag?"auto 5":"machine gun"));
             testFlag = !testFlag;
         }
     }

@@ -2,54 +2,67 @@ import com.raylib.java.core.Color;
 import com.raylib.java.core.input.Keyboard;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
+import com.raylib.java.text.rText;
 
-import static com.raylib.java.core.input.Keyboard.*;
+import static com.raylib.java.core.input.Keyboard.KEY_K;
 
 public class Player extends Tank {
     float currentZoom;
     float targetZoom;
     Vector2 cameraTarget;
+    Stopwatch levelUpWatch = new Stopwatch();
+
+    // Variables for HUD
     Vector2 levelBarPos;
     Bar levelBar, scoreBar;
-    Stopwatch levelUpWatch = new Stopwatch();
     final float BAR_WIDTH = 500, BAR_HEIGHT = 25;
     String formattedBuildName;
+    Vector2 usernamePos;
+    float usernameSpacing;
+    final float usernameFontSize = 40;
 
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(0, 7, 7, 7, 7, 0, 0, 5), 1);
+        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 0, 5), 1);
 
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
-        setTankBuild(TankBuild.createTankBuild(buildName));
+        initTankBuild(TankBuild.createTankBuild(buildName));
+        currentZoom = targetZoom;  // Spawn with right zoom level
         cameraTarget = pos;
-        currentZoom = targetZoom;
-        Graphics.setZoom(currentZoom);
+        Graphics.setZoom(currentZoom);  // Set zoom level
         initBars();
+
+        // Set username variables
+        usernameSpacing = -16f*usernameFontSize / Graphics.outlineFont.getBaseSize();
+        Vector2 textDimensions = rText.MeasureTextEx(Graphics.outlineFont, username, usernameFontSize, usernameSpacing);
+        usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - 21 - textDimensions.getY() * 0.5f);
     }
 
     public void initBars() {
-        levelBarPos = new Vector2(Graphics.cameraWidth/2 - BAR_WIDTH/2, Graphics.cameraHeight - 2.7f * BAR_HEIGHT);
+        levelBarPos = new Vector2(Graphics.cameraWidth/2 - BAR_WIDTH/2, Graphics.cameraHeight - 2.5f * BAR_HEIGHT);
 
         float levelStartScore = ScoreHandler.levelToScore(level), levelNextScore = ScoreHandler.levelToScore(level+1);
         float initialLevelPercentage = (level == ScoreHandler.maxPlayerLevel) ? 1 : (score-levelStartScore)/(levelNextScore-levelStartScore);
-
-        levelBar = new Bar(levelBarPos, BAR_WIDTH, BAR_HEIGHT, 3, Graphics.LEVELBAR, Graphics.DARK_GREY_STROKE, 0.08f, initialLevelPercentage);  // If level max level, prevent division by 0 -> infinity
+        levelBar = new Bar(levelBarPos, BAR_WIDTH, BAR_HEIGHT, 3, Graphics.LEVELBAR, Graphics.BAR_GREY, 0.08f, initialLevelPercentage);  // If level max level, prevent division by 0 -> infinity
         levelBar.setText("Lvl " + level + " " + formattedBuildName, 21);
         levelUpWatch.start();
 
         final float scoreBarWidth = BAR_WIDTH*2/3, scoreBarHeight = BAR_HEIGHT*0.8f;
-        scoreBar = new Bar(new Vector2((Graphics.cameraWidth - scoreBarWidth) * 0.5f, levelBarPos.y - scoreBarHeight - 3), scoreBarWidth, scoreBarHeight, 2, Graphics.SCORE_GREEN, Graphics.DARK_GREY_STROKE, 0.08f, 0);
+        scoreBar = new Bar(new Vector2((Graphics.cameraWidth - scoreBarWidth) * 0.5f, levelBarPos.y - scoreBarHeight - 3), scoreBarWidth, scoreBarHeight, 2, Graphics.SCORE_GREEN, Graphics.BAR_GREY, 0.08f, 0);
     }
 
     @Override
-    public void setTankBuild(TankBuild tankBuild) {
-        super.setTankBuild(tankBuild);
+    public void initTankBuild(TankBuild tankBuild) {
+        super.initTankBuild(tankBuild);
         TextureLoader.pendingAdd(this);
         formattedBuildName = NameGenerator.formatNameCase(tankBuild.name);
-        if (levelBar != null) {  // Null on first initialization
-            levelBar.setText("Lvl " + level + " " + formattedBuildName, 21);
-        }
         targetZoom = getZoom();
         tankBuild.update();  // In order to have correct position and rotation right away
+    }
+
+    public void changeTankBuild(TankBuild tankBuild) {
+        this.tankBuild.delete();  // Delete old tank build
+        initTankBuild(tankBuild);  // Initialize new tank build
+        levelBar.setText("Lvl " + level + " " + formattedBuildName, 21);
     }
 
     // For timing speed
@@ -128,8 +141,8 @@ public class Player extends Tank {
         if (Graphics.isKeyDown(KEY_K)) {
             score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) + 0.01f - score, 23000.f/(2 * 120)));  // 2 seconds
         }
-        if (Graphics.isKeyPressed(Keyboard.KEY_T) && Main.counter % 2 == 0) {  // Test
-            setTankBuild(TankBuild.createTankBuild(testFlag?"auto 5":"machine gun"));
+        if (Graphics.isKeyPressed(Keyboard.KEY_T)) {  // Test
+            changeTankBuild(TankBuild.createTankBuild(testFlag?"battleship":"overlord"));
             testFlag = !testFlag;
         }
     }
@@ -173,7 +186,8 @@ public class Player extends Tank {
 
     public void drawUsername() {
         // Draw username
-        Graphics.drawTextCenteredOutlineNoAA(username, Graphics.cameraWidth/2, (int) (levelBarPos.y - 0.8f * BAR_HEIGHT - 3 - 20), 40, Color.WHITE);
+        Graphics.drawTextOutline(username, usernamePos, (int) usernameFontSize, usernameSpacing, Color.WHITE);
+        //Graphics.drawTextCenteredOutline(username, Graphics.cameraWidth/2, (int) (levelBarPos.y - 0.8f * BAR_HEIGHT - 20), 40, Color.WHITE);
     }
 
     @Override

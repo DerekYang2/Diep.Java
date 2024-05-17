@@ -18,7 +18,6 @@ public class TextureLoader {
         if (!tankTextures.get(fillCol).containsKey(buildName)) {  // If build name not in sub-map, add it
             Image tankImage = Graphics.createTankImage(buildName, fillCol, strokeCol);
             tankTextures.get(fillCol).put(buildName, Graphics.loadTextureFromImage(tankImage));
-
             Graphics.imageResize(tankImage, 0.097f);
             iconTextures.get(fillCol).put(buildName, Graphics.loadTextureFromImage(tankImage));
         }

@@ -2,6 +2,7 @@ import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 public class Barrel {
     boolean noDamageAnimation = false;  // Flag to disable damage animation
+    protected boolean deleted = false;  // Flag to delete the barrel
 
     Vector2 pos;
     Vector2 posOriginal;
@@ -86,6 +87,14 @@ public class Barrel {
     public void setColor(Color fillCol, Color strokeCol) {
         this.fillCol = fillCol;
         this.strokeCol = strokeCol;
+    }
+
+    public void delete() {
+        deleted = true;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
     }
 
     /**

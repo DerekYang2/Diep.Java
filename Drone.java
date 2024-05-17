@@ -61,6 +61,11 @@ public class Drone extends Projectile {
 
         if (isDead) return;
 
+        if (hostBarrel.isDeleted()) {  // If host barrel is deleted, delete drone
+            triggerDelete();
+            return;
+        }
+
         // Update AI on from host tank
         aiOn = host.getAutoFire() || !hostBarrel.canControlDrones;  // If host tank has autofire or cannot control drones, turn on AI
 

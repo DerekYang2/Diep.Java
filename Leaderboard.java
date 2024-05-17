@@ -21,7 +21,7 @@ public class Leaderboard {
         tankIds.clear();
         tankList.clear();
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
-            scoreBars[i] = new Bar(leaderboardWidth, leaderboardHeight, 2, Graphics.SCORE_GREEN, Graphics.DARK_GREY_STROKE, 1f, 0);
+            scoreBars[i] = new Bar(leaderboardWidth, leaderboardHeight, 2, Graphics.SCORE_GREEN, Graphics.BAR_GREY, 1f, 0);
         }
     }
     public static void addTank(Tank tank) {
@@ -56,6 +56,7 @@ public class Leaderboard {
             });
         }
     }
+
     public static void draw() {
 /*        float reverseZoom = 1.f / Graphics.getCameraZoom();
         Vector2 cornerPos = Graphics.getScreenToWorld2D(new Vector2(1675, leaderboardGap), Graphics.camera);

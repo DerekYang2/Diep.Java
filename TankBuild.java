@@ -33,6 +33,8 @@ public class TankBuild
     float visibilityRateMoving;  // Rate of visibility increase when moving
     float invisibilityRate;  // Constant rate of invisibility decrease
 
+    protected boolean isDeleted = false;  // Whether the tank build has been deleted
+
     public TankBuild(String name, AddOn addOn, Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats, float fieldFactor) {
         this.name = name;
         this.barrels = barrels;
@@ -71,6 +73,15 @@ public class TankBuild
         this.visibilityRateMoving = visibilityRateMoving;
         this.invisibilityRate = invisibilityRate;
         this.zoomAbility = zoomAbility;
+    }
+
+    public void delete() {
+        if (!isDeleted) {
+            isDeleted = true;
+            for (Barrel barrel : barrels) {
+                barrel.delete();
+            }
+        }
     }
 
     public void update() {

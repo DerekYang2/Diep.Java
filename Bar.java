@@ -21,7 +21,7 @@ public class Bar implements Drawable {
     private String text;
     private int fontSize;
     private float spacing;
-    private Vector2 drawPos;
+    private Vector2 textDrawPos;
     // Custom draw
     private Consumer<Rectangle> customDraw = null;
 
@@ -56,9 +56,9 @@ public class Bar implements Drawable {
     public void setText(String text, int fontSize) {
         this.text = text;
         this.fontSize = fontSize;
-        spacing = -8.f * fontSize / Graphics.outlineFont.getBaseSize();
-        Vector2 textDimensions = rText.MeasureTextEx(Graphics.outlineFont, text, fontSize, spacing);
-        drawPos = new Vector2(pos.x + width * 0.5f - textDimensions.x * 0.5f, pos.y + height * 0.5f - textDimensions.y * 0.5f);
+        spacing = -8.f * fontSize / Graphics.outlineSmallFont.getBaseSize();
+        Vector2 textDimensions = rText.MeasureTextEx(Graphics.outlineSmallFont, text, fontSize, spacing);
+        textDrawPos = new Vector2(pos.x + width * 0.5f - textDimensions.x * 0.5f, pos.y + height * 0.5f - textDimensions.y * 0.5f + 0.5f);
     }
 
     public void setCustomDraw(Consumer<Rectangle> customDraw) {
@@ -115,9 +115,9 @@ public class Bar implements Drawable {
             return;
         }
         if (!isHidden()) {
-            int xInt = Math.round(pos.x);
-            int yInt = Math.round(pos.y);
-            int segments = (int)(height  * 0.7);
+            int xInt = (int)(pos.x);
+            int yInt = (int)pos.y;
+            int segments = (int)(height  * 0.7f);
             Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, segments, Graphics.colAlpha(strokeCol, opacity));
             float rectWidth = Math.max(width * percentage - 2 * strokeWidth, height - 2 * strokeWidth);
             Graphics.drawRectangleRounded(xInt + strokeWidth, yInt + strokeWidth, rectWidth, height - 2 * strokeWidth, 1f, segments, Graphics.colAlpha(fillCol, opacity));
@@ -126,7 +126,7 @@ public class Bar implements Drawable {
                 customDraw.accept(new Rectangle(xInt, yInt, width, height));
             }
             if (text != null) {
-                Graphics.drawTextOutline(text, drawPos, fontSize, spacing, Color.WHITE);
+                Graphics.drawTextOutline(text, textDrawPos, fontSize, spacing, Color.WHITE);
             }
         }
     }

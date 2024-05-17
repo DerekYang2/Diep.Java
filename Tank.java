@@ -56,7 +56,7 @@ public class Tank extends GameObject {
         this.maxHealth = maxHealth;
     }
 
-    public void setTankBuild(TankBuild tankBuild) {
+    public void initTankBuild(TankBuild tankBuild) {
         this.tankBuild = tankBuild;
         tankBuild.setHost(this);
         // Update controller

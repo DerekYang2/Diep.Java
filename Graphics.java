@@ -39,7 +39,7 @@ public class Graphics extends Raylib {
     public static Raylib rlj;
     public static Camera2D camera;
     private static RenderTexture target, tankTex, UITex;
-    public static Font outlineFont, font, outlineFontNoAA;  // For large outline, use separate font without anti-aliasing
+    public static Font outlineFont, font, outlineSmallFont;
     private static Vector2 mouse = new Vector2(), virtualMouse = new Vector2();
 
     private static Random random = new Random();
@@ -82,14 +82,16 @@ public class Graphics extends Raylib {
             PURPLE_STROKE = rgb(143, 95, 183),
             GREY = rgb(153, 153, 153),
             GRID = rgb(205, 205, 205),
-            GRID_STROKE = rgba(0, 0, 0, 6),
+            GRID_STROKE = rgba(0, 0, 0, 12),
             BOUNDARY = rgba(0, 0, 0, 15),
             HEALTH_BAR = rgb(133, 227, 125),
             HEALTH_BAR_STROKE = rgb(85, 85, 85),
             DARK_GREY = rgb(85, 85, 85),
             DARK_GREY_STROKE = rgb(63, 63, 63),
             LEVELBAR = rgb(255, 232, 105),
-            SCORE_GREEN = rgb(67, 255, 145);
+            SCORE_GREEN = rgb(67, 255, 145),
+            BAR_GREY = rgb(20, 20, 20);
+
 
 
     public static Color getColor(String hexStr) {
@@ -153,11 +155,13 @@ public class Graphics extends Raylib {
     }
 
     public static void initFont() {
-        outlineFont = rlj.text.LoadFont("assets/UbuntuOutlineBitmap.fnt");  // Load and apply anti-aliasing
+        outlineFont = rlj.text.LoadFont("assets/UbuntuCustom.fnt");  // Load and apply anti-aliasing
         rTextures.SetTextureFilter(outlineFont.texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
         rlj.textures.SetTextureWrap(outlineFont.texture, RLGL.RL_TEXTURE_WRAP_CLAMP);
 
-        outlineFontNoAA = rlj.text.LoadFont("assets/UbuntuOutlineBitmap.fnt");  // No anti-aliasing
+        outlineSmallFont = rlj.text.LoadFont("assets/UbuntuCustomSmall.fnt");
+        rTextures.SetTextureFilter(outlineSmallFont.texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        rlj.textures.SetTextureWrap(outlineSmallFont.texture, RLGL.RL_TEXTURE_WRAP_CLAMP);
 
         font = rlj.text.LoadFontEx("assets/Ubuntu-Regular.ttf", 64, null, 250);
         //font = rText.GetFontDefault();
@@ -206,7 +210,7 @@ public class Graphics extends Raylib {
         return texture;
     }
 
-    private static void setTextureAntiAliasing(Texture2D texture) {
+    public static void setTextureAntiAliasing(Texture2D texture) {
         rlj.textures.GenTextureMipmaps(texture);
         rTextures.SetTextureFilter(texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
         rlj.textures.SetTextureWrap(texture, RLGL.RL_TEXTURE_WRAP_CLAMP);
@@ -287,7 +291,7 @@ public class Graphics extends Raylib {
 
         rTextures.DrawTexturePro(UITex.texture, new Rectangle(0.0f, 0.0f, (float) UITex.texture.width, (float) -UITex.texture.height),
                 new Rectangle((screenWidth - ((float) cameraWidth * screenScale)) * 0.5f, (screenHeight - ((float) cameraHeight * screenScale)) * 0.5f,
-                        (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, colAlpha(Color.WHITE, 0.81f));
+                        (float) cameraWidth * screenScale, (float) cameraHeight * screenScale), new Vector2(), 0.0f, colAlpha(Color.WHITE, 0.8f));
 
         try {
             rlj.core.EndDrawing();
@@ -504,6 +508,7 @@ public class Graphics extends Raylib {
     }
 
     public static void drawTurret(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity) {
+        stroke *= 1.1f;
         // Set opacity of colors
         color = colAlpha(color, opacity);
         strokeCol = colAlpha(strokeCol, opacity);
@@ -517,6 +522,7 @@ public class Graphics extends Raylib {
         Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
     }
     public static void drawTrapperTurret(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity) {
+        stroke *= 1.3f;
         // Set opacity of colors
         color = colAlpha(color, opacity);
         strokeCol = colAlpha(strokeCol, opacity);
@@ -530,13 +536,14 @@ public class Graphics extends Raylib {
         trapperLength *= k;
         rTextures.DrawTexturePro(innerTrapperHead, new Rectangle(0, 0, innerTrapperHead.width, innerTrapperHead.height), new Rectangle(xleft, ycenter, trapperLength, trapperHeight), new Vector2(-(length-strokeWidth), trapperHeight/2), (float)(radians * 180/Math.PI), color);
 
+        stroke *= 1.1f/1.3f;
         Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height), new Vector2(0, height/2.f), (float)radians, strokeCol);
         Graphics.drawRectangle(new Rectangle(xleft, ycenter, length, height - 2 * stroke), new Vector2(stroke, (height - 2 * stroke)/2.f), (float)radians, color);
     }
 
 
     public static void drawTurretTrapezoid(float xleft, float ycenter, float length, float height, double radians, float stroke, Color color, Color strokeCol, float opacity, boolean isFlipped) {
-        stroke *= 1.1f;
+        stroke *= 1.3f;
         color = colAlpha(color, opacity);
         strokeCol = colAlpha(strokeCol, opacity);
 
@@ -590,25 +597,14 @@ public class Graphics extends Raylib {
         rlj.text.DrawTextEx(font, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
     }
 
-    public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, float spacingFactor, Color color) {
-        float spacing = spacingFactor * fontSize / outlineFont.getBaseSize();
-        Vector2 textDimensions = rText.MeasureTextEx(outlineFont, text, fontSize, spacing);
-        rlj.text.DrawTextEx(outlineFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
-    }
-
     public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, Color color) {
-        float spacing = -5f*fontSize / outlineFont.getBaseSize();
-        Vector2 textDimensions = rText.MeasureTextEx(outlineFont, text, fontSize, spacing);
-        rlj.text.DrawTextEx(outlineFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
+        float spacing = -8.f * fontSize / outlineSmallFont.getBaseSize();
+        Vector2 textDimensions = rText.MeasureTextEx(outlineSmallFont, text, fontSize, spacing);
+        rlj.text.DrawTextEx(outlineSmallFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, colAlpha(color, 0.8f));
     }
 
     public static void drawTextOutline(String text, Vector2 pos, int fontSize, float spacing, Color color) {
-        rlj.text.DrawTextEx(outlineFont, text, pos, fontSize, spacing, color);
-    }
-    public static void drawTextCenteredOutlineNoAA(String text, int xCenter, int yCenter, int fontSize, Color color) {
-        float spacing = -5f*fontSize / outlineFontNoAA.getBaseSize();
-        Vector2 textDimensions = rText.MeasureTextEx(outlineFontNoAA, text, fontSize, spacing);
-        rlj.text.DrawTextEx(outlineFontNoAA, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
+        rlj.text.DrawTextEx(fontSize < 25 ? outlineSmallFont: outlineFont, text, pos, fontSize, spacing, color);
     }
 
     public static void unloadTexture(Texture2D texture) {
@@ -812,7 +808,7 @@ public class Graphics extends Raylib {
     }
 
     public static float round(float f, int precision) {
-        int scale = (int) Math.pow(10, precision);
+        float scale = (float)Math.pow(10, precision);
         return Math.round(f * scale) / scale;
     }
 }

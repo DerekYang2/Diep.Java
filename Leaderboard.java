@@ -1,6 +1,7 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
+import com.raylib.java.text.rText;
 import com.raylib.java.textures.Texture2D;
 
 import java.util.ArrayList;
@@ -13,9 +14,15 @@ public class Leaderboard {
     private static ArrayList<Tank> tankList = new ArrayList<>();
     private static Bar[] scoreBars = new Bar[LEADERBOARD_SIZE];
     private static Texture2D[] tankBuilds = new Texture2D[LEADERBOARD_SIZE];
-    static final float leaderboardGap = 25, leaderboardWidth = 250, leaderboardHeight = 21;
+    static final float leaderboardGap = 25, leaderboardWidth = 230, leaderboardHeight = 21;
     static final float cornerY = leaderboardHeight;
     static final float cornerX = Graphics.cameraWidth - leaderboardWidth - cornerY * 0.5f;
+
+    // Scoreboard title variables
+    static final int titleFontSize = 30;
+    static final float titleSpacing = -16f*titleFontSize / Graphics.outlineFont.getBaseSize();
+    static final Vector2 titleDimensions = rText.MeasureTextEx(Graphics.outlineFont, "Scoreboard", titleFontSize, titleSpacing);
+    static final Vector2 titlePos = new Vector2(cornerX + (leaderboardWidth - titleDimensions.x) * 0.5f, cornerY - titleDimensions.y * 0.5f);
 
     public static void clear() {
         tankIds.clear();
@@ -47,7 +54,7 @@ public class Leaderboard {
             Tank tank = tankList.get(i);
             tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
 
-            scoreBars[i].update(new Vector2(cornerX, cornerY + i * leaderboardGap - 23 * 0.5f), tankList.get(i).score/maxScore);
+            scoreBars[i].update(new Vector2(cornerX, cornerY + (i+1) * leaderboardGap - 23 * 0.5f), tankList.get(i).score/maxScore);
             scoreBars[i].setText(tank.username + " - " + Graphics.round(tank.score / 1000, 1) + "k", 19);
 
             final int finalI = i;
@@ -70,7 +77,7 @@ public class Leaderboard {
                 Graphics.drawTextCenteredY(leaderboard[i], (int) (cornerX + 25f * reverseZoom), cornerY, (int) (leaderboardGap * 0.75f * reverseZoom), Graphics.DARK_GREY_STROKE);
             }
         }*/
-
+        Graphics.drawTextOutline("Scoreboard", titlePos, titleFontSize, titleSpacing, Color.WHITE);
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
             if (tankBuilds[i] != null) {
                 scoreBars[i].draw();

@@ -8,8 +8,6 @@ import com.raylib.java.shapes.Rectangle;
  */
 
 public class Tank extends GameObject {
-    String username;
-
     float score;
     int level;
     // 54.7766480515
@@ -215,9 +213,7 @@ public class Tank extends GameObject {
     }
 
     @Override
-    public void updateVictim(GameObject victim) {
-        score += victim.getScoreReward();
-    }
+    public void updateVictim(GameObject victim) { score += victim.getScoreReward();}
 
     public Vector2 getTarget() {
         return controller.getTarget();

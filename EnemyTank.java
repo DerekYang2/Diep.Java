@@ -14,12 +14,13 @@ public class EnemyTank extends Tank {
         super.update();
     }
 
+    // TODO: always draw username in front
     @Override
     public void draw() {
         super.draw();
         if (!isDead && Main.onScreen(pos, radius*scale) && !isInvisible()) {
             float inverseZoom = 1.f / Graphics.getCameraZoom(), scoreFont = 22 * inverseZoom, yPos = (pos.y - radius * scale);
-            Graphics.drawTextCenteredOutline(Graphics.round(score/1000, 1) + "k", (int) pos.x, (int) (yPos - 1.25f * scoreFont * 0.5f), (int) scoreFont, -8.f, Graphics.colAlpha(Color.WHITE, 0.75f));
+            Graphics.drawTextCenteredOutline(Leaderboard.formatScoreShort(score), (int) pos.x, (int) (yPos - 1.25f * scoreFont * 0.5f), (int) scoreFont, -8.f, Graphics.colAlpha(Color.WHITE, 0.75f));
             yPos -= scoreFont;
             float usernameFont = 30 * inverseZoom;
             Graphics.drawTextCenteredOutline(username, (int) pos.x, (int) (yPos - usernameFont * 0.8f * 0.5f), (int) usernameFont, -8.f, Graphics.colAlpha(Color.WHITE, 0.75f));

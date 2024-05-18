@@ -4,6 +4,8 @@ import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 public abstract class GameObject implements Updatable, Drawable {
+    String username = "unnamed";  // Either the username of a tank or the name of the object (square, pentagon, etc.)
+
     // Objects always collide each other regardless of group (unless noInternalCollision is true)
     int group;  // Objects in different groups damage each other
     int DRAW_LAYER;

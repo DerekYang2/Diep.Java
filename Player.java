@@ -4,6 +4,9 @@ import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.text.rText;
 
+import java.util.Queue;
+import java.util.LinkedList;
+
 import static com.raylib.java.core.input.Keyboard.KEY_K;
 
 public class Player extends Tank {
@@ -21,6 +24,9 @@ public class Player extends Tank {
     float usernameSpacing;
     final int usernameFontSize = 48, levelBarFontSize = 22;
 
+    Queue<Pair<String, Long>> killQueue = new LinkedList<>();  // {message, expireTime (Main.counter)}
+    final private static int KILL_MESSAGE_DURATION = 240;  // 2 seconds
+
     public Player(Vector2 spawn, String buildName) {
         super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 0, 5), 1);
 
@@ -34,6 +40,7 @@ public class Player extends Tank {
         // Set username variables
         usernameSpacing = -18f*usernameFontSize / Graphics.outlineFont.getBaseSize();
         Vector2 textDimensions = rText.MeasureTextEx(Graphics.outlineFont, username, usernameFontSize, usernameSpacing);
+        textDimensions.x *= 0.98f;
         usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - textDimensions.getY() * 0.5f - BAR_HEIGHT);
     }
 
@@ -91,6 +98,7 @@ public class Player extends Tank {
         return (float) ((.55f * this.tankBuild.fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f));
     }
     boolean testFlag = false;
+
     public void updateCamera() {
         if (tankBuild.zoomAbility && controller.holdSpecial()) {
             if (controller.pressSpecial()) {  // Only update target if the button is pressed
@@ -118,7 +126,6 @@ public class Player extends Tank {
 
     @Override
     public void update() {
-
         super.update();
 
         if (Math.abs(targetZoom - currentZoom) > 1e-3) {
@@ -144,6 +151,10 @@ public class Player extends Tank {
         if (Graphics.isKeyPressed(Keyboard.KEY_T)) {  // Test
             changeTankBuild(TankBuild.createTankBuild(testFlag?"auto 5":"auto smasher"));
             testFlag = !testFlag;
+        }
+
+        while (!killQueue.isEmpty() && Main.counter >= killQueue.peek().second) {  // If not empty and counter is past the expire time
+            killQueue.remove();  // Remove the top element
         }
     }
 
@@ -174,7 +185,7 @@ public class Player extends Tank {
         if (Main.counter % 4 == 0) {
             scoreBar.setText(String.format("Score: %,d", (int)score), 20);
         }
-        scoreBar.update((firstTank == null) ? 0 : score/firstTank.score);
+        scoreBar.update((firstTank == null) ? 0 : score/firstTank.score);  // Percentage compared to top scorer
     }
 
     public void drawLevelBar() {
@@ -188,6 +199,47 @@ public class Player extends Tank {
         // Draw username
         Graphics.drawTextOutline(username, usernamePos, usernameFontSize, usernameSpacing, Color.WHITE);
         //Graphics.drawTextCenteredOutline(username, Graphics.cameraWidth/2, (int) (levelBarPos.y - 0.8f * BAR_HEIGHT - 20), 40, Color.WHITE);
+    }
+
+    public void drawKillQueue() {
+        float inverseZoom = 1.f / Graphics.getCameraZoom();
+        float x = Graphics.cameraWidth * 0.5f, y = 10;
+        Vector2 pos = Graphics.getScreenToWorld2D(new Vector2(x, y), Graphics.camera);
+        float textHeight = 20 * inverseZoom * 1.1f;
+
+        float yPos = pos.y;
+        for (Pair<String, Long> killData : killQueue) {
+            int framesLeft = (int) (killData.second - Main.counter);
+            Graphics.drawTextCenteredBackground("You killed " + killData.first, (int) pos.x, (int) (yPos + textHeight * 0.5f), (int)(20 * inverseZoom), Color.WHITE, Graphics.colAlpha(Graphics.BAR_GREY, killMessageOpacity(framesLeft)));
+            yPos += textHeight + 3 * inverseZoom;  // Extra 3 spacing
+        }
+    }
+
+
+    /**
+     * Function to calculate the opacity of the kill message
+     * <a href="https://www.desmos.com/calculator/x8adbicvxa">function graph</a>
+     * Assumes frames is between 0 and KILL_MESSAGE_DURATION
+     * @param frames The number of frames since the kill message was added
+     * @return The opacity of the kill message
+     */
+    private static float killMessageOpacity(int frames) {
+        final float O_max = 0.75f, T = KILL_MESSAGE_DURATION, p = 0.1f;
+        if (frames < T*p) {
+            return O_max/(T*p) * frames;
+        } else if (frames < T*(1-p)){
+            return O_max;
+        } else {
+            return -O_max/(T*p) * (frames - T*(1-p)) + O_max;
+        }
+    }
+
+    @Override
+    public void updateVictim(GameObject victim) {
+        super.updateVictim(victim);
+        if (victim instanceof Tank) {  // Only add tanks to kill queue
+            killQueue.add(new Pair<>(victim.username, Main.counter + KILL_MESSAGE_DURATION));
+        }
     }
 
     @Override

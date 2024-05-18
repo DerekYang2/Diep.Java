@@ -163,7 +163,9 @@ public class Graphics extends Raylib {
         rTextures.SetTextureFilter(outlineSmallFont.texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
         rlj.textures.SetTextureWrap(outlineSmallFont.texture, RLGL.RL_TEXTURE_WRAP_CLAMP);
 
-        font = rlj.text.LoadFontEx("assets/Ubuntu-Regular.ttf", 64, null, 250);
+        font = rlj.text.LoadFontEx("assets/Ubuntu-Regular.ttf", 32, null, 250);
+        rTextures.SetTextureFilter(font.texture, RLGL.rlTextureFilterMode.RL_TEXTURE_FILTER_BILINEAR);
+        rlj.textures.SetTextureWrap(font.texture, RLGL.RL_TEXTURE_WRAP_CLAMP);
         //font = rText.GetFontDefault();
     }
 
@@ -604,10 +606,16 @@ public class Graphics extends Raylib {
        Vector2 textDimensions = rText.MeasureTextEx(font, text, fontSize, (float) fontSize / font.getBaseSize());
         rlj.text.DrawTextEx(font, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
     }
-
+    public static void drawTextCenteredBackground(String text, int xCenter, int yCenter, int fontSize, Color color, Color backgroundCol) {
+        Vector2 textDimensions = rText.MeasureTextEx(font, text, fontSize, (float) fontSize / font.getBaseSize());
+        float rectWidth = textDimensions.getX() * 1.07f, rectHeight = textDimensions.getY() * 1.1f;
+        rlj.shapes.DrawRectangleRounded(new Rectangle(xCenter - rectWidth * 0.5f, yCenter - rectHeight * 0.5f, rectWidth, rectHeight), 0.3f, 10, backgroundCol);
+        rlj.text.DrawTextEx(font, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
+    }
     public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, float spacingFactor, Color color) {
         float spacing = spacingFactor * fontSize / outlineSmallFont.getBaseSize();
         Vector2 textDimensions = rText.MeasureTextEx(outlineSmallFont, text, fontSize, spacing);
+        textDimensions.x *= 0.98f;
         rlj.text.DrawTextEx(outlineSmallFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
     }
 

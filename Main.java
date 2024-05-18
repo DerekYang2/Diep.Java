@@ -214,6 +214,7 @@ public class Main {
             draw();  // Main draw function
             //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(0, 0), Math.PI/4, 1, Color.WHITE);
             Minimap.draw();
+            player.drawKillQueue();
             Graphics.endCameraMode();
             Graphics.endTextureMode();
 

@@ -15,11 +15,11 @@ public class Player extends Tank {
     // Variables for HUD
     Vector2 levelBarPos;
     Bar levelBar, scoreBar;
-    final float BAR_WIDTH = 500, BAR_HEIGHT = 25;
+    final float BAR_WIDTH = 450, BAR_HEIGHT = 25;  // Bar should be 16 squares
     String formattedBuildName;
     Vector2 usernamePos;
     float usernameSpacing;
-    final float usernameFontSize = 40;
+    final int usernameFontSize = 48, levelBarFontSize = 22;
 
     public Player(Vector2 spawn, String buildName) {
         super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 0, 5), 1);
@@ -32,18 +32,18 @@ public class Player extends Tank {
         initBars();
 
         // Set username variables
-        usernameSpacing = -16f*usernameFontSize / Graphics.outlineFont.getBaseSize();
+        usernameSpacing = -18f*usernameFontSize / Graphics.outlineFont.getBaseSize();
         Vector2 textDimensions = rText.MeasureTextEx(Graphics.outlineFont, username, usernameFontSize, usernameSpacing);
-        usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - 21 - textDimensions.getY() * 0.5f);
+        usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - textDimensions.getY() * 0.5f - BAR_HEIGHT);
     }
 
     public void initBars() {
-        levelBarPos = new Vector2(Graphics.cameraWidth/2 - BAR_WIDTH/2, Graphics.cameraHeight - 2.5f * BAR_HEIGHT);
+        levelBarPos = new Vector2((Graphics.cameraWidth- BAR_WIDTH) * 0.5f, Graphics.cameraHeight - 2.5f * BAR_HEIGHT);
 
         float levelStartScore = ScoreHandler.levelToScore(level), levelNextScore = ScoreHandler.levelToScore(level+1);
         float initialLevelPercentage = (level == ScoreHandler.maxPlayerLevel) ? 1 : (score-levelStartScore)/(levelNextScore-levelStartScore);
         levelBar = new Bar(levelBarPos, BAR_WIDTH, BAR_HEIGHT, 3, Graphics.LEVELBAR, Graphics.BAR_GREY, 0.08f, initialLevelPercentage);  // If level max level, prevent division by 0 -> infinity
-        levelBar.setText("Lvl " + level + " " + formattedBuildName, 21);
+        levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
         levelUpWatch.start();
 
         final float scoreBarWidth = BAR_WIDTH*2/3, scoreBarHeight = BAR_HEIGHT*0.8f;
@@ -62,7 +62,7 @@ public class Player extends Tank {
     public void changeTankBuild(TankBuild tankBuild) {
         this.tankBuild.delete();  // Delete old tank build
         initTankBuild(tankBuild);  // Initialize new tank build
-        levelBar.setText("Lvl " + level + " " + formattedBuildName, 21);
+        levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
     }
 
     // For timing speed
@@ -82,7 +82,7 @@ public class Player extends Tank {
             level = newLevel;
             updateStats();
             levelUpWatch.start();
-            levelBar.setText("Lvl " + level + " " + formattedBuildName, 21);
+            levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
         }
         targetZoom = getZoom();
     }
@@ -142,7 +142,7 @@ public class Player extends Tank {
             score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) + 0.01f - score, 23000.f/(2 * 120)));  // 2 seconds
         }
         if (Graphics.isKeyPressed(Keyboard.KEY_T)) {  // Test
-            changeTankBuild(TankBuild.createTankBuild(testFlag?"battleship":"overlord"));
+            changeTankBuild(TankBuild.createTankBuild(testFlag?"auto 5":"auto smasher"));
             testFlag = !testFlag;
         }
     }
@@ -151,7 +151,7 @@ public class Player extends Tank {
         super.draw();
         if (!isDead && Main.onScreen(pos, radius * scale)) {
             float inverseZoom = 1.f / Graphics.getCameraZoom();
-            float scoreFont = 21 * inverseZoom;
+            float scoreFont = levelBarFontSize * inverseZoom;
             float yPos = (pos.y - radius * scale);
             Graphics.drawTextCenteredOutline(Graphics.round(score / 1000, 1) + "k", (int) pos.x, (int) (yPos - scoreFont * 1.2f * 0.5f), (int) scoreFont, Color.WHITE);
             yPos -= scoreFont;
@@ -172,22 +172,21 @@ public class Player extends Tank {
 
         Tank firstTank = Leaderboard.getTankRank(0);
         if (Main.counter % 4 == 0) {
-            scoreBar.setText("Score: " + (int) score, 19);
+            scoreBar.setText(String.format("Score: %,d", (int)score), 20);
         }
         scoreBar.update((firstTank == null) ? 0 : score/firstTank.score);
     }
 
     public void drawLevelBar() {
         levelBar.draw();
-
         //float reverseZoom = 1.f / Graphics.getCameraZoom();
-        //Graphics.drawTextCenteredOutline("Level " + level, Graphics.screenWidth/2 , (int) (Graphics.screenHeight - 25 * 0.5f), 21, Color.WHITE);
+        //Graphics.drawTextCenteredOutline("Level " + level, Graphics.screenWidth/2 , (int) (Graphics.screenHeight - 25 * 0.5f), 22, Color.WHITE);
         scoreBar.draw();
     }
 
     public void drawUsername() {
         // Draw username
-        Graphics.drawTextOutline(username, usernamePos, (int) usernameFontSize, usernameSpacing, Color.WHITE);
+        Graphics.drawTextOutline(username, usernamePos, usernameFontSize, usernameSpacing, Color.WHITE);
         //Graphics.drawTextCenteredOutline(username, Graphics.cameraWidth/2, (int) (levelBarPos.y - 0.8f * BAR_HEIGHT - 20), 40, Color.WHITE);
     }
 

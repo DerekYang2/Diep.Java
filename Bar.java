@@ -58,7 +58,7 @@ public class Bar implements Drawable {
         this.fontSize = fontSize;
         spacing = -8.f * fontSize / Graphics.outlineSmallFont.getBaseSize();
         Vector2 textDimensions = rText.MeasureTextEx(Graphics.outlineSmallFont, text, fontSize, spacing);
-        textDrawPos = new Vector2(pos.x + width * 0.5f - textDimensions.x * 0.5f, pos.y + height * 0.5f - textDimensions.y * 0.5f + 0.5f);
+        textDrawPos = new Vector2((int)pos.x + width * 0.5f - textDimensions.x * 0.5f, pos.y + height * 0.5f - (int)(0.99f * textDimensions.y * 0.5f));
     }
 
     public void setCustomDraw(Consumer<Rectangle> customDraw) {
@@ -115,7 +115,7 @@ public class Bar implements Drawable {
             return;
         }
         if (!isHidden()) {
-            int xInt = (int)(pos.x);
+            int xInt = (int)pos.x;
             int yInt = (int)pos.y;
             int segments = (int)(height  * 0.7f);
             Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, segments, Graphics.colAlpha(strokeCol, opacity));

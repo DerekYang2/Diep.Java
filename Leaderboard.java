@@ -14,15 +14,15 @@ public class Leaderboard {
     private static ArrayList<Tank> tankList = new ArrayList<>();
     private static Bar[] scoreBars = new Bar[LEADERBOARD_SIZE];
     private static Texture2D[] tankBuilds = new Texture2D[LEADERBOARD_SIZE];
-    static final float leaderboardGap = 25, leaderboardWidth = 230, leaderboardHeight = 21;
+    static final float leaderboardGap = 25, leaderboardWidth = 240, leaderboardHeight = 21;
     static final float cornerY = leaderboardHeight;
     static final float cornerX = Graphics.cameraWidth - leaderboardWidth - cornerY * 0.5f;
 
     // Scoreboard title variables
     static final int titleFontSize = 30;
-    static final float titleSpacing = -16f*titleFontSize / Graphics.outlineFont.getBaseSize();
+    static final float titleSpacing = -18f*titleFontSize / Graphics.outlineFont.getBaseSize();
     static final Vector2 titleDimensions = rText.MeasureTextEx(Graphics.outlineFont, "Scoreboard", titleFontSize, titleSpacing);
-    static final Vector2 titlePos = new Vector2(cornerX + (leaderboardWidth - titleDimensions.x) * 0.5f, cornerY - titleDimensions.y * 0.5f);
+    static final Vector2 titlePos = new Vector2(cornerX + (leaderboardWidth - titleDimensions.x) * 0.5f, cornerY/2);
 
     public static void clear() {
         tankIds.clear();
@@ -54,8 +54,8 @@ public class Leaderboard {
             Tank tank = tankList.get(i);
             tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
 
-            scoreBars[i].update(new Vector2(cornerX, cornerY + (i+1) * leaderboardGap - 23 * 0.5f), tankList.get(i).score/maxScore);
-            scoreBars[i].setText(tank.username + " - " + Graphics.round(tank.score / 1000, 1) + "k", 19);
+            scoreBars[i].update(new Vector2(cornerX, (cornerY/2 + titleDimensions.y + 10) + (i - 0.5f) * leaderboardGap), tankList.get(i).score/maxScore);
+            scoreBars[i].setText(tank.username + " - " + formatScoreShort(tank.score), 21);
 
             final int finalI = i;
             scoreBars[i].setCustomDraw((Rectangle rect) -> {
@@ -89,5 +89,20 @@ public class Leaderboard {
     public static Tank getTankRank(int rank) {
         if (rank >= tankList.size() || rank < 0) return null;
         return tankList.get(rank);
+    }
+
+    // Utility
+
+    /**
+     * Formats a score to the thousands, e.g. 1,100 -> 1.1k
+     * @param score The score to format
+     * @return The formatted score
+     */
+    public static String formatScoreShort(float score) {
+        if (score < 1000) {
+            return String.valueOf((int) score);
+        } else {
+            return Graphics.round(score / 1000, 1) + "k";
+        }
     }
 }

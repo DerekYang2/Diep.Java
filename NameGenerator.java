@@ -42,7 +42,10 @@ public class NameGenerator {
         do {
             double rand = Math.random();
             if (rand < 0.1) {
-                randomName = nounList.get(Graphics.randInt(0, nounList.size())).toUpperCase();
+                randomName = nounList.get(Graphics.randInt(0, nounList.size()));
+                if (rand < 0.06) {
+                    randomName = randomName.toUpperCase();
+                }
             } else if (rand < 0.1 + 0.4) {
                 randomName = adjList.get(Graphics.randInt(0, adjList.size()));
                 String randomNoun = nounList.get(Graphics.randInt(0, nounList.size()));

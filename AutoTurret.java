@@ -46,7 +46,7 @@ public class AutoTurret {
         if (hostTarget != null && !host.getAutoFire() && Graphics.isAngleBetween(Math.atan2(hostTarget.y - absPos.y, hostTarget.x - absPos.x), startAngle, endAngle)) {  // If direct target is within range
             closestTarget = hostTarget;
         } else {
-            float projectile_speed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * barrel.bulletStats.speed * 25.f / 120;
+            float projectile_speed = (20 + 3 * host.getStat(Stats.BULLET_SPEED)) * barrel.bulletStats.speed * 25.f / 120;
             closestTarget = AutoAim.getAdjustedTarget(getAbsPos(), barrel.getSpawnPoint(), VIEW_RADIUS * host.scale, host.group, baseAngle, range, projectile_speed);  // Get closest target
         }
 

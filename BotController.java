@@ -31,7 +31,7 @@ public class BotController implements Controller {
         frontBarrel = host.tankBuild.getFrontBarrel();
         if (frontBarrel != null) {
             BulletStats bulletStats = host.tankBuild.getBarrelBulletStats(frontBarrel);
-            frontBulletSpeed = (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f / 120;
+            frontBulletSpeed = (20 + 3 * host.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f / 120;
         }
     }
 
@@ -100,7 +100,7 @@ public class BotController implements Controller {
 
     @Override
     public float moveDirection() {
-        if (host.stats.getStat(Stats.BODY_DAMAGE) >= 6) {
+        if (host.getStat(Stats.BODY_DAMAGE) >= 6) {
             // Bot will chase the player
             Vector2 PlayerPos = Main.player.pos;
             moveDir = (float) Math.atan2(PlayerPos.y - host.pos.y, PlayerPos.x - host.pos.x);

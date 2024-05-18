@@ -52,17 +52,17 @@ public class Main {
         TextureLoader.clear();
         Leaderboard.clear();
 
-        int spawn = 10;
+        int spawn = 0;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "tank");
+        player = new Player(new Vector2(0,0), "landmine");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
-            //buildName = "auto gunner";
+            buildName = "auto 5";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
 
-            t.group = -Graphics.randInt(0, 4);
+            t.group = -Graphics.randInt(1, 4);
             if (t.group == 0) {
                 t.setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
             } else if (t.group == -1) {
@@ -194,6 +194,7 @@ public class Main {
                 Graphics.updateMouse();
                 update();
                 Minimap.update();
+                player.updateUpgradeBars();
             }
             Leaderboard.update();
             player.updateBars();
@@ -203,7 +204,6 @@ public class Main {
             //----------------------------------------------------------------------------------
             Graphics.beginDrawMode();
             Graphics.drawBackground(Graphics.GRID);
-            Graphics.drawFPS(10, 10, 20, Color.BLACK);
             // Graphics.drawText("Number of objects: " + gameObjectPool.getObjects().size(), 10, 25, 20, Color.BLACK);
             //Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
             //Graphics.drawText(String.format("Score: %d\tLevel: %d", (int)player.score, (int)player.level), 10, 60, 20, Color.BLACK);
@@ -215,7 +215,9 @@ public class Main {
             //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(0, 0), Math.PI/4, 1, Color.WHITE);
             Minimap.draw();
             player.drawKillQueue();
+            Graphics.drawFPS(Graphics.getScreenToWorld2D(new Vector2(10, 10), Graphics.camera), (int)(20/Graphics.getCameraZoom()), Color.BLACK);
             Graphics.endCameraMode();
+            player.drawUpgradeBars();
             Graphics.endTextureMode();
 
             if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) == 0) {  // Every other frame

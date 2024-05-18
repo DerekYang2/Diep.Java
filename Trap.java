@@ -24,10 +24,10 @@ public class Trap extends Projectile {
     @Override
     public void updateStats() {
         // Calculate bullet stats
-        setCollisionFactors(bulletStats.absorbtionFactor, (7.f / 3 + host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
+        setCollisionFactors(bulletStats.absorbtionFactor, (7.f / 3 + host.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
 
-        float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
-        float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
+        float damage = (7 + (3 * host.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
+        float maxHealth = (8 + 6 * host.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
 
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
@@ -44,8 +44,8 @@ public class Trap extends Projectile {
     @Override
     public float getMaxSpeed() {
         // Scale factor of bullet speed stat: https://www.desmos.com/calculator/nganqiqqf3 (scale factor is 1.6 at bs=0 and 5.1 at bs=7)
-        float scaleFactor = (float)(1.32288 * Math.sqrt(host.stats.getStat(Stats.BULLET_PENETRATION)) + 1.6);
-        float velMax = (20 + scaleFactor * 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed;  // src: not link above (check diepcustom repo)
+        float scaleFactor = (float)(1.32288 * Math.sqrt(host.getStat(Stats.BULLET_PENETRATION)) + 1.6);
+        float velMax = (20 + scaleFactor * 3 * host.getStat(Stats.BULLET_SPEED)) * bulletStats.speed;  // src: not link above (check diepcustom repo)
         return velMax * 25.f/120;
     }
 

@@ -68,16 +68,16 @@ public class Tank extends GameObject {
     @Override
     public void updateStats() {
         // Max health
-        this.setMaxHealth(50 + (2 * (level - 1)) + (20 * stats.getStat(Stats.MAX_HEALTH)));
+        this.setMaxHealth(50 + (2 * (level - 1)) + (20 * getStat(Stats.MAX_HEALTH)));
         // Body Damage (base should be 20 not 25 TODO: see if this is good)
-        this.setDamage((20 + 6 * stats.getStat(Stats.BODY_DAMAGE)) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE (or maybe not in diepcustom repo, spike is mutliplied though)
+        this.setDamage((20 + 6 * getStat(Stats.BODY_DAMAGE)) * (25.f/120));  // Body damage scaled down because fps TODO: TANK-TANK is different from TANK-OTHER DAMAGE (or maybe not in diepcustom repo, spike is mutliplied though)
 
         // ACCELERATION: https://www.desmos.com/calculator/qre98xzg76
-        float A0 = (float)(2.55 * Math.pow(1.07, stats.getStat(Stats.MOVEMENT_SPEED)) / Math.pow(1.015, level - 1));
+        float A0 = (float)(2.55 * Math.pow(1.07, getStat(Stats.MOVEMENT_SPEED)) / Math.pow(1.015, level - 1));
         float convergeSpeed = (10 * A0) * (25.f/120);  // 10A0 is max speed, 25/120 is scaling factor for 25->120 fps
         this.baseAcceleration = convergeSpeed * (1 - friction);  // a = Converge * (1-r)
         // Regen (regen per SECOND is 0.1 + (0.4 * P) percent of max health)
-        this.regenPerFrame = (maxHealth + 4 * maxHealth * stats.getStat(Stats.HEALTH_REGEN)) / (120 * 1000);  // 120 fps
+        this.regenPerFrame = (maxHealth + 4 * maxHealth * getStat(Stats.HEALTH_REGEN)) / (120 * 1000);  // 120 fps
         // Size of tank
         scale = (float)Math.pow(1.01, (level - 1));
 
@@ -219,6 +219,10 @@ public class Tank extends GameObject {
         return controller.getTarget();
     }
 
+    public int getStat(int statEnum) {
+        return stats.getStat(statEnum);
+    }
+    
     /**
      * Gets the view bounds of a tank
      * @return A rectangle representing the view bounds

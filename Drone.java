@@ -28,8 +28,8 @@ public class Drone extends Projectile {
         setCollisionFactors(bulletStats.absorbtionFactor, 4);
 
         // Calculate bullet stats
-        float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
-        float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
+        float damage = (7 + (3 * host.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
+        float maxHealth = (8 + 6 * host.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
@@ -46,7 +46,7 @@ public class Drone extends Projectile {
     @Override
     public float getMaxSpeed() {
         // velMax *= 1.1f;  // TODO: test drone speed
-        return (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
+        return (20 + 3 * host.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
     }
 
     @Override

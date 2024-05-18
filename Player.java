@@ -7,7 +7,7 @@ import com.raylib.java.text.rText;
 import java.util.Queue;
 import java.util.LinkedList;
 
-import static com.raylib.java.core.input.Keyboard.KEY_K;
+import static com.raylib.java.core.input.Keyboard.*;
 
 public class Player extends Tank {
     float currentZoom;
@@ -27,8 +27,14 @@ public class Player extends Tank {
     Queue<Pair<String, Long>> killQueue = new LinkedList<>();  // {message, expireTime (Main.counter)}
     final private static int KILL_MESSAGE_DURATION = 240;  // 2 seconds
 
+    UpgradeBar[] upgradeBar = new UpgradeBar[8];
+    final static int UPGRADE_HUD_DURATION = 3 * 120;
+    final static float PERCENT_FADE = 0.05f;
+    float upgradeOpacity = 0;
+    int upgradeFrames = 0;
+
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(7, 7, 7, 7, 7, 0, 0, 5), 1);
+        super(spawn, new PlayerController(), new Stats(0, 0, 0, 0, 0, 0, 0, 0), 1);
 
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         initTankBuild(TankBuild.createTankBuild(buildName));
@@ -55,6 +61,18 @@ public class Player extends Tank {
 
         final float scoreBarWidth = BAR_WIDTH*2/3, scoreBarHeight = BAR_HEIGHT*0.8f;
         scoreBar = new Bar(new Vector2((Graphics.cameraWidth - scoreBarWidth) * 0.5f, levelBarPos.y - scoreBarHeight - 3), scoreBarWidth, scoreBarHeight, 2, Graphics.SCORE_GREEN, Graphics.BAR_GREY, 0.08f, 0);
+
+        // Upgrade bars
+        float yPos = Graphics.cameraHeight - 54;
+        final float upgradeBarHeight = 22;
+        upgradeBar[0] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.MOVEMENT_SPEED, "Movement Speed", "[8]"); yPos -= upgradeBarHeight + 3;
+        upgradeBar[1] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.RELOAD, "Reload", "[7]"); yPos -= upgradeBarHeight + 3;
+        upgradeBar[2] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.BULLET_DAMAGE, "Bullet Damage", "[6]"); yPos -= upgradeBarHeight + 3;
+        upgradeBar[3] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.BULLET_PENETRATION, "Bullet Penetration", "[5]"); yPos -= upgradeBarHeight + 3;
+        upgradeBar[4] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.BULLET_SPEED, "Bullet Speed", "[4]"); yPos -= upgradeBarHeight + 3;
+        upgradeBar[5] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.BODY_DAMAGE, "Body Damage", "[3]"); yPos -= upgradeBarHeight + 3;
+        upgradeBar[6] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.MAX_HEALTH, "Max Health", "[2]"); yPos -= upgradeBarHeight + 3;
+        upgradeBar[7] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.HEALTH_REGEN, "Health Regen", "[1]");
     }
 
     @Override
@@ -156,6 +174,44 @@ public class Player extends Tank {
         while (!killQueue.isEmpty() && Main.counter >= killQueue.peek().second) {  // If not empty and counter is past the expire time
             killQueue.remove();  // Remove the top element
         }
+        updateStatUpgrade();
+    }
+
+    public void updateStatUpgrade() {
+        if (Graphics.isKeyPressed(KEY_ONE)) {
+            incrementStat(Stats.HEALTH_REGEN);
+        }
+        if (Graphics.isKeyPressed(KEY_TWO)) {
+            incrementStat(Stats.MAX_HEALTH);
+        }
+        if (Graphics.isKeyPressed(KEY_THREE)) {
+            incrementStat(Stats.BODY_DAMAGE);
+        }
+        if (Graphics.isKeyPressed(KEY_FOUR)) {
+            incrementStat(Stats.BULLET_SPEED);
+        }
+        if (Graphics.isKeyPressed(KEY_FIVE)) {
+            incrementStat(Stats.BULLET_PENETRATION);
+        }
+        if (Graphics.isKeyPressed(KEY_SIX)) {
+            incrementStat(Stats.BULLET_DAMAGE);
+        }
+        if (Graphics.isKeyPressed(KEY_SEVEN)) {
+            incrementStat(Stats.RELOAD);
+        }
+        if (Graphics.isKeyPressed(KEY_EIGHT)) {
+            incrementStat(Stats.MOVEMENT_SPEED);
+        }
+    }
+
+    public void incrementStat(int statEnum) {
+        stats.setStat(statEnum, getStat(statEnum) + 1);
+        updateStats();
+        upgradeBar[statEnum].setRects(getStat(statEnum));
+        if (upgradeFrames >= UPGRADE_HUD_DURATION * (1-PERCENT_FADE))  // If bar is fading out
+            upgradeFrames = UPGRADE_HUD_DURATION - upgradeFrames;  // Set frames to symmetric fading in
+        else if (upgradeFrames >= UPGRADE_HUD_DURATION * PERCENT_FADE)  // If bar is fully visible
+            upgradeFrames = (int) (UPGRADE_HUD_DURATION * PERCENT_FADE);  // Reset to start of being fully visible
     }
 
 /*    public void draw() {
@@ -186,6 +242,16 @@ public class Player extends Tank {
             scoreBar.setText(String.format("Score: %,d", (int)score), 20);
         }
         scoreBar.update((firstTank == null) ? 0 : score/firstTank.score);  // Percentage compared to top scorer
+    }
+
+    public void updateUpgradeBars() {
+        upgradeFrames++;
+        upgradeFrames = Math.min(UPGRADE_HUD_DURATION, upgradeFrames);  // Cap the frames
+        upgradeOpacity = upgradeBarOpacity(upgradeFrames);
+
+        for (UpgradeBar bar : upgradeBar) {
+            bar.update(upgradeOpacity);
+        }
     }
 
     public void drawLevelBar() {
@@ -234,6 +300,17 @@ public class Player extends Tank {
         }
     }
 
+    private static float upgradeBarOpacity(int frames) {
+        final float O_max = .8f, T = UPGRADE_HUD_DURATION, p = PERCENT_FADE;
+        if (frames < T*p) {
+            return O_max/(T*p) * frames;
+        } else if (frames < T*(1-p)){
+            return O_max;
+        } else {
+            return -O_max/(T*p) * (frames - T*(1-p)) + O_max;
+        }
+    }
+
     @Override
     public void updateVictim(GameObject victim) {
         super.updateVictim(victim);
@@ -247,5 +324,12 @@ public class Player extends Tank {
         super.delete();
         levelBar.delete();
         Main.resetGame();
+    }
+
+    public void drawUpgradeBars() {
+        if (upgradeOpacity < 0.01f) return;  // If opacity is too low, don't draw
+        for (UpgradeBar bar : upgradeBar) {
+            bar.draw();
+        }
     }
 }

@@ -29,11 +29,11 @@ public class Bullet extends Projectile {
     @Override
     public void updateStats() {
         // Calculate bullet stats
-        setCollisionFactors(bulletStats.absorbtionFactor, (7.f / 3 + host.stats.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
+        setCollisionFactors(bulletStats.absorbtionFactor, (7.f / 3 + host.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
 
         // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
-        float damage = (7 + (3 * host.stats.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
-        float maxHealth = (8 + 6 * host.stats.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
+        float damage = (7 + (3 * host.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above
+        float maxHealth = (8 + 6 * host.getStat(Stats.BULLET_PENETRATION)) * bulletStats.health;  // src: link above
         super.setDamage(damage * (25.f / 120));  // Scale down because different fps
         super.setMaxHealth(maxHealth);
 
@@ -48,7 +48,7 @@ public class Bullet extends Projectile {
 
     @Override
     public float getMaxSpeed() {
-        return (20 + 3 * host.stats.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
+        return (20 + 3 * host.getStat(Stats.BULLET_SPEED)) * bulletStats.speed * 25.f/120;
     }
 
     @Override

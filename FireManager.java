@@ -58,7 +58,7 @@ public class FireManager {
      */
     public int getReloadFrames(int ti) {
         if (manualReloadTime != null) return Math.round((120.f/25) * manualReloadTime * getReloadFactor(ti));
-        return Math.round((120.f/25) * 15*(float)Math.pow(0.914, host.stats.getStat(Stats.RELOAD)) * getReloadFactor(ti));  // convert 25 fps to 120 fps
+        return Math.round((120.f/25) * 15*(float)Math.pow(0.914, host.getStat(Stats.RELOAD)) * getReloadFactor(ti));  // convert 25 fps to 120 fps
     }
 
     /**

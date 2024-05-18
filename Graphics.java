@@ -90,8 +90,15 @@ public class Graphics extends Raylib {
             DARK_GREY_STROKE = rgb(63, 63, 63),
             LEVELBAR = rgb(255, 232, 105),
             SCORE_GREEN = rgb(67, 255, 145),
-            BAR_GREY = rgb(20, 20, 20);
-
+            BAR_GREY = rgb(20, 20, 20),
+            HEALTH_REGEN = rgb(252, 173, 118),
+            MAX_HEALTH = rgb(249, 67, 255),
+            BODY_DAMAGE = rgb(133, 67, 255),
+            BULLET_SPEED = rgb(67, 127, 255),
+            BULLET_PENETRATION = rgb(255, 222, 67),
+            BULLET_DAMAGE = rgb(255, 67, 67),
+            RELOAD = rgb(130, 255, 67),
+            MOVEMENT_SPEED = rgb(67, 255, 249);
 
 
     public static Color getColor(String hexStr) {
@@ -421,8 +428,8 @@ public class Graphics extends Raylib {
         return lerpColor(color, GRID, 1 - opacity);
     }
 
-    public static void drawFPS(int x, int y, int fontSize, Color color) {
-        rlj.text.DrawText(rCore.GetFPS() + " FPS", x, y, fontSize, color);
+    public static void drawFPS(Vector2 pos, int fontSize, Color color) {
+        drawText(rCore.GetFPS() + " FPS", (int)pos.x, (int)pos.y, fontSize, color);
     }
 
 /*    private static void drawTextureCenteredHelper(Texture2D texture, Vector2 position, float width, float height) {
@@ -574,6 +581,10 @@ public class Graphics extends Raylib {
         rlj.shapes.DrawRectangleLinesEx(rect, stroke, color);
     }
 
+    public static void drawCircleSector(Vector2 pos, float radius, float startAngle, float endAngle, Color color, float opacity) {
+        rlj.shapes.DrawCircleSector(pos, radius, startAngle, endAngle, 36, colAlpha(color, opacity));
+    }
+
     public static void drawCircle(Vector2 pos, float radius, Color color, float opacity) {
         rlj.shapes.DrawCircleV(pos, radius, colAlpha(color, opacity));
     }
@@ -615,7 +626,10 @@ public class Graphics extends Raylib {
     public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, float spacingFactor, Color color) {
         float spacing = spacingFactor * fontSize / outlineSmallFont.getBaseSize();
         Vector2 textDimensions = rText.MeasureTextEx(outlineSmallFont, text, fontSize, spacing);
-        textDimensions.x *= 0.98f;
+        rlj.text.DrawTextEx(outlineSmallFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
+    }
+
+    public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, float spacing, Vector2 textDimensions, Color color) {
         rlj.text.DrawTextEx(outlineSmallFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
     }
 

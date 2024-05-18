@@ -59,6 +59,7 @@ public class AutoAim {
 
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
+            if (obj == null) continue;
             float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
 
             if (obj.group == group || obj.isProjectile || distSquared > radius * radius || obj.isInvisible()) {  // If same group or projectile OR too far, skip

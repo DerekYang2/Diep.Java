@@ -187,8 +187,8 @@ public class Graphics extends Raylib {
         // Always set texture anti-aliasing
         setTextureAntiAliasing(sharpRectangle);
         setTextureAntiAliasing(roundedRectangle);
-        setTextureAntiAliasing(circle);
         setTextureAntiAliasing(trapperHead);
+        setTextureAntiAliasing(circle);
 
         if (ANTIALIASING == 1) {
             //setTextureAntiAliasing(sharpRectangle);
@@ -455,6 +455,10 @@ public class Graphics extends Raylib {
         rlj.shapes.DrawRectangleRounded(new Rectangle(x, y, width, height), roundness, segments, color);
     }
 
+    public static void drawRectangleRoundedLines(float x, float y, float width, float height, float roundness, int segments, float thickness, Color color) {
+        rlj.shapes.DrawRectangleRoundedLines(new Rectangle(x, y, width, height), roundness, segments, thickness, color);
+    }
+
     // https://www.desmos.com/calculator/odkmazouws
     private static float shiftFactor(float radius) {
         double a = 0.000155254, b = 0.000221842, c = 0.800486;
@@ -462,6 +466,11 @@ public class Graphics extends Raylib {
         return (float) (a * radius * radius + b * radius + c);  // Quadratic
     }
 
+    public static void drawTriangle(Vector2 centerPos, float radius, float lengthScale, float radians, Color color) {
+        float height = 3 * radius;  // Height of the triangle
+        float sideLen = (float) (2.0 / Math.sqrt(3) * height);  // Width of the triangle
+        rTextures.DrawTexturePro(sharpTriangle, new Rectangle(0, 0, sharpTriangle.width, sharpTriangle.height), new Rectangle(centerPos.x, centerPos.y, height * lengthScale, sideLen), new Vector2(height / 3, sideLen / 2), (float) (radians * 180 / Math.PI), color);
+    }
 
     public static void drawTriangleRounded(Vector2 centerPos, float radius, float radians, float strokeWidth, Color color, Color strokeCol) {
         // Height of triangle is 3/2 * diameter or 3 * radius
@@ -564,7 +573,6 @@ public class Graphics extends Raylib {
     }
 
     public static void drawCircle(Vector2 pos, float radius, Color color, float opacity) {
-        rlj.shapes.DrawCircleSector(pos, radius, 0, 360, 16, colAlpha(color, opacity));
         rlj.shapes.DrawCircleV(pos, radius, colAlpha(color, opacity));
     }
     public static void drawCircle(Vector2 pos, float radius, float stroke, Color color, Color strokeColor, float opacity) {
@@ -573,7 +581,7 @@ public class Graphics extends Raylib {
     }
 
     public static void drawCircleTexture(Vector2 pos, float radius, float stroke, Color color, Color strokeColor, float opacity) {
-        if (true || ANTIALIASING == 1) {  // Temporary "true ||" - always use anti-aliasing for circles (for now)
+        if (ANTIALIASING == 1) {
             Graphics.drawTextureCenteredHelper(circle, pos, (radius) * 2, (radius) * 2, colAlpha(strokeColor, opacity));
             Graphics.drawTextureCenteredHelper(circleNoAA, pos, (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, colAlpha(color, opacity));
         } else {
@@ -597,10 +605,10 @@ public class Graphics extends Raylib {
         rlj.text.DrawTextEx(font, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, (float) fontSize / font.getBaseSize(), color);
     }
 
-    public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, Color color) {
-        float spacing = -8.f * fontSize / outlineSmallFont.getBaseSize();
+    public static void drawTextCenteredOutline(String text, int xCenter, int yCenter, int fontSize, float spacingFactor, Color color) {
+        float spacing = spacingFactor * fontSize / outlineSmallFont.getBaseSize();
         Vector2 textDimensions = rText.MeasureTextEx(outlineSmallFont, text, fontSize, spacing);
-        rlj.text.DrawTextEx(outlineSmallFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, colAlpha(color, 0.8f));
+        rlj.text.DrawTextEx(outlineSmallFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, spacing, color);
     }
 
     public static void drawTextOutline(String text, Vector2 pos, int fontSize, float spacing, Color color) {

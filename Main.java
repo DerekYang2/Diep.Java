@@ -52,7 +52,7 @@ public class Main {
         TextureLoader.clear();
         Leaderboard.clear();
 
-        int spawn = 30;
+        int spawn = 10;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
@@ -193,6 +193,7 @@ public class Main {
                 // Compute required framebuffer scaling
                 Graphics.updateMouse();
                 update();
+                Minimap.update();
             }
             Leaderboard.update();
             player.updateBars();
@@ -212,6 +213,7 @@ public class Main {
             drawBounds();
             draw();  // Main draw function
             //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(0, 0), Math.PI/4, 1, Color.WHITE);
+            Minimap.draw();
             Graphics.endCameraMode();
             Graphics.endTextureMode();
 

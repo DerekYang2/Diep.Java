@@ -52,14 +52,14 @@ public class Main {
         TextureLoader.clear();
         Leaderboard.clear();
 
-        int spawn = 0;
+        int spawn = 30;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "landmine");
+        player = new Player(new Vector2(0,0), "auto 5");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
-            buildName = "auto 5";
+            // buildName = "auto 5";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
 
             t.group = -Graphics.randInt(1, 4);
@@ -215,7 +215,7 @@ public class Main {
             //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(0, 0), Math.PI/4, 1, Color.WHITE);
             Minimap.draw();
             player.drawKillQueue();
-            Graphics.drawFPS(Graphics.getScreenToWorld2D(new Vector2(10, 10), Graphics.camera), (int)(20/Graphics.getCameraZoom()), Color.BLACK);
+            Graphics.drawFPS(Graphics.getScreenToWorld2D(new Vector2(10, 10), Graphics.camera), (int)(20/Graphics.getCameraZoom()), Color.WHITE);
             Graphics.endCameraMode();
             player.drawUpgradeBars();
             Graphics.endTextureMode();

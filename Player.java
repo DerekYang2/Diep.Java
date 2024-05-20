@@ -25,7 +25,7 @@ public class Player extends Tank {
     final int usernameFontSize = 48, levelBarFontSize = 22;
 
     Queue<Pair<String, Long>> killQueue = new LinkedList<>();  // {message, expireTime (Main.counter)}
-    final private static int KILL_MESSAGE_DURATION = 240;  // 2 seconds
+    final private static int KILL_MESSAGE_DURATION = 3 * 120;  // 3 seconds
 
     UpgradeBar[] upgradeBar = new UpgradeBar[8];
     final static int UPGRADE_HUD_DURATION = 3 * 120;
@@ -271,12 +271,13 @@ public class Player extends Tank {
         float inverseZoom = 1.f / Graphics.getCameraZoom();
         float x = Graphics.cameraWidth * 0.5f, y = 10;
         Vector2 pos = Graphics.getScreenToWorld2D(new Vector2(x, y), Graphics.camera);
-        float textHeight = 20 * inverseZoom * 1.1f;
+        float textHeight = 22 * inverseZoom;
 
         float yPos = pos.y;
         for (Pair<String, Long> killData : killQueue) {
             int framesLeft = (int) (killData.second - Main.counter);
-            Graphics.drawTextCenteredBackground("You killed " + killData.first, (int) pos.x, (int) (yPos + textHeight * 0.5f), (int)(20 * inverseZoom), Color.WHITE, Graphics.colAlpha(Graphics.BAR_GREY, killMessageOpacity(framesLeft)));
+            float opacity = killMessageOpacity(framesLeft);
+            Graphics.drawTextCenteredBackground("You killed " + killData.first, (int) pos.x, (int) (yPos + textHeight * 0.5f), (int)(22 * inverseZoom), -3 * inverseZoom, Graphics.colAlpha(Color.WHITE, opacity), Graphics.colAlpha(Graphics.BAR_GREY, opacity * 1.1f));
             yPos += textHeight + 3 * inverseZoom;  // Extra 3 spacing
         }
     }
@@ -290,7 +291,7 @@ public class Player extends Tank {
      * @return The opacity of the kill message
      */
     private static float killMessageOpacity(int frames) {
-        final float O_max = 0.75f, T = KILL_MESSAGE_DURATION, p = 0.1f;
+        final float O_max = 0.75f, T = KILL_MESSAGE_DURATION, p = 0.07f;
         if (frames < T*p) {
             return O_max/(T*p) * frames;
         } else if (frames < T*(1-p)){

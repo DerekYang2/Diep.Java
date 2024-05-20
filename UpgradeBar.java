@@ -52,9 +52,9 @@ public class UpgradeBar {
         Color buttonCol = curRects == maxRects ? Graphics.GREY : fillCol;
         int xInt = (int)pos.x;
         int yInt = (int)pos.y;
-        float width = 2 * height * 0.5f + ((maxRects+1)+1) * strokeWidth + (maxRects+1) * rectWidth;
+        float width = getWidth();
         Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, 10, Graphics.colAlpha(strokeCol, opacity));
-        float higherOpacity = (float) Math.pow(opacity, 0.33);
+        float higherOpacity = (float) Math.pow(opacity, 1);
         if (curRects > 0) {
             Graphics.drawCircleSector(new Vector2(xInt + height * 0.5f, yInt + height * 0.5f), height * 0.5f - strokeWidth, 180, 360, fillCol, higherOpacity);
         }
@@ -79,5 +79,9 @@ public class UpgradeBar {
         Graphics.drawCircleSector(new Vector2(rectX, yInt + height * 0.5f), height * 0.5f - strokeWidth, 0, 180, buttonCol, higherOpacity);
         Graphics.drawTextCenteredOutline(text, (int) (xInt + (width - height*0.5f - rectWidth) * 0.5f), (int) (yInt + (height) * 0.55f), (int)(height * 0.95f), textSpacing, textDim, Graphics.colAlpha(Color.WHITE, higherOpacity));
         Graphics.drawTextOutline(smallText, new Vector2(rectX - rectWidth*1.5f - strokeWidth - smallTextDim.x * 0.5f, yInt + (height- smallTextDim.y) * 0.6f), (int)(height * 0.8f), smallTextSpacing, Graphics.colAlpha(Color.WHITE, higherOpacity));
+    }
+
+    public float getWidth() {
+        return 2 * height * 0.5f + ((maxRects + 1) + 1) * strokeWidth + (maxRects + 1) * rectWidth;
     }
 }

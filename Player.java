@@ -31,7 +31,8 @@ public class Player extends Tank {
     final static int UPGRADE_HUD_DURATION = 3 * 120;
     final static float PERCENT_FADE = 0.05f;
     float upgradeOpacity = 0;
-    int upgradeFrames = 0;
+    int upgradeFrames = UPGRADE_HUD_DURATION;
+    Vector2 usagePos;
 
     public Player(Vector2 spawn, String buildName) {
         super(spawn, new PlayerController(), new Stats(0, 0, 0, 0, 0, 0, 0, 0), 1);
@@ -74,6 +75,7 @@ public class Player extends Tank {
                 yPos -= upgradeBarHeight + 3;
             }
         }
+        usagePos = new Vector2(10 + upgradeBar[0].getWidth(), yPos);
     }
 
     @Override
@@ -179,6 +181,8 @@ public class Player extends Tank {
     }
 
     public void updateStatUpgrade() {
+        if (usedStatPoints == maxStatPoints) return;  // If no stat points to use
+
         if (Graphics.isKeyPressed(KEY_ONE)) {
             incrementStat(Stats.HEALTH_REGEN);
         }
@@ -217,6 +221,8 @@ public class Player extends Tank {
             upgradeFrames = UPGRADE_HUD_DURATION - upgradeFrames;  // Set frames to symmetric fading in
         else if (upgradeFrames >= UPGRADE_HUD_DURATION * PERCENT_FADE)  // If bar is fully visible
             upgradeFrames = (int) (UPGRADE_HUD_DURATION * PERCENT_FADE);  // Reset to start of being fully visible
+
+        usedStatPoints++;  // Increment used stat points
     }
 
 /*    public void draw() {
@@ -249,10 +255,24 @@ public class Player extends Tank {
         scoreBar.update((firstTank == null) ? 0 : score/firstTank.score);  // Percentage compared to top scorer
     }
 
+    float prevUpgradeOpacity = 0;
+
     public void updateUpgradeBars() {
         upgradeFrames++;
         upgradeFrames = Math.min(UPGRADE_HUD_DURATION, upgradeFrames);  // Cap the frames
+
+        if (usedStatPoints < maxStatPoints) {  // If has upgrade points
+            if (upgradeFrames == UPGRADE_HUD_DURATION) {  // If bar is invisible
+                upgradeFrames = 0;  // Restart animation
+            }
+            if (upgradeFrames >= UPGRADE_HUD_DURATION * PERCENT_FADE && upgradeFrames < UPGRADE_HUD_DURATION * (1-PERCENT_FADE)) { // If has upgrade points and bar is fully visible
+                upgradeFrames = (int) (UPGRADE_HUD_DURATION * PERCENT_FADE);  // Reset to start of being fully visible
+            }
+        }
+
+        prevUpgradeOpacity = upgradeOpacity;
         upgradeOpacity = upgradeBarOpacity(upgradeFrames);
+
 
         for (UpgradeBar bar : upgradeBar) {
             if (bar != null) {
@@ -340,6 +360,9 @@ public class Player extends Tank {
             if (bar != null) {
                 bar.draw();
             }
+        }
+        if (maxStatPoints - usedStatPoints > 0) {
+            Graphics.drawTextOutline("x" + (maxStatPoints - usedStatPoints), usagePos, 30, -2, Graphics.colAlpha(Color.WHITE, upgradeOpacity));
         }
     }
 }

@@ -23,6 +23,10 @@ public class Tank extends GameObject {
     TankBuild tankBuild;
     Controller controller;
 
+    int usedStatPoints = 0;
+    int maxStatPoints = 0;
+
+
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
         super(pos, 50, 1.f, DrawPool.MIDDLE);
@@ -83,6 +87,9 @@ public class Tank extends GameObject {
 
         // Health bar size
         healthBar.setWidth(radius * scale * 2);
+
+        // The number of upgrade points the tank has
+        maxStatPoints = Stats.getStatCount(level);
     }
 
     public void updateLevel() {

@@ -28,4 +28,16 @@ public class Stats {
     public int getStat(int stat) {
         return stats[stat];
     }
+
+    /**
+     * Gets the number of upgrade stats for a given level
+     * @param level The level of the tank
+     * @return The number of upgrade stats for the given level
+     */
+    public static int getStatCount(int level) {
+        if (level <= 0) return 0;
+        if (level <= 28) return level - 1;
+
+        return (int) (level / 3.f) + 18;
+    }
 }

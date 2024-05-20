@@ -35,6 +35,9 @@ public class TankBuild
 
     protected boolean isDeleted = false;  // Whether the tank build has been deleted
 
+    // Max stats
+    HashMap<String, Integer> maxStats;
+
     public TankBuild(String name, AddOn addOn, Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats, float fieldFactor) {
         this.name = name;
         this.barrels = barrels;
@@ -43,6 +46,7 @@ public class TankBuild
         this.fieldFactor = fieldFactor;
         this.addOn = addOn;
         pendingRecoil = new Vector2[barrels.length];
+        maxStats = new HashMap<>();
 
         // Set whether barrels are drone barrels, which are always on fire regardless of controller
         for (int idx = 0; idx < barrels.length; idx++) {
@@ -50,6 +54,14 @@ public class TankBuild
                 fireManager.setDroneBarrel(idx);
             }
         }
+    }
+
+    public void setMaxStat(String stat, int value) {
+        maxStats.put(stat, value);
+    }
+
+    public int getMaxStat(String stat) {
+        return maxStats.get(stat);
     }
 
     public void setHost(Tank host) {
@@ -246,6 +258,12 @@ public class TankBuild
 
         JSONObject jsonFlags = jsonTank.getJSONObject("flags");
         build.setFlags(jsonFlags.getBoolean("invisibility"), jsonTank.getFloat("visibilityRateShooting"), jsonTank.getFloat("visibilityRateMoving"), jsonTank.getFloat("invisibilityRate"), jsonFlags.getBoolean("zoomAbility"));
+
+        JSONArray statObject = jsonTank.getJSONArray("stats");
+        for (Object obj : statObject) {
+            JSONObject stat = (JSONObject) obj;
+            build.setMaxStat(stat.getString("name"), stat.getInt("max"));
+        }
 
         return build;
     }

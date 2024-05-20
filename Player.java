@@ -65,14 +65,15 @@ public class Player extends Tank {
         // Upgrade bars
         float yPos = Graphics.cameraHeight - 54;
         final float upgradeBarHeight = 22;
-        upgradeBar[0] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.MOVEMENT_SPEED, "Movement Speed", "[8]"); yPos -= upgradeBarHeight + 3;
-        upgradeBar[1] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.RELOAD, "Reload", "[7]"); yPos -= upgradeBarHeight + 3;
-        upgradeBar[2] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.BULLET_DAMAGE, "Bullet Damage", "[6]"); yPos -= upgradeBarHeight + 3;
-        upgradeBar[3] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.BULLET_PENETRATION, "Bullet Penetration", "[5]"); yPos -= upgradeBarHeight + 3;
-        upgradeBar[4] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.BULLET_SPEED, "Bullet Speed", "[4]"); yPos -= upgradeBarHeight + 3;
-        upgradeBar[5] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.BODY_DAMAGE, "Body Damage", "[3]"); yPos -= upgradeBarHeight + 3;
-        upgradeBar[6] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.MAX_HEALTH, "Max Health", "[2]"); yPos -= upgradeBarHeight + 3;
-        upgradeBar[7] = new UpgradeBar(10, yPos, 23, 7, upgradeBarHeight, 2, Graphics.HEALTH_REGEN, "Health Regen", "[1]");
+        String[] upgradeText = {"Movement Speed", "Reload", "Bullet Damage", "Bullet Penetration", "Bullet Speed", "Body Damage", "Max Health", "Health Regen"};
+        Color[] colors = {Graphics.MOVEMENT_SPEED, Graphics.RELOAD, Graphics.BULLET_DAMAGE, Graphics.BULLET_PENETRATION, Graphics.BULLET_SPEED, Graphics.BODY_DAMAGE, Graphics.MAX_HEALTH, Graphics.HEALTH_REGEN};
+        for (int i = 0; i < 8; i++) {
+            int maxStat = tankBuild.getMaxStat(upgradeText[i]);
+            if (maxStat > 0) {
+                upgradeBar[i] = new UpgradeBar(10, yPos, 23, maxStat, upgradeBarHeight, 2, colors[i], upgradeText[i], "[" + (8 - i) + "]");
+                yPos -= upgradeBarHeight + 3;
+            }
+        }
     }
 
     @Override
@@ -205,6 +206,10 @@ public class Player extends Tank {
     }
 
     public void incrementStat(int statEnum) {
+        if (upgradeBar[statEnum] == null || getStat(statEnum) >= tankBuild.getMaxStat(upgradeBar[statEnum].text)) {  // If stat doesn't exist or is maxed
+            return;
+        }
+
         stats.setStat(statEnum, getStat(statEnum) + 1);
         updateStats();
         upgradeBar[statEnum].setRects(getStat(statEnum));
@@ -250,7 +255,9 @@ public class Player extends Tank {
         upgradeOpacity = upgradeBarOpacity(upgradeFrames);
 
         for (UpgradeBar bar : upgradeBar) {
-            bar.update(upgradeOpacity);
+            if (bar != null) {
+                bar.update(upgradeOpacity);
+            }
         }
     }
 
@@ -330,7 +337,9 @@ public class Player extends Tank {
     public void drawUpgradeBars() {
         if (upgradeOpacity < 0.01f) return;  // If opacity is too low, don't draw
         for (UpgradeBar bar : upgradeBar) {
-            bar.draw();
+            if (bar != null) {
+                bar.draw();
+            }
         }
     }
 }

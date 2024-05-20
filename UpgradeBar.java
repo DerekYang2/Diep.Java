@@ -54,7 +54,8 @@ public class UpgradeBar {
         int yInt = (int)pos.y;
         float width = getWidth();
         Graphics.drawRectangleRounded(xInt, yInt, width, height, 1f, 10, Graphics.colAlpha(strokeCol, opacity));
-        float higherOpacity = (float) Math.pow(opacity, 1);
+
+        float higherOpacity = (float) Math.pow(opacity, 0.33);
         if (curRects > 0) {
             Graphics.drawCircleSector(new Vector2(xInt + height * 0.5f, yInt + height * 0.5f), height * 0.5f - strokeWidth, 180, 360, fillCol, higherOpacity);
         }

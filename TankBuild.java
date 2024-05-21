@@ -38,6 +38,10 @@ public class TankBuild
     // Max stats
     HashMap<String, Integer> maxStats;
 
+    // Upgrading variables
+    int levelRequirement;
+
+
     public TankBuild(String name, AddOn addOn, Barrel[] barrels, FireManager fireManager, BulletStats[] bulletStats, float fieldFactor) {
         this.name = name;
         this.barrels = barrels;
@@ -264,6 +268,8 @@ public class TankBuild
             JSONObject stat = (JSONObject) obj;
             build.setMaxStat(stat.getString("name"), stat.getInt("max"));
         }
+
+        build.levelRequirement = jsonTank.getInt("levelRequirement");
 
         return build;
     }

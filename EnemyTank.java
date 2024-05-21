@@ -3,9 +3,14 @@ import com.raylib.java.raymath.Vector2;
 
 public class EnemyTank extends Tank {
     public EnemyTank(Vector2 spawn, String buildName) {
-        super(spawn, new BotController(), new Stats(0, 7, 7, 7, 7, 0, 0, 0), 45);
+        super(spawn, new BotController(), new Stats(0, 7, 7, 7, 7, 0, 0, 0), 14);
         setColor(Graphics.RED, Graphics.RED_STROKE);
         initTankBuild(TankBuild.createTankBuild(buildName));
+    }
+
+    @Override
+    public void initTankBuild(TankBuild build) {
+        super.initTankBuild(build);
         TextureLoader.pendingAdd(this);
     }
 

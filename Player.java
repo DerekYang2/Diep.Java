@@ -4,8 +4,8 @@ import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.text.rText;
 
-import java.util.Queue;
 import java.util.LinkedList;
+import java.util.Queue;
 
 import static com.raylib.java.core.input.Keyboard.*;
 
@@ -84,13 +84,6 @@ public class Player extends Tank {
         TextureLoader.pendingAdd(this);
         formattedBuildName = NameGenerator.formatNameCase(tankBuild.name);
         targetZoom = getZoom();
-        tankBuild.update();  // In order to have correct position and rotation right away
-    }
-
-    public void changeTankBuild(TankBuild tankBuild) {
-        this.tankBuild.delete();  // Delete old tank build
-        initTankBuild(tankBuild);  // Initialize new tank build
-        levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
     }
 
     // For timing speed
@@ -118,7 +111,6 @@ public class Player extends Tank {
     protected float getZoom() {
         return (float) ((.55f * this.tankBuild.fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f));
     }
-    boolean testFlag = false;
 
     public void updateCamera() {
         if (tankBuild.zoomAbility && controller.holdSpecial()) {
@@ -169,16 +161,14 @@ public class Player extends Tank {
         if (Graphics.isKeyDown(KEY_K)) {
             score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) + 0.01f - score, 23000.f/(2 * 120)));  // 2 seconds
         }
-        if (Graphics.isKeyPressed(Keyboard.KEY_T)) {  // Test
-            changeTankBuild(TankBuild.createTankBuild(testFlag?"auto 5":"auto smasher"));
-            testFlag = !testFlag;
-        }
 
         while (!killQueue.isEmpty() && Main.counter >= killQueue.peek().second) {  // If not empty and counter is past the expire time
             killQueue.remove();  // Remove the top element
         }
+
         updateStatUpgrade();
     }
+
 
     public void updateStatUpgrade() {
         if (usedStatPoints == maxStatPoints) return;  // If no stat points to use

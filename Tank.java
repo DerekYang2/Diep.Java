@@ -26,6 +26,9 @@ public class Tank extends GameObject {
     int usedStatPoints = 0;
     int maxStatPoints = 0;
 
+    // Upgrade path variables
+    String level15Build = "flank guard", level30Build = "tri-angle", level45Build = "booster";
+    boolean upgraded15 = false, upgraded30 = false, upgraded45 = false;
 
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
@@ -60,9 +63,17 @@ public class Tank extends GameObject {
 
     public void initTankBuild(TankBuild tankBuild) {
         this.tankBuild = tankBuild;
-        tankBuild.setHost(this);
+        this.tankBuild.setHost(this);
         // Update controller
         this.controller.updateTankBuild();
+        this.tankBuild.update();  // In order to have correct position and rotation right away
+    }
+
+    public void changeTankBuild(TankBuild tankBuild) {
+        if (tankBuild.name != this.tankBuild.name) {  // If new tank build is different
+            this.tankBuild.delete();  // Delete old tank build
+            initTankBuild(tankBuild);  // Initialize new tank build
+        }
     }
 
     /**
@@ -149,11 +160,25 @@ public class Tank extends GameObject {
 
         // Update level
         updateLevel();
+        updateUpgradePaths();
     }
 
     public void setPos(Vector2 pos) {
         this.pos = pos;
         tankBuild.setPos(pos);
+    }
+
+    public void updateUpgradePaths() {
+        if (!upgraded15 && level >= 15) {
+            changeTankBuild(TankBuild.createTankBuild(level15Build));
+            upgraded15 = true;
+        } else if (!upgraded30 && level >= 30) {
+            changeTankBuild(TankBuild.createTankBuild(level30Build));
+            upgraded30 = true;
+        } else if (!upgraded45 && level >= 45) {
+            changeTankBuild(TankBuild.createTankBuild(level45Build));
+            upgraded45 = true;
+        }
     }
 
     @Override

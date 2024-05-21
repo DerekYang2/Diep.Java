@@ -52,14 +52,14 @@ public class Main {
         TextureLoader.clear();
         Leaderboard.clear();
 
-        int spawn = 0;
+        int spawn = 4;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
-        player = new Player(new Vector2(0,0), "streamliner");
+        player = new Player(new Vector2(0,0), "tank");
         for (int i = 0; i < spawn; i++) {
             String buildName = TankBuild.getRandomBuildName();
-            // buildName = "auto 5";
+            buildName = "tank";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
 
             t.group = -Graphics.randInt(0, 4);

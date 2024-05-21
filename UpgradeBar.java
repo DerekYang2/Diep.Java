@@ -80,6 +80,24 @@ public class UpgradeBar {
         Graphics.drawCircleSector(new Vector2(rectX, yInt + height * 0.5f), height * 0.5f - strokeWidth, 0, 180, buttonCol, higherOpacity);
         Graphics.drawTextCenteredOutline(text, (int) (xInt + (width - height*0.5f - rectWidth) * 0.5f), (int) (yInt + (height) * 0.55f), (int)(height * 0.95f), textSpacing, textDim, Graphics.colAlpha(Color.WHITE, higherOpacity * 1.5f));
         Graphics.drawTextOutline(smallText, new Vector2(rectX - rectWidth*1.5f - strokeWidth - smallTextDim.x * 0.5f, yInt + (height- smallTextDim.y) * 0.6f), (int)(height * 0.8f), smallTextSpacing, Graphics.colAlpha(Color.WHITE, higherOpacity * 1.5f));
+
+        drawPlus(rectX + height * 0.5f - strokeWidth - (height * 0.5f - strokeWidth + rectWidth) * 0.5f, yInt + height * 0.5f, height * 0.5f, height * 0.15f, Graphics.colAlpha(strokeCol, opacity));
+    }
+
+    /**
+     * Helper method to draw a plus sign, same width as height with certain center coordinates
+     * Cross rectangles have a variable stroke
+     * @param centerX center x coordinate
+     * @param centerY center y coordinate
+     * @param longLength length of the long side of the plus
+     * @param shortLength length of the short side of the plus
+     * @param col color of the plus
+     */
+    private void drawPlus(float centerX, float centerY, float longLength, float shortLength, Color col) {
+        // Draw vertical rect
+        Graphics.drawRectangle(centerX - shortLength * 0.5f, centerY - longLength * 0.5f, shortLength, longLength, col);
+        // Draw horizontal rect
+        Graphics.drawRectangle(centerX - longLength * 0.5f, centerY - shortLength * 0.5f, longLength, shortLength, col);
     }
 
     public float getWidth() {

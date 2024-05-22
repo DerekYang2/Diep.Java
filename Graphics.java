@@ -370,8 +370,12 @@ public class Graphics extends Raylib {
     }
 
     // IO --------------------------------------------------------------------------------------------
+    public static long[] lastPressFrame = new long[256], lastReleaseFrame = new long[256];
     public static boolean isKeyPressed(int key) {
-        return rlj.core.IsKeyPressed(key);
+        if (Main.counter - lastPressFrame[key] <= 1) return false;  // Ensure last press is greater than 1 apart to prevent double press on performance mode
+        boolean pressed = rlj.core.IsKeyPressed(key);
+        if (pressed) lastPressFrame[key] = Main.counter;
+        return pressed;
     }
 
     public static boolean isKeyDown(int key) {

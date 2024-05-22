@@ -9,7 +9,7 @@ public class Main {
     public static float arenaWidth = GRID_SIZE * 100, arenaHeight = GRID_SIZE * 100;
     public final static float ARENA_PADDING = GRID_SIZE * 4;
 
-    public static long counter;
+    public static long counter = 0;
     public static DrawPool drawablePool;
     public static HashPool<GameObject> gameObjectPool;
     public static IdServer idServer;
@@ -76,7 +76,7 @@ public class Main {
         }
         Graphics.setCameraTarget(player.pos);
         cameraBox = Graphics.getCameraWorld();
-        counter = 0;
+        //counter = 0;
     }
 
     private static void update() {

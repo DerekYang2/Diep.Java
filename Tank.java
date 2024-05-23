@@ -2,6 +2,9 @@ import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * NOTES:
  * this.cameraEntity.cameraData.respawnLevel = Math.min(Math.max(this.cameraEntity.cameraData.values.level - 1, 1), Math.floor(Math.sqrt(this.cameraEntity.cameraData.values.level) * 3.2796));
@@ -27,8 +30,7 @@ public class Tank extends GameObject {
     int maxStatPoints = 0;
 
     // Upgrade path variables
-    String level15Build = "flank guard", level30Build = "tri-angle", level45Build = "booster";
-    boolean upgraded15 = false, upgraded30 = false, upgraded45 = false;
+    Queue<Pair<String, Integer>> upgradeBuilds;
 
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
@@ -74,6 +76,17 @@ public class Tank extends GameObject {
             this.tankBuild.delete();  // Delete old tank build
             initTankBuild(tankBuild);  // Initialize new tank build
         }
+    }
+
+    public void setUpgradePath(String[] upgradePaths) {
+        upgradeBuilds = new LinkedList<>();
+        for (String str: upgradePaths) {
+            upgradeBuilds.add(new Pair<>(str, TankBuild.getLevelRequirement(str)));
+        }
+    }
+
+    public void setUpgradePath(Queue<Pair<String, Integer>> upgradePaths) {
+        upgradeBuilds = upgradePaths;
     }
 
     /**
@@ -169,16 +182,15 @@ public class Tank extends GameObject {
     }
 
     public void updateUpgradePaths() {
-        if (!upgraded15 && level >= 15) {
-            changeTankBuild(TankBuild.createTankBuild(level15Build));
-            upgraded15 = true;
-        } else if (!upgraded30 && level >= 30) {
-            changeTankBuild(TankBuild.createTankBuild(level30Build));
-            upgraded30 = true;
-        } else if (!upgraded45 && level >= 45) {
-            changeTankBuild(TankBuild.createTankBuild(level45Build));
-            upgraded45 = true;
+        String newBuild = tankBuild.name;
+        while (!upgradeBuilds.isEmpty()) {
+            if (level >= upgradeBuilds.peek().second) {
+                newBuild = upgradeBuilds.poll().first;
+            } else {
+                break;
+            }
         }
+        changeTankBuild(TankBuild.createTankBuild(newBuild));
     }
 
     @Override

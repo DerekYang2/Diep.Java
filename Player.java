@@ -49,6 +49,9 @@ public class Player extends Tank {
         Vector2 textDimensions = rText.MeasureTextEx(Graphics.outlineFont, username, usernameFontSize, usernameSpacing);
         textDimensions.x *= 0.98f;
         usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - textDimensions.getY() * 0.5f - BAR_HEIGHT);
+
+        // Set upgrade paths
+        setUpgradePath(TankBuild.getRandomUpgradePath());
     }
 
     public void initBars() {

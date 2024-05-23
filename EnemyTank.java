@@ -6,6 +6,9 @@ public class EnemyTank extends Tank {
         super(spawn, new BotController(), new Stats(0, 7, 7, 7, 7, 0, 0, 0), 14);
         setColor(Graphics.RED, Graphics.RED_STROKE);
         initTankBuild(TankBuild.createTankBuild(buildName));
+
+        // Set upgrade paths
+        setUpgradePath(TankBuild.getRandomUpgradePath());
     }
 
     @Override

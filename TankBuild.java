@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 public class TankBuild
 {
@@ -196,6 +194,7 @@ public class TankBuild
 
     // Static creation methods
     public static HashMap<String, JSONObject> tankDefinitions;
+    public static String[] buildName = new String[100];  // The build name for a given ID
     public static final String DEFINITIONS_PATH = "config/TankDefinitions.json";
 
     public static void loadTankDefinitions() {
@@ -204,12 +203,15 @@ public class TankBuild
             JSONArray jsonArray = new JSONArray(TankBuild.readFile(DEFINITIONS_PATH, Charset.defaultCharset()));
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                tankDefinitions.put(jsonObject.getString("name").trim().toLowerCase(), jsonObject);
+                String nameStr = jsonObject.getString("name").trim().toLowerCase();
+                tankDefinitions.put(nameStr, jsonObject);
+                buildName[jsonObject.getInt("id")] = nameStr;  // Store the build name for a given ID
             }
         } catch (IOException e) {
             System.out.println("Error reading TankDefinitions.json: " + e.getMessage());
         }
     }
+
     private static String readFile(String path, Charset encoding) throws IOException
     {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
@@ -287,6 +289,27 @@ public class TankBuild
             buildName = keyList.get((int)(Math.random() * keyList.size()));
         } while (buildName.contains("dominator") || buildName.equals("arena closer") || buildName.equals("mothership"));
         return buildName;
+    }
+
+    public static Queue<Pair<String, Integer>> getRandomUpgradePath() {
+        Queue<Pair<String, Integer>> upgradePath = new LinkedList<>();
+        Pair<String, Integer> currentTank = new Pair<>("tank", 1);
+        do {
+            JSONObject jsonTank = tankDefinitions.get(currentTank.first);
+            JSONArray jsonUpgrades = jsonTank.getJSONArray("upgrades");
+
+            int randId = jsonUpgrades.getInt(Graphics.randInt(0, jsonUpgrades.length()));
+            String upgradeName = buildName[randId];
+
+            currentTank = new Pair<>(upgradeName, getLevelRequirement(upgradeName));
+            upgradePath.add(currentTank);
+        } while (currentTank.second < 45);
+
+        return upgradePath;
+    }
+
+    public static int getLevelRequirement(String name) {
+        return tankDefinitions.get(name).getInt("levelRequirement");
     }
 
     public static Set<String> getTankDefinitions() {

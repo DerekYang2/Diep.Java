@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class TextureLoader {
     private static HashMap<Color, HashMap<String, Texture2D>> tankTextures = new HashMap<>(), iconTextures = new HashMap<>();
-    private static ArrayList<Tank> pendingTankTexture = new ArrayList<>();  // TODO: move to new class
+    private static ArrayList<Tank> pendingTankTexture = new ArrayList<>();
 
     private static void createAndInsertTexture(String buildName, Color fillCol, Color strokeCol) {
         if (!tankTextures.containsKey(fillCol)) {  // If fill color not in map, add it

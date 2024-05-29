@@ -7,8 +7,10 @@ public class Main {
     final public static float GRID_SIZE = 50;
     static Rectangle cameraBox;
     public static float arenaWidth = GRID_SIZE * 100, arenaHeight = GRID_SIZE * 100;
+    public static Rectangle nestBox, crasherZone;
     public final static float ARENA_PADDING = GRID_SIZE * 4;
 
+    public static int polygonAmount = 0;
     public static long counter = 0;
     public static DrawPool drawablePool;
     public static HashPool<GameObject> gameObjectPool;
@@ -53,12 +55,21 @@ public class Main {
         Leaderboard.clear();
 
         int spawn = 30;
+
+        polygonAmount = spawn * 12;
+        Polygon.count = 0;
+        Polygon.nestCount = 0;
+
         // Set arena size
-        arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
+        arenaWidth = arenaHeight = (float) (Math.floor(40 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
+        float nestSide = arenaWidth / 5, crasherSide = nestSide * 2f;
+        nestBox = new Rectangle(arenaWidth/2 - nestSide/2, arenaHeight/2 - nestSide/2, nestSide, nestSide);
+        crasherZone = new Rectangle(arenaWidth/2 - crasherSide/2, arenaHeight/2 - crasherSide/2, crasherSide, crasherSide);
         // new TestObj();
         player = new Player(new Vector2(0,0), "tank");
         for (int i = 0; i < spawn; i++) {
-            String buildName = TankBuild.getRandomBuildName();
+            String buildName;
+            //buildName = TankBuild.getRandomBuildName();
             buildName = "tank";
             Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
 
@@ -74,8 +85,6 @@ public class Main {
             }
             if (t.group == 0) t.group = player.group;
         }
-        for (int i = 0; i < 50 * spawn; i++)
-            Polygon.spawnRandomPolygon();
 
         Graphics.setCameraTarget(player.pos);
         cameraBox = Graphics.getCameraWorld();
@@ -98,6 +107,14 @@ public class Main {
         Main.drawablePool.refresh();
         Main.gameObjectPool.refresh();
         Main.idServer.refresh();
+
+        // Create polygons
+        while (Polygon.count < polygonAmount) {
+            Polygon.spawnRandomPolygon();
+        }
+        while (Polygon.nestCount < 30) {
+            Polygon.spawnNestPolygon();
+        }
 
         CollisionManager.updateCollision();
 

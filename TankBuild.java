@@ -89,6 +89,10 @@ public class TankBuild
         this.zoomAbility = zoomAbility;
     }
 
+    public void resetFireManagerDelay() {
+        fireManager.resetDelay();
+    }
+
     public void delete() {
         if (!isDeleted) {
             isDeleted = true;

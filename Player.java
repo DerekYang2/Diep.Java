@@ -51,8 +51,17 @@ public class Player extends Tank {
         usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - textDimensions.getY() * 0.5f - BAR_HEIGHT);
 
         // Set upgrade paths
-        //setUpgradePath(TankBuild.getRandomUpgradePath());
-        setUpgradePath(new String[]{"gunner", "triple twin"});
+        setUpgradePath(TankBuild.getRandomUpgradePath());
+        //setUpgradePath(new String[]{"machine gun"});
+    }
+
+    @Override
+    public void initTankBuild(TankBuild tankBuild) {
+        super.initTankBuild(tankBuild);
+        TextureLoader.pendingAdd(this);
+        formattedBuildName = NameGenerator.formatNameCase(tankBuild.name);
+        targetZoom = getZoom();
+        initUpgradeBars();
     }
 
     public void initBars() {
@@ -66,8 +75,9 @@ public class Player extends Tank {
 
         final float scoreBarWidth = BAR_WIDTH*2/3, scoreBarHeight = BAR_HEIGHT*0.8f;
         scoreBar = new Bar(new Vector2((Graphics.cameraWidth - scoreBarWidth) * 0.5f, levelBarPos.y - scoreBarHeight - 3), scoreBarWidth, scoreBarHeight, 2, Graphics.SCORE_GREEN, Graphics.BAR_GREY, 0.08f, 0);
+    }
 
-        // Upgrade bars
+    public void initUpgradeBars() {
         float yPos = Graphics.cameraHeight - 54;
         final float upgradeBarHeight = 22;
         String[] upgradeText = {"Movement Speed", "Reload", "Bullet Damage", "Bullet Penetration", "Bullet Speed", "Body Damage", "Max Health", "Health Regen"};
@@ -80,14 +90,11 @@ public class Player extends Tank {
             }
         }
         usagePos = new Vector2(10 + upgradeBar[0].getWidth(), yPos);
-    }
-
-    @Override
-    public void initTankBuild(TankBuild tankBuild) {
-        super.initTankBuild(tankBuild);
-        TextureLoader.pendingAdd(this);
-        formattedBuildName = NameGenerator.formatNameCase(tankBuild.name);
-        targetZoom = getZoom();
+        for (int statEnum = 0; statEnum < 8; statEnum++) {
+            if (upgradeBar[statEnum] != null) {
+                upgradeBar[statEnum].setRects(getStat(statEnum));
+            }
+        }
     }
 
     // For timing speed
@@ -169,12 +176,11 @@ public class Player extends Tank {
         while (!killQueue.isEmpty() && Main.counter >= killQueue.peek().second) {  // If not empty and counter is past the expire time
             killQueue.remove();  // Remove the top element
         }
-
-        updateStatUpgrade();
     }
 
-
+    @Override
     public void updateStatUpgrade() {
+        super.updateStatUpgrade();
         if (usedStatPoints == maxStatPoints) return;  // If no stat points to use
 
         if (Graphics.isKeyPressed(KEY_ONE)) {
@@ -207,16 +213,12 @@ public class Player extends Tank {
         if (upgradeBar[statEnum] == null || getStat(statEnum) >= tankBuild.getMaxStat(upgradeBar[statEnum].text)) {  // If stat doesn't exist or is maxed
             return;
         }
-
-        stats.setStat(statEnum, getStat(statEnum) + 1);
-        updateStats();
+        super.incrementStat(statEnum);
         upgradeBar[statEnum].setRects(getStat(statEnum));
         if (upgradeFrames >= UPGRADE_HUD_DURATION * (1-PERCENT_FADE))  // If bar is fading out
             upgradeFrames = UPGRADE_HUD_DURATION - upgradeFrames;  // Set frames to symmetric fading in
         else if (upgradeFrames >= UPGRADE_HUD_DURATION * PERCENT_FADE)  // If bar is fully visible
             upgradeFrames = (int) (UPGRADE_HUD_DURATION * PERCENT_FADE);  // Reset to start of being fully visible
-
-        usedStatPoints++;  // Increment used stat points
     }
 
 /*    public void draw() {

@@ -32,10 +32,14 @@ public class FireManager {
     public void setHost(Tank host) {
         this.host = host;
         // Initialize frame counter
+        resetDelay();
+    }
+
+   public void resetDelay() {
         for (int i = 0; i < turretCount; i++) {
             frameCounter[i] = getDelayFrames(i);
         }
-    }
+   }
 
     public void setReloadTime(float reloadTime) {
         manualReloadTime = reloadTime;
@@ -59,6 +63,16 @@ public class FireManager {
     public int getReloadFrames(int ti) {
         if (manualReloadTime != null) return Math.round((120.f/25) * manualReloadTime * getReloadFactor(ti));
         return Math.round((120.f/25) * 15*(float)Math.pow(0.914, host.getStat(Stats.RELOAD)) * getReloadFactor(ti));  // convert 25 fps to 120 fps
+    }
+
+    public int getNextFireFrames() {
+        int minFrames = Integer.MAX_VALUE;
+        for (int i = 0; i < turretCount; i++) {
+            if (frameCounter[i] < minFrames) {
+                minFrames = frameCounter[i];
+            }
+        }
+        return minFrames;
     }
 
     /**

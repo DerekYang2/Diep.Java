@@ -129,6 +129,29 @@ public class Tank extends GameObject {
         }
     }
 
+    int upgradeFrames = 0;
+    boolean resetFireDelay = true;
+    public void updateStatUpgrade() {
+       upgradeFrames = Math.max(0, upgradeFrames - 1);
+        if (upgradeFrames == 0 && !resetFireDelay) {
+            tankBuild.resetFireManagerDelay();
+            resetFireDelay = true;
+        }
+    }
+
+
+    public void incrementStat(int statEnum) {
+        if (usedStatPoints < maxStatPoints) {
+            stats.setStat(statEnum, stats.getStat(statEnum) + 1);
+            usedStatPoints++;
+            if (statEnum == Stats.RELOAD) {
+                upgradeFrames = tankBuild.fireManager.getNextFireFrames();
+                resetFireDelay = false;
+            }
+        }
+        updateStats();
+    }
+
     protected void setDirection(double radians) {
         direction = (float) radians;
     }
@@ -174,6 +197,8 @@ public class Tank extends GameObject {
         // Update level
         updateLevel();
         updateUpgradePaths();
+
+        updateStatUpgrade();
     }
 
     public void setPos(Vector2 pos) {

@@ -1,5 +1,6 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
+import com.raylib.java.shapes.Rectangle;
 
 public class Polygon extends GameObject {
     final static String SQUARE = "square", TRIANGLE = "triangle", PENTAGON = "pentagon", ALPHA_PENTAGON = "alpha pentagon";
@@ -8,23 +9,25 @@ public class Polygon extends GameObject {
     final static float BASE_ORBIT = 0.5f*0.005f * 25.f/120;
     /** The velocity of the shape's orbits. */
     final static float BASE_VELOCITY = 0.5f*1 * 25.f/120;
+    public static int count = 0, nestCount = 0;
 
     float rotation;
     float direction;
     float baseAcceleration;
     float orbitRate;
     float rotationRate;
+    boolean isNestPolygon = false;
 
     private float scoreReward;
-    public Polygon(Vector2 pos, String name) {
+    public Polygon(Vector2 pos, String name, boolean inNest) {
         super(pos, (int)(switch (name) {
             case Polygon.SQUARE, Polygon.TRIANGLE -> 38.890872;
             case Polygon.PENTAGON -> 145.0/2.2360679775;  // (1+1/Math.cos(0.5f*(2*Math.PI)/5))
             case Polygon.ALPHA_PENTAGON ->  2.666666 * 145.0/2.2360679775;
             default -> 0;
         }), 1, DrawPool.BOTTOM);
-
         group = Integer.MIN_VALUE;  // Set to impossible group
+        isNestPolygon = inNest;
 
         orbitRate = (Math.random() < 0.5 ? 1 : -1) * BASE_ORBIT * Graphics.randf(0.75f, 1.25f);
         rotationRate = (Math.random() < 0.5 ? 1 : -1) * BASE_ROTATION;
@@ -134,24 +137,45 @@ public class Polygon extends GameObject {
 
     public static Polygon spawnRandomPolygon() {
         double rand = Math.random();
-        Vector2 pos = new Vector2((float) (Math.random() * (Main.arenaWidth)), (float) (Math.random() * (Main.arenaHeight)));
-        Vector2 mapCenter = new Vector2(Main.arenaWidth/2, Main.arenaHeight/2);
+        Vector2 pos;
+
+        do {  // Ensure the polygon does not spawn inside the nest
+            pos = new Vector2((float) (Math.random() * (Main.arenaWidth)), (float) (Math.random() * (Main.arenaHeight)));
+        } while (Graphics.isIntersecting(new Rectangle(pos.x-100, pos.y-100, 200, 200), Main.crasherZone));
+
+        count++;
+
         String shape;
-        if (Graphics.distance(pos, mapCenter) < Main.arenaWidth/8) {
-            if (rand < 0.05) {
-                shape = Polygon.ALPHA_PENTAGON;
-            } else {
-                shape = Polygon.PENTAGON;
-            }
+        if (rand < 0.04) {
+            shape = Polygon.PENTAGON;
+        } else if (rand < 0.20) {
+            shape = Polygon.TRIANGLE;
         } else {
-            if (rand < 0.04) {
-                shape= Polygon.PENTAGON;
-            } else if (rand < 0.20) {
-                shape= Polygon.TRIANGLE;
-            } else {
-                shape= Polygon.SQUARE;
-            }
+            shape = Polygon.SQUARE;
         }
-        return new Polygon(pos, shape);
+        return new Polygon(pos, shape, false);
+    }
+
+    public static Polygon spawnNestPolygon() {
+        Vector2 pos = new Vector2(Graphics.randf(Main.nestBox.x, Main.nestBox.x + Main.nestBox.width), Graphics.randf(Main.nestBox.y, Main.nestBox.y + Main.nestBox.height));
+
+        nestCount++;
+
+        double rand = Math.random();
+        if (rand < 0.02) {
+            return new Polygon(pos, Polygon.ALPHA_PENTAGON, true);
+        } else {
+            return new Polygon(pos, Polygon.PENTAGON, true);
+        }
+    }
+
+    @Override
+    public void delete() {
+        super.delete();
+        if (isNestPolygon) {
+            nestCount--;
+        } else {
+            count--;
+        }
     }
 }

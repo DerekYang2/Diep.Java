@@ -43,6 +43,10 @@ public class UpgradeBar {
         this.curRects = Math.min(curRects, maxRects);
     }
 
+    public void setMaxRects(int maxRects) {
+        this.maxRects = maxRects;
+    }
+
     public void update(float opacity) {
         this.opacity = opacity;
     }

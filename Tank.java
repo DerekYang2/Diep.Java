@@ -34,6 +34,8 @@ public class Tank extends GameObject {
     int upgradeFrames = 0;
     boolean resetFireDelay = true;
 
+    boolean cullingOff = false;
+
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
         super(pos, 50, 1.f, DrawPool.MIDDLE);

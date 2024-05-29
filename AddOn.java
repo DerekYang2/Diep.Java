@@ -47,7 +47,7 @@ class SpikeAddOn extends AddOn {
     @Override
     public void drawBefore() {
         final float radius = host.radius * host.scale, scaledRadius = radius * 0.707f * 0.92f;  // scale is always 1 until death animation
-        if (Main.onScreen(host.pos, maxRadius())) {  // Use larger radius for culling
+        if (host.cullingOff || Main.onScreen(host.pos, maxRadius())) {  // Use larger radius for culling
             final Color fillCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY), host.opacity), strokeCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity * host.opacity);
             Graphics.drawTriangleRounded(host.pos, scaledRadius, offsetRadians, Graphics.strokeWidth, fillCol, strokeCol);
             Graphics.drawTriangleRounded(host.pos, scaledRadius, offsetRadians + (float) (Math.PI/3), Graphics.strokeWidth, fillCol, strokeCol);
@@ -88,7 +88,7 @@ class SmasherAddOn extends AddOn {
     @Override
     public void drawBefore() {
         float sideLen = (host.radius * host.scale) * 1.15f;
-        if (Main.onScreen(host.pos, sideLen)) {  // Use larger radius for culling
+        if (host.cullingOff || Main.onScreen(host.pos, sideLen)) {  // Use larger radius for culling
             final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity);
             Graphics.drawHexagon(host.pos, sideLen, offsetRadians, col);
         }
@@ -123,7 +123,7 @@ class LandmineAddOn extends AddOn {
     @Override
     public void drawBefore() {
         final float sideLen = (host.radius * host.scale) * 1.15f;
-        if (Main.onScreen(host.pos, sideLen)) {
+        if (host.cullingOff || Main.onScreen(host.pos, sideLen)) {
             final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity);
             Graphics.drawHexagon(host.pos, sideLen, offset1, col);
             Graphics.drawHexagon(host.pos, sideLen, offset2, col);
@@ -151,7 +151,7 @@ class DominatorAddOn extends AddOn {
     @Override
     public void drawBefore() {
         final float sideLen = (host.radius * host.scale) * 1.24f;
-        if (Main.onScreen(host.pos, sideLen)) {
+        if (host.cullingOff || Main.onScreen(host.pos, sideLen)) {
             final Color fillCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY), host.opacity), strokeCol = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity);
             Graphics.drawHexagon(host.pos, sideLen, 0, strokeCol);
             Graphics.drawHexagon(host.pos, sideLen - Graphics.strokeWidth, 0, fillCol);
@@ -162,7 +162,7 @@ class DominatorAddOn extends AddOn {
     public void drawMiddle() {
         float offsetDist = host.radius * host.scale * 4.f / 5;
         float length = host.radius * host.scale * 2.1f / 5;
-        if (Main.onScreen(host.pos, offsetDist + length)) {
+        if (host.cullingOff || Main.onScreen(host.pos, offsetDist + length)) {
             float width = 35 * host.scale * 0.94f;
             Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), host.opacity, true);
         }
@@ -247,7 +247,7 @@ class AutoSmasherAddOn extends AutoTurretAddOn {
     @Override
     public void drawBefore() {
         float sideLen = (host.radius * host.scale) * 1.15f;
-        if (Main.onScreen(host.pos, sideLen)) {  // Use larger radius for culling
+        if (host.cullingOff || Main.onScreen(host.pos, sideLen)) {  // Use larger radius for culling
             final Color col = Graphics.colAlpha(host.getDamageLerpColor(Graphics.DARK_GREY_STROKE), host.opacity);
             Graphics.drawHexagon(host.pos, sideLen, offsetRadians, col);
         }
@@ -278,7 +278,7 @@ class AutoNAddOn extends AddOn {
             Barrel barrel = new Barrel(BULLET_STATS, 42 * 0.8f, 55, 1,0, 0, false, false, false);
             barrel.setHost(tank);
 
-            FireManager fireManager = new FireManager(new double[][]{{0.01, 1}});
+            FireManager fireManager = new FireManager(new double[][]{{1, 1}});
             fireManager.setHost(tank);
 
             autoTurrets[i] = new AutoTurret(tank, barrel, fireManager);
@@ -346,7 +346,7 @@ class PronouncedAddOn extends AddOn {
     public void drawMiddle() {
         float offsetDist = (host.radius * host.scale) * 3.1f / 5;
         float length = (host.radius * host.scale) * 3.3f / 5;
-        if (Main.onScreen(host.pos, offsetDist + length)) {
+        if (host.cullingOff || Main.onScreen(host.pos, offsetDist + length)) {
             float width = host.tankBuild.getBarrel(0).getTurretWidth() * 0.94f;
             Graphics.drawTurretTrapezoid((float) (host.pos.x + offsetDist * Math.cos(host.direction)), (float) (host.pos.y + offsetDist * Math.sin(host.direction)), length, width, host.direction, Graphics.strokeWidth, host.getDamageLerpColor(Graphics.GREY), host.getDamageLerpColor(Graphics.GREY_STROKE), host.opacity, true);
         }

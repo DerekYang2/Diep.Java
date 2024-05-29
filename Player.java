@@ -52,13 +52,13 @@ public class Player extends Tank {
 
         // Set upgrade paths
         //setUpgradePath(TankBuild.getRandomUpgradePath());
-        setUpgradePath(new String[]{"smasher", "spike"});
+        setUpgradePath(new String[]{"auto 3", "auto 5"});
     }
 
     @Override
     public void initTankBuild(TankBuild tankBuild) {
         super.initTankBuild(tankBuild);
-        TextureLoader.pendingAdd(this);
+        TextureLoader.pendingAdd(this.tankBuild.name, this.fillCol, this.strokeCol);
         formattedBuildName = NameGenerator.formatNameCase(tankBuild.name);
         targetZoom = getZoom();
         initUpgradeBars();

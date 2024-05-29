@@ -53,14 +53,11 @@ public class Leaderboard {
         for (int i = 0; i < Math.min(tankIds.size(), LEADERBOARD_SIZE); i++) {
             Tank tank = tankList.get(i);
             tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
-
             scoreBars[i].update(new Vector2(cornerX, (cornerY/2 + titleDimensions.y + 10) + (i - 0.5f) * leaderboardGap), tankList.get(i).score/maxScore);
             scoreBars[i].setText(tank.username + " - " + formatScoreShort(tank.score), 21);
 
             final int finalI = i;
-            scoreBars[i].setCustomDraw((Rectangle rect) -> {
-                Graphics.drawTextureCentered(tankBuilds[finalI], new Vector2(rect.x + 11, rect.y + rect.height * 0.5f), 0, 1f, Color.WHITE);
-            });
+            scoreBars[i].setCustomDraw((Rectangle rect) -> Graphics.drawTextureCentered(tankBuilds[finalI], new Vector2(rect.x + 11, rect.y + rect.height * 0.5f), 0, 1f, Color.WHITE));
         }
     }
 
@@ -81,7 +78,6 @@ public class Leaderboard {
         for (int i = 0; i < LEADERBOARD_SIZE; i++) {
             if (tankBuilds[i] != null) {
                 scoreBars[i].draw();
-                //Graphics.drawTextureCentered(tankBuilds[i], new Vector2(cornerX + 12, cornerY + i * leaderboardGap - 1), 0, 1f, Graphics.rgb(255, 255, 255));
             }
         }
     }

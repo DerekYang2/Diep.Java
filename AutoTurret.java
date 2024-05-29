@@ -79,7 +79,7 @@ public class AutoTurret {
     public void draw() {
         float scaledRadius = host.radius * host.scale;
         Vector2 absPos = getAbsPos();
-        if (Main.onScreen(absPos, barrel.getTurretLength())) {
+        if (host.cullingOff || Main.onScreen(absPos, barrel.getTurretLength())) {
             barrel.draw();
             final Color fillCol = host.getDamageLerpColor(Graphics.GREY), strokeCol = host.getDamageLerpColor(Graphics.GREY_STROKE);
             Graphics.drawCircleTexture(absPos, scaledRadius * 0.5f, Graphics.strokeWidth, fillCol, strokeCol, host.opacity);

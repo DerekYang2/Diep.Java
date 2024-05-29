@@ -5,11 +5,19 @@ import com.raylib.java.textures.Texture2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-// TODO: FIX THIS!!
-
 public class TextureLoader {
+    private static class TextureInfo {
+        String buildName;
+        Color fillCol, strokeCol;
+        public TextureInfo(String buildName, Color fillCol, Color strokeCol) {
+            this.buildName = buildName;
+            this.fillCol = fillCol;
+            this.strokeCol = strokeCol;
+        }
+    }
+
     private static HashMap<Color, HashMap<String, Texture2D>> tankTextures = new HashMap<>(), iconTextures = new HashMap<>();
-    private static ArrayList<Tank> pendingTankTexture = new ArrayList<>();
+    private static ArrayList<TextureInfo> pendingTankTexture = new ArrayList<>();
 
     private static void createAndInsertTexture(String buildName, Color fillCol, Color strokeCol) {
         if (!tankTextures.containsKey(fillCol)) {  // If fill color not in map, add it
@@ -25,8 +33,9 @@ public class TextureLoader {
         }
     }
 
-    public static void pendingAdd(Tank tank) {
-        pendingTankTexture.add(tank);
+    public static void pendingAdd(String buildName, Color fillCol, Color strokeCol) {
+        pendingTankTexture.add(new TextureInfo(buildName, fillCol, strokeCol));
+        System.out.println("Pending add: " + buildName + " " + fillCol);
     }
 
     public static Texture2D getTankTexture(String buildName, Color fillCol) {
@@ -38,13 +47,12 @@ public class TextureLoader {
     }
 
     public static void refreshTankTextures() {
-        for (Tank tank : pendingTankTexture) {
-            String buildName = tank.tankBuild.name;
-            switch (buildName) {
-                case "auto gunner" -> createAndInsertTexture("gunner", tank.fillCol, tank.strokeCol);
-                case "auto trapper" -> createAndInsertTexture("trapper", tank.fillCol, tank.strokeCol);
+        for (TextureInfo texInfo : pendingTankTexture) {
+            switch (texInfo.buildName) {
+                case "auto gunner" -> createAndInsertTexture("gunner", texInfo.fillCol, texInfo.strokeCol);
+                case "auto trapper" -> createAndInsertTexture("trapper", texInfo.fillCol, texInfo.strokeCol);
             }
-            createAndInsertTexture(buildName, tank.fillCol, tank.strokeCol);
+            createAndInsertTexture(texInfo.buildName, texInfo.fillCol, texInfo.strokeCol);
         }
         pendingTankTexture.clear();
     }

@@ -140,7 +140,7 @@ public class Barrel {
 
     public void draw() {
         final int widthScaled = (int) getTurretWidth(), lengthScaled = (int) getTurretLength();
-        if (Main.onScreen(new Vector2(pos.x + xAbsolute, pos.y + yAbsolute), lengthScaled)) {  // Culling
+        if (host.cullingOff || Main.onScreen(new Vector2(pos.x + xAbsolute, pos.y + yAbsolute), lengthScaled)) {  // Culling
             drawTurret((int) (pos.x + xAbsolute), (int) (pos.y + yAbsolute), lengthScaled, widthScaled, angleAbsolute);
         }
     }

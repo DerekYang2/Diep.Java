@@ -56,7 +56,7 @@ public class Main {
 
         int spawn = 30;
 
-        polygonAmount = spawn * 20;
+        polygonAmount = spawn * 30;
         pentagonNestAmount = spawn;
         Polygon.count = 0;
         Polygon.nestCount = 0;
@@ -72,18 +72,28 @@ public class Main {
             String buildName;
             //buildName = TankBuild.getRandomBuildName();
             buildName = "tank";
-            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName);
-
-            t.group = -Graphics.randInt(0, 4);
-            if (t.group == 0) {
-                t.setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
-            } else if (t.group == -1) {
-                t.setColor(Graphics.RED, Graphics.RED_STROKE);
-            } else if (t.group == -2) {
-                t.setColor(Graphics.GREEN, Graphics.GREEN_STROKE);
-            } else {
-                t.setColor(Graphics.PURPLE, Graphics.PURPLE_STROKE);
+            int group = -Graphics.randInt(0, 4);
+            Color fillCol, strokeCol;
+            switch (group) {
+                case 0 -> {
+                    fillCol = Graphics.BLUE;
+                    strokeCol = Graphics.BLUE_STROKE;
+                }
+                case -1 -> {
+                    fillCol = Graphics.RED;
+                    strokeCol = Graphics.RED_STROKE;
+                }
+                case -2 -> {
+                    fillCol = Graphics.GREEN;
+                    strokeCol = Graphics.GREEN_STROKE;
+                }
+                default -> {
+                    fillCol = Graphics.PURPLE;
+                    strokeCol = Graphics.PURPLE_STROKE;
+                }
             }
+            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName, fillCol, strokeCol);
+            t.group = group;
             if (t.group == 0) t.group = player.group;
         }
 

@@ -8,9 +8,9 @@ public class EnemyTank extends Tank {
     // 33 upgrades available for level 45
     protected Queue<Integer> statUpgradeQueue = new LinkedList<Integer>();
 
-    public EnemyTank(Vector2 spawn, String buildName) {
-        super(spawn, new BotController(), new Stats(), 14);
-        setColor(Graphics.RED, Graphics.RED_STROKE);
+    public EnemyTank(Vector2 spawn, String buildName, Color fillCol, Color strokeCol) {
+        super(spawn, new BotController(), new Stats(), 1);
+        setColor(fillCol, strokeCol);
         initTankBuild(TankBuild.createTankBuild(buildName));
 
         // Set upgrade paths
@@ -32,13 +32,13 @@ public class EnemyTank extends Tank {
     @Override
     public void initTankBuild(TankBuild build) {
         super.initTankBuild(build);
-        TextureLoader.pendingAdd(this);
+        TextureLoader.pendingAdd(this.tankBuild.name, this.fillCol, this.strokeCol);
     }
 
     @Override
     public void update() {
         super.update();
-        while (usedStatPoints < maxStatPoints) {
+        while (usedStatPoints < maxStatPoints && !statUpgradeQueue.isEmpty()) {
             incrementStat(statUpgradeQueue.poll());
         }
     }

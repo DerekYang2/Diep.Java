@@ -52,7 +52,7 @@ public class Main {
         TextureLoader.clear();
         Leaderboard.clear();
 
-        int spawn = 4;
+        int spawn = 0;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(25 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         // new TestObj();
@@ -74,6 +74,9 @@ public class Main {
             }
             if (t.group == 0) t.group = player.group;
         }
+        for (int i = 0; i < 50; i++)
+            Polygon.spawnRandomPolygon(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight));
+
         Graphics.setCameraTarget(player.pos);
         cameraBox = Graphics.getCameraWorld();
         //counter = 0;

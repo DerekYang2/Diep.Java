@@ -9,7 +9,7 @@ import java.util.Queue;
  * NOTES:
  * this.cameraEntity.cameraData.respawnLevel = Math.min(Math.max(this.cameraEntity.cameraData.values.level - 1, 1), Math.floor(Math.sqrt(this.cameraEntity.cameraData.values.level) * 3.2796));
  */
-
+// TODO: When upgrading tank, upgrade bars/max upgrade stats need to be upgraded
 public class Tank extends GameObject {
     float score;
     int level;

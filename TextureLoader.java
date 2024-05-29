@@ -5,6 +5,8 @@ import com.raylib.java.textures.Texture2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+// TODO: FIX THIS!!
+
 public class TextureLoader {
     private static HashMap<Color, HashMap<String, Texture2D>> tankTextures = new HashMap<>(), iconTextures = new HashMap<>();
     private static ArrayList<Tank> pendingTankTexture = new ArrayList<>();

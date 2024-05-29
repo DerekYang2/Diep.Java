@@ -20,7 +20,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Random;
 
 import static com.raylib.java.core.input.Mouse.MouseButton.MOUSE_BUTTON_LEFT;
@@ -46,6 +45,7 @@ public class Graphics extends Raylib {
 
     // Custom textures
     public static Texture2D circle, sharpRectangle, circleNoAA, roundedRectangle, roundedTrapezoid, trapezoidNoAA, roundedTriangle, sharpTriangle, trapperHead, innerTrapperHead, roundedTrap, sharpTrap, sharpRoundTriangle, roundHexagon;
+    public static Texture2D squarePolygon, pentagonPolygon, alphaPentagon;
     /*
     TODO: research
         export const ColorsHexCode: Record<Color, number> = {
@@ -98,7 +98,10 @@ public class Graphics extends Raylib {
             BULLET_PENETRATION = rgb(255, 222, 67),
             BULLET_DAMAGE = rgb(255, 67, 67),
             RELOAD = rgb(130, 255, 67),
-            MOVEMENT_SPEED = rgb(67, 255, 249);
+            MOVEMENT_SPEED = rgb(67, 255, 249),
+            TRIANGLE = rgb(252, 118, 119),
+            TRIANGLE_STROKE = rgb(189, 88, 89);
+
 
 
     public static Color getColor(String hexStr) {
@@ -193,11 +196,16 @@ public class Graphics extends Raylib {
         sharpRoundTriangle = loadTexture("assets/SharpRoundTriangle.png");
         roundHexagon = loadTexture("assets/RoundHexagon.png");
 
+        squarePolygon = loadTexture("assets/SquarePolygon.png");
+        pentagonPolygon = loadTexture("assets/PentagonPolygon.png");
+        alphaPentagon = loadTexture("AlphaPentagon.png");
+
         // Always set texture anti-aliasing
         setTextureAntiAliasing(sharpRectangle);
         setTextureAntiAliasing(roundedRectangle);
         setTextureAntiAliasing(trapperHead);
         setTextureAntiAliasing(circle);
+        //setTextureAntiAliasing(squarePolygon);
 
         if (ANTIALIASING == 1) {
             //setTextureAntiAliasing(sharpRectangle);
@@ -442,10 +450,11 @@ public class Graphics extends Raylib {
         rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), 0, scale, Color.WHITE);
     }*/
 
-    private static void drawTextureCenteredHelper(Texture2D texture, Vector2 position, float width, float height, Color tint) {
-        float scale = Math.min(width / texture.width, height / texture.height);
+    public static void drawTextureCentered(Texture2D texture, Vector2 position, float width, float height, float radians, Color tint) {
+/*        float scale = Math.min(width / texture.width, height / texture.height);
         float tWidth = texture.width * scale, tHeight = texture.height * scale;
-        rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), 0, scale, tint);
+        rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), (float)Math.toDegrees(radians), scale, tint);*/
+        rTextures.DrawTexturePro(texture, new Rectangle(0, 0, texture.width, texture.height), new Rectangle(position.x, position.y, width, height), new Vector2(width * 0.5f, height * 0.5f), (float)Math.toDegrees(radians), tint);
     }
 
     public static void drawTextureCentered(Texture2D texture, Vector2 position, double radians, float scale, Color tint) {
@@ -599,8 +608,8 @@ public class Graphics extends Raylib {
 
     public static void drawCircleTexture(Vector2 pos, float radius, float stroke, Color color, Color strokeColor, float opacity) {
         if (ANTIALIASING == 1) {
-            Graphics.drawTextureCenteredHelper(circle, pos, (radius) * 2, (radius) * 2, colAlpha(strokeColor, opacity));
-            Graphics.drawTextureCenteredHelper(circleNoAA, pos, (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, colAlpha(color, opacity));
+            Graphics.drawTextureCentered(circle, pos, (radius) * 2, (radius) * 2, 0, colAlpha(strokeColor, opacity));
+            Graphics.drawTextureCentered(circleNoAA, pos, (radius) * 2 - 2 * Graphics.strokeWidth, (radius) * 2 - 2 * Graphics.strokeWidth, 0, colAlpha(color, opacity));
         } else {
             drawCircle(pos, radius, stroke, color, strokeColor, opacity);
         }

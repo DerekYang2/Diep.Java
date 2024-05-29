@@ -17,6 +17,10 @@ public class Bar implements Drawable {
     boolean isHiding;
     boolean inGameWorld;
 
+    // Delay for bar to show
+    int BEGIN_DELAY = 15;
+    int delayFrames = 0;
+
     // Text variables
     private String text;
     private int fontSize;
@@ -77,12 +81,16 @@ public class Bar implements Drawable {
         // Animate the bar (LERP)
         this.percentage += (this.targetPercentage - this.percentage) * lerpFactor;
 
+        delayFrames = Math.max(delayFrames - 1, 0);
+
         if (isHiding) {
             opacity -= 1.f/12;
             opacity = Math.max(opacity, 0);  // Keep positive
         } else {
-            opacity += 1.f/12;
-            opacity = Math.min(opacity, 1);  // Keep less than 1
+            if (delayFrames == 0) {
+                opacity += 1.f / 12;
+                opacity = Math.min(opacity, 1);  // Keep less than 1
+            }
         }
     }
 
@@ -97,6 +105,9 @@ public class Bar implements Drawable {
     }
 
     public void triggerHidden(boolean isHidden) {
+        if (this.isHiding && !isHidden) {  // If hiding and now showing, reset delay
+            delayFrames = BEGIN_DELAY;
+        }
         this.isHiding = isHidden;
     }
 

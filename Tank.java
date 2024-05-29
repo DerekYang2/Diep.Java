@@ -31,6 +31,8 @@ public class Tank extends GameObject {
 
     // Upgrade path variables
     Queue<Pair<String, Integer>> upgradeBuilds;
+    int upgradeFrames = 0;
+    boolean resetFireDelay = true;
 
     // TODO: update stats (health, body damage, movement speed), rest should be auto-updated (verify this)
     public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
@@ -65,6 +67,15 @@ public class Tank extends GameObject {
 
     public void initTankBuild(TankBuild tankBuild) {
         this.tankBuild = tankBuild;
+
+        // If tankBuild is smasher, reset stats
+        if (tankBuild.name.equals("smasher")) {
+            for (int statEnum = 0; statEnum < 8; statEnum++) {
+                stats.setStat(statEnum, 0);
+            }
+            usedStatPoints = 0;
+        }
+
         this.tankBuild.setHost(this);
         // Update controller
         this.controller.updateTankBuild();
@@ -72,7 +83,7 @@ public class Tank extends GameObject {
     }
 
     public void changeTankBuild(TankBuild tankBuild) {
-        if (tankBuild.name != this.tankBuild.name) {  // If new tank build is different
+        if (!tankBuild.name.equals(this.tankBuild.name)) {  // If new tank build is different
             this.tankBuild.delete();  // Delete old tank build
             initTankBuild(tankBuild);  // Initialize new tank build
         }
@@ -129,8 +140,6 @@ public class Tank extends GameObject {
         }
     }
 
-    int upgradeFrames = 0;
-    boolean resetFireDelay = true;
     public void updateStatUpgrade() {
        upgradeFrames = Math.max(0, upgradeFrames - 1);
         if (upgradeFrames == 0 && !resetFireDelay) {

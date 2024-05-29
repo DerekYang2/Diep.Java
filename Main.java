@@ -10,7 +10,7 @@ public class Main {
     public static Rectangle nestBox, crasherZone;
     public final static float ARENA_PADDING = GRID_SIZE * 4;
 
-    public static int polygonAmount = 0;
+    public static int polygonAmount = 0, pentagonNestAmount = 0;
     public static long counter = 0;
     public static DrawPool drawablePool;
     public static HashPool<GameObject> gameObjectPool;
@@ -56,7 +56,8 @@ public class Main {
 
         int spawn = 30;
 
-        polygonAmount = spawn * 12;
+        polygonAmount = spawn * 20;
+        pentagonNestAmount = spawn;
         Polygon.count = 0;
         Polygon.nestCount = 0;
 
@@ -112,7 +113,7 @@ public class Main {
         while (Polygon.count < polygonAmount) {
             Polygon.spawnRandomPolygon();
         }
-        while (Polygon.nestCount < 30) {
+        while (Polygon.nestCount < pentagonNestAmount) {
             Polygon.spawnNestPolygon();
         }
 

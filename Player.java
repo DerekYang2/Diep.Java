@@ -35,7 +35,7 @@ public class Player extends Tank {
     Vector2 usagePos;
 
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(0, 0, 0, 0, 0, 0, 0, 0), 1);
+        super(spawn, new PlayerController(), new Stats(), 1);
 
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         initTankBuild(TankBuild.createTankBuild(buildName));
@@ -51,8 +51,8 @@ public class Player extends Tank {
         usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - textDimensions.getY() * 0.5f - BAR_HEIGHT);
 
         // Set upgrade paths
-        setUpgradePath(TankBuild.getRandomUpgradePath());
-        //setUpgradePath(new String[]{"machine gun"});
+        //setUpgradePath(TankBuild.getRandomUpgradePath());
+        setUpgradePath(new String[]{"smasher", "spike"});
     }
 
     @Override
@@ -82,11 +82,14 @@ public class Player extends Tank {
         final float upgradeBarHeight = 22;
         String[] upgradeText = {"Movement Speed", "Reload", "Bullet Damage", "Bullet Penetration", "Bullet Speed", "Body Damage", "Max Health", "Health Regen"};
         Color[] colors = {Graphics.MOVEMENT_SPEED, Graphics.RELOAD, Graphics.BULLET_DAMAGE, Graphics.BULLET_PENETRATION, Graphics.BULLET_SPEED, Graphics.BODY_DAMAGE, Graphics.MAX_HEALTH, Graphics.HEALTH_REGEN};
+
         for (int i = 0; i < 8; i++) {
             int maxStat = tankBuild.getMaxStat(upgradeText[i]);
             if (maxStat > 0) {
                 upgradeBar[i] = new UpgradeBar(10, yPos, 23, maxStat, upgradeBarHeight, 2, colors[i], upgradeText[i], "[" + (8 - i) + "]");
                 yPos -= upgradeBarHeight + 3;
+            } else {
+                upgradeBar[i] = null;
             }
         }
         usagePos = new Vector2(10 + upgradeBar[0].getWidth(), yPos);

@@ -1,6 +1,6 @@
 import com.raylib.java.raymath.Vector2;
 
-// TODO: auto turret should be auto fire mode
+// TODO: auto turret should be auto fire mode, these guys turn too fast, maybe add lock on time
 public class BotController implements Controller {
     Tank host;
     float moveDir;
@@ -74,7 +74,7 @@ public class BotController implements Controller {
                     reactionWatch.start();  // Restart reaction watch when no target
                 }
             }
-            direction = (float) Graphics.angle_lerp(direction, targetDirection, 0.17f);
+            direction = (float) Graphics.angle_lerp(direction, targetDirection, 0.1f);
         } else {
             direction = 0;
         }

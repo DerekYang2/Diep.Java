@@ -132,16 +132,26 @@ public class Polygon extends GameObject {
         return scoreReward;
     }
 
-    public static Polygon spawnRandomPolygon(Vector2 pos) {
+    public static Polygon spawnRandomPolygon() {
         double rand = Math.random();
-        // TODO: Pentagon nest with alpha polygons
-
-        if (rand < 0.04) {
-            return new Polygon(pos, Polygon.PENTAGON);
-        } else if (rand < 0.20) {
-            return new Polygon(pos, Polygon.TRIANGLE);
+        Vector2 pos = new Vector2((float) (Math.random() * (Main.arenaWidth)), (float) (Math.random() * (Main.arenaHeight)));
+        Vector2 mapCenter = new Vector2(Main.arenaWidth/2, Main.arenaHeight/2);
+        String shape;
+        if (Graphics.distance(pos, mapCenter) < Main.arenaWidth/8) {
+            if (rand < 0.05) {
+                shape = Polygon.ALPHA_PENTAGON;
+            } else {
+                shape = Polygon.PENTAGON;
+            }
         } else {
-            return new Polygon(pos, Polygon.SQUARE);
+            if (rand < 0.04) {
+                shape= Polygon.PENTAGON;
+            } else if (rand < 0.20) {
+                shape= Polygon.TRIANGLE;
+            } else {
+                shape= Polygon.SQUARE;
+            }
         }
+        return new Polygon(pos, shape);
     }
 }

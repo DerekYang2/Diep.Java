@@ -41,6 +41,8 @@ public abstract class GameObject implements Updatable, Drawable {
     Bar healthBar;  // Null if not initialized
     final float HEALTH_BAR_HEIGHT = 15;
     final float HEALTH_BAR_STROKE = 3;
+    long lastDamageFrame = -30 * 120;
+    float regenPerFrame = 0;
 
     // Collision
     float absorptionFactor = 1, pushFactor = 8;  // Default
@@ -119,6 +121,14 @@ public abstract class GameObject implements Updatable, Drawable {
         if (damageAnimationFrames > 0) {
             damageAnimationFrames--;
         }
+
+        // Health updates
+        if (Main.counter - lastDamageFrame > 30 * 120) {  // After 30 seconds, hyper-regen
+            health += maxHealth / (120 * 10);  // 10 percent HP per second
+        } else {  // Normal regen
+            health += regenPerFrame;
+        }
+        health = Math.min(health, maxHealth);  // Cap health at maxHealth
 
         // Update health bar
         if (healthBar != null) {
@@ -248,6 +258,8 @@ public abstract class GameObject implements Updatable, Drawable {
         if (health <= 1e-6) {  // Close enough to 0
             triggerDelete();
         }
+
+        lastDamageFrame = Main.counter;
     }
 
     public static void receiveDamage(GameObject a, GameObject b) {

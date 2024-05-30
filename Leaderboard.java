@@ -10,8 +10,8 @@ import java.util.HashSet;
 
 public class Leaderboard {
     private static final int LEADERBOARD_SIZE = 10;
-    private static HashSet<Integer> tankIds = new HashSet<>();
-    private static ArrayList<Tank> tankList = new ArrayList<>();
+    public static HashSet<Integer> tankIds = new HashSet<>();
+    public static ArrayList<Tank> tankList = new ArrayList<>();
     private static Bar[] scoreBars = new Bar[LEADERBOARD_SIZE];
     private static Texture2D[] tankBuilds = new Texture2D[LEADERBOARD_SIZE];
     static final float leaderboardGap = 25, leaderboardWidth = 240, leaderboardHeight = 21;

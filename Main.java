@@ -7,10 +7,8 @@ public class Main {
     final public static float GRID_SIZE = 50;
     static Rectangle cameraBox;
     public static float arenaWidth = GRID_SIZE * 100, arenaHeight = GRID_SIZE * 100;
-    public static Rectangle nestBox, crasherZone;
     public final static float ARENA_PADDING = GRID_SIZE * 4;
 
-    public static int polygonAmount = 0, pentagonNestAmount = 0;
     public static long counter = 0;
     public static DrawPool drawablePool;
     public static HashPool<GameObject> gameObjectPool;
@@ -46,6 +44,10 @@ public class Main {
     }
 
     public static void startGame() {
+        int spawn = 50;
+        // Set arena size
+        arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
+        System.out.println("Arena size: " + arenaWidth + "x" + arenaHeight);
         // Game initialization
         globalClock.start();
         drawablePool.clear();
@@ -53,21 +55,10 @@ public class Main {
         idServer.reset();
         TextureLoader.clear();
         Leaderboard.clear();
+        Spawner.reset();
 
-        int spawn = 30;
-
-        polygonAmount = spawn * 30;
-        pentagonNestAmount = spawn;
-        Polygon.count = 0;
-        Polygon.nestCount = 0;
-
-        // Set arena size
-        arenaWidth = arenaHeight = (float) (Math.floor(40 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
-        float nestSide = arenaWidth / 5, crasherSide = nestSide * 2f;
-        nestBox = new Rectangle(arenaWidth/2 - nestSide/2, arenaHeight/2 - nestSide/2, nestSide, nestSide);
-        crasherZone = new Rectangle(arenaWidth/2 - crasherSide/2, arenaHeight/2 - crasherSide/2, crasherSide, crasherSide);
         // new TestObj();
-        player = new Player(new Vector2(0,0), "tank");
+        player = new Player(new Vector2(Main.arenaWidth * 0.5f,Main.arenaHeight * 0.5f), "tank");
         for (int i = 0; i < spawn; i++) {
             String buildName;
             //buildName = TankBuild.getRandomBuildName();
@@ -120,13 +111,8 @@ public class Main {
         Main.idServer.refresh();
 
         // Create polygons
-        while (Polygon.count < polygonAmount) {
-            Polygon.spawnRandomPolygon();
-        }
-        while (Polygon.nestCount < pentagonNestAmount) {
-            Polygon.spawnNestPolygon();
-        }
-
+        Spawner.updateSpawn();
+        // Update game collisions
         CollisionManager.updateCollision();
 
         // Update all the game objects
@@ -239,6 +225,7 @@ public class Main {
             //Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
             //Graphics.drawText(String.format("Score: %d\tLevel: %d", (int)player.score, (int)player.level), 10, 60, 20, Color.BLACK);
             drawGrid();
+            if (Graphics.PERFORMANCE_MODE == 1) player.drawUpgradeBars();
             //Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
             Graphics.beginCameraMode();
             drawBounds();
@@ -248,7 +235,7 @@ public class Main {
             player.drawKillQueue();
             Graphics.drawFPS(Graphics.getScreenToWorld2D(new Vector2(10, 10), Graphics.camera), (int)(20/Graphics.getCameraZoom()), Color.WHITE);
             Graphics.endCameraMode();
-            player.drawUpgradeBars();
+            if (Graphics.PERFORMANCE_MODE == 0) player.drawUpgradeBars();
             Graphics.endTextureMode();
 
             if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) == 0) {  // Every other frame

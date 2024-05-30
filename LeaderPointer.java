@@ -1,23 +1,23 @@
 import com.raylib.java.raymath.Vector2;
 
 public class LeaderPointer {
-    public static double direction;
+    public static double direction = 0, targetDirection = 0;
+    private static Tank leader;
+
     public static void update() {
-        Tank leader = Leaderboard.getTankRank(0);
+        leader = Leaderboard.getTankRank(0);
         if (leader != null) {
-            if (leader == Main.player)
-                direction = 0;
-            else
-                direction = Math.atan2(leader.pos.y - Main.player.pos.y, leader.pos.x - Main.player.pos.x);
+            targetDirection = Math.atan2(leader.pos.y - Main.player.pos.y, leader.pos.x - Main.player.pos.x);
         }
-        direction = Graphics.normalizeAngle(direction);
+        targetDirection = Graphics.normalizeAngle(targetDirection);
+        //targetDirection = Graphics.normalizeAngle(Main.player.direction);
+        direction = Graphics.angle_lerp(direction, targetDirection, 0.03f);
     }
     // https://www.desmos.com/calculator/topmpimq9v
     // TODO: if leader is on screen, do not draw
     public static void draw() {
             //Graphics.drawTriangle(Main.player.pos, 20F, 1.5F, (float) direction, Graphics.RED);
-            //direction = Graphics.normalizeAngle(Main.player.direction);
-            if (direction != 0) {
+            if (leader != null && !Graphics.isIntersecting(leader.pos, Main.cameraBox)) {
     /*            theta_i = arctan(H / W) @{ color: "#c74440" }
 
                 r(theta) = W / cos(theta) @{
@@ -48,9 +48,9 @@ public class LeaderPointer {
                 } else if (direction > Math.PI + theta_i && direction <= 2 * Math.PI - theta_i) {
                     r = -H / (float) Math.sin(direction);
                 }
-                r -= 60;
-                Vector2 pos = new Vector2(W + r * (float) Math.cos(direction), H - 18 + r * (float) Math.sin(direction));
-                Graphics.drawTriangle(Graphics.getScreenToWorld2D(pos, Graphics.camera), 12 * inverseZoom, 1, (float) direction, Graphics.rgba(0, 0, 0, 50));
+                r -= 35;
+                Vector2 pos = new Vector2(W + r * (float) Math.cos(direction), H + r * (float) Math.sin(direction));
+                Graphics.drawTriangle(Graphics.getScreenToWorld2D(pos, Graphics.camera), 13 * inverseZoom, 1f, (float) direction, Graphics.rgba(0, 0, 0, 50));
             }
     }
 }

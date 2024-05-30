@@ -42,7 +42,7 @@ public class TextureLoader {
     }
 
     public static Texture2D getIconTexture(String buildName, Color fillCol) {
-        return iconTextures.get(fillCol).get(buildName);
+        return iconTextures.get(fillCol).getOrDefault(buildName, null);
     }
 
     public static void refreshTankTextures() {

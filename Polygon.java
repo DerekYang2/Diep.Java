@@ -1,6 +1,5 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
-import com.raylib.java.shapes.Rectangle;
 
 public class Polygon extends GameObject {
     final static String SQUARE = "square", TRIANGLE = "triangle", PENTAGON = "pentagon", ALPHA_PENTAGON = "alpha pentagon";
@@ -9,9 +8,8 @@ public class Polygon extends GameObject {
     final static float BASE_ORBIT = 0.5f*0.005f * 25.f/120;
     /** The velocity of the shape's orbits. */
     final static float BASE_VELOCITY = 0.5f*1 * 25.f/120;
-    public static int count = 0, nestCount = 0;
-    public static int multiplier = 3;
-
+    public static int multiplier = 1;
+    public static int polyGroup = Integer.MIN_VALUE;
     float rotation;
     float direction;
     float baseAcceleration;
@@ -27,7 +25,7 @@ public class Polygon extends GameObject {
             case Polygon.ALPHA_PENTAGON ->  2.666666 * 145.0/2.2360679775;
             default -> 0;
         }), 1, DrawPool.BOTTOM);
-        group = Integer.MIN_VALUE;  // Set to impossible group
+        group = polyGroup;
         isNestPolygon = inNest;
 
         orbitRate = (Math.random() < 0.5 ? 1 : -1) * BASE_ORBIT * Graphics.randf(0.75f, 1.25f);
@@ -136,47 +134,13 @@ public class Polygon extends GameObject {
         return scoreReward * multiplier;
     }
 
-    public static Polygon spawnRandomPolygon() {
-        double rand = Math.random();
-        Vector2 pos;
-
-        do {  // Ensure the polygon does not spawn inside the nest
-            pos = new Vector2((float) (Math.random() * (Main.arenaWidth)), (float) (Math.random() * (Main.arenaHeight)));
-        } while (Graphics.isIntersecting(new Rectangle(pos.x-100, pos.y-100, 200, 200), Main.crasherZone));
-
-        count++;
-
-        String shape;
-        if (rand < 0.04) {
-            shape = Polygon.PENTAGON;
-        } else if (rand < 0.20) {
-            shape = Polygon.TRIANGLE;
-        } else {
-            shape = Polygon.SQUARE;
-        }
-        return new Polygon(pos, shape, false);
-    }
-
-    public static Polygon spawnNestPolygon() {
-        Vector2 pos = new Vector2(Graphics.randf(Main.nestBox.x, Main.nestBox.x + Main.nestBox.width), Graphics.randf(Main.nestBox.y, Main.nestBox.y + Main.nestBox.height));
-
-        nestCount++;
-
-        double rand = Math.random();
-        if (rand < 0.02) {
-            return new Polygon(pos, Polygon.ALPHA_PENTAGON, true);
-        } else {
-            return new Polygon(pos, Polygon.PENTAGON, true);
-        }
-    }
-
     @Override
     public void delete() {
         super.delete();
         if (isNestPolygon) {
-            nestCount--;
+            Spawner.nestCount--;
         } else {
-            count--;
+            Spawner.count--;
         }
     }
 }

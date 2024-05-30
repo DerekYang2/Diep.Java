@@ -19,8 +19,6 @@ public class Tank extends GameObject {
 
     // Stat variables
     float baseAcceleration;
-    float regenPerFrame;
-    long lastDamageFrame = -30 * 120;
 
     // Objects that control the tank
     TankBuild tankBuild;
@@ -183,13 +181,6 @@ public class Tank extends GameObject {
             addOpacity(isFiring() ? tankBuild.visibilityRateShooting : 0);  // Increase opacity if shooting
         }
 
-        // Health updates
-        if (Main.counter - lastDamageFrame > 30 * 120) {  // After 30 seconds, hyper-regen
-            health += maxHealth / (120 * 10);  // 10 percent HP per second
-        } else {  // Normal regen
-            health += regenPerFrame;
-        }
-        health = Math.min(health, maxHealth);  // Cap health at maxHealth
         controller.update();
 
         // Update the direction barrel is facing
@@ -279,12 +270,6 @@ public class Tank extends GameObject {
 
     public boolean specialControl() {
         return controller.holdSpecial();
-    }
-
-    @Override
-    public void receiveDamage(float damage) {
-        super.receiveDamage(damage);
-        lastDamageFrame = Main.counter;
     }
 
     @Override

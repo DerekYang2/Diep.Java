@@ -100,7 +100,9 @@ public class Graphics extends Raylib {
             RELOAD = rgb(130, 255, 67),
             MOVEMENT_SPEED = rgb(67, 255, 249),
             TRIANGLE = rgb(252, 118, 119),
-            TRIANGLE_STROKE = rgb(189, 88, 89);
+            TRIANGLE_STROKE = rgb(189, 88, 89),
+            CRASHER = rgb(241, 119, 221),
+            CRASHER_STROKE = rgb(180, 89, 165);
 
 
 
@@ -847,6 +849,10 @@ public class Graphics extends Raylib {
      */
     public static boolean isIntersecting(Rectangle rect1, Rectangle rect2) {
         return rect1.x <= rect2.x + rect2.width && rect1.x + rect1.width >= rect2.x && rect1.y <= rect2.y + rect2.height && rect1.y + rect1.height >= rect2.y;
+    }
+
+    public static boolean isIntersecting(Vector2 point, Rectangle rect) {
+        return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
     }
 
     public static float round(float f, int precision) {

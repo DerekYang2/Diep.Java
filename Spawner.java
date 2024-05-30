@@ -65,21 +65,20 @@ public class Spawner {
 
     // Spawn between the crasher zone, or rectangle with a rectangular hole (pentagon nest) in the middle
     public static void spawnCrasher() {
-        boolean leftSide = Math.random() < 0.5, topSide = Math.random() < 0.5;
-        float innerShift = nestBox.x / 2;
-        float x, y;
-        if (leftSide) {
-            x = Graphics.randf(crasherZone.x + innerShift, nestBox.x + innerShift);
+        double rand = Math.random();
+        float innerShift = nestBox.width * 0.25f;
+        Vector2 pos;
+        if (rand < 0.25) {
+            pos = new Vector2(Graphics.randf(crasherZone.x + innerShift, nestBox.x + innerShift), Graphics.randf(crasherZone.y + innerShift, crasherZone.y + crasherZone.height - innerShift));
+        } else if (rand < 0.5){
+            pos = new Vector2(Graphics.randf(nestBox.x + nestBox.width - innerShift, crasherZone.x + crasherZone.width - innerShift), Graphics.randf(crasherZone.y + innerShift, crasherZone.y + crasherZone.height - innerShift));
+        } else if (rand < 0.75) {
+            pos = new Vector2(Graphics.randf(crasherZone.x + innerShift, crasherZone.x + crasherZone.width - innerShift), Graphics.randf(crasherZone.y + innerShift, nestBox.y + innerShift));
         } else {
-            x = Graphics.randf(nestBox.x + nestBox.width - innerShift, crasherZone.x + crasherZone.width - innerShift);
+            pos = new Vector2(Graphics.randf(crasherZone.x + innerShift, crasherZone.x + crasherZone.width - innerShift), Graphics.randf(nestBox.y + nestBox.height - innerShift, crasherZone.y + crasherZone.height - innerShift));
         }
-        if (topSide) {
-            y = Graphics.randf(crasherZone.y + innerShift, nestBox.y + innerShift);
-        } else {
-            y = Graphics.randf(nestBox.y + nestBox.height - innerShift, crasherZone.y + crasherZone.height - innerShift);
-        }
-
-        new Crasher(new Vector2(x, y), Math.random() < 0.2);
+        
+        new Crasher(pos, Math.random() < 0.2);
         crasherCount++;  // Increment the count of crashers
     }
 }

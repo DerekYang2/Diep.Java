@@ -1,7 +1,7 @@
 import com.raylib.java.raymath.Vector2;
 
 public class Crasher extends GameObject {
-    final static float aiRadius = 1700;
+    final static float aiRadius = 1800;
 
     boolean isLarge;
     private float baseAcceleration;

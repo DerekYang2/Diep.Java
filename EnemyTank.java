@@ -38,8 +38,12 @@ public class EnemyTank extends Tank {
     @Override
     public void update() {
         super.update();
+        boolean hasUpdate = (usedStatPoints < maxStatPoints);
         while (usedStatPoints < maxStatPoints && !statUpgradeQueue.isEmpty()) {
             incrementStat(statUpgradeQueue.poll());
+        }
+        if (hasUpdate) {
+            tankBuild.resetFireManagerDelay();
         }
     }
 

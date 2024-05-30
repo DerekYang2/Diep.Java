@@ -94,4 +94,9 @@ public class AutoTurret {
         this.pos = pos;
         barrel.setPos(getAbsPos());
     }
+
+    public void setDirection(float direction) {
+        this.direction = direction;
+        barrel.setDirection(direction);
+    }
 }

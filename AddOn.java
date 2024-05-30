@@ -291,7 +291,7 @@ class AutoNAddOn extends AddOn {
             float offsetX = (float) (radiusScaled * Math.cos(angle));
             float offsetY = (float) (radiusScaled * Math.sin(angle));
             autoTurrets[i].setOffset(new Vector2(offsetX, offsetY), rangeRad);
-            autoTurrets[i].direction = (float)Math.atan2(offsetY, offsetX);
+            autoTurrets[i].setDirection((float)Math.atan2(offsetY, offsetX));
         }
     }
 

@@ -63,7 +63,11 @@ public class TankBuild
     }
 
     public int getMaxStat(String stat) {
-        return maxStats.get(stat);
+        if (maxStats.containsKey(stat)) {
+            return maxStats.get(stat);
+        } else {
+            throw new IllegalArgumentException("Stat " + stat + " not found in maxStats");
+        }
     }
 
     public void setHost(Tank host) {
@@ -225,14 +229,14 @@ public class TankBuild
     /**
      * Create a TankBuild object from a tank definition in TankDefinitions.json
      * Hierarchy: Tank -> Barrels -> Bullet
-     * @param name Name of the tank definition
+     * @param buildName Name of the tank definition
      * @return TankBuild object
      */
-    public static TankBuild createTankBuild(String name) {
-        name = name.trim().toLowerCase();
-        JSONObject jsonTank = tankDefinitions.get(name);
+    public static TankBuild createTankBuild(String buildName) {
+        buildName = buildName.trim().toLowerCase();
+        JSONObject jsonTank = tankDefinitions.get(buildName);
         if (jsonTank == null) {
-            System.out.println("Tank definition not found: " + name);
+            System.out.println("Tank definition not found: " + buildName);
             jsonTank = tankDefinitions.get("tank");  // Default to tank
         }
 
@@ -264,7 +268,7 @@ public class TankBuild
         FireManager fireManager = new FireManager(reloadData);
         float fieldFactor = jsonTank.getFloat("fieldFactor");
 
-        TankBuild build = new TankBuild(name, addOn, barrels, fireManager, bulletStats, fieldFactor);
+        TankBuild build = new TankBuild(buildName, addOn, barrels, fireManager, bulletStats, fieldFactor);
 
         JSONObject jsonFlags = jsonTank.getJSONObject("flags");
         build.setFlags(jsonFlags.getBoolean("invisibility"), jsonTank.getFloat("visibilityRateShooting"), jsonTank.getFloat("visibilityRateMoving"), jsonTank.getFloat("invisibilityRate"), jsonFlags.getBoolean("zoomAbility"));

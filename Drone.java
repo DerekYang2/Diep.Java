@@ -25,7 +25,7 @@ public class Drone extends Projectile {
 
     @Override
     public void updateStats() {
-        setCollisionFactors(bulletStats.absorbtionFactor, 4);
+        setCollisionFactors(0.8f*bulletStats.absorbtionFactor, 4);
 
         // Calculate bullet stats
         float damage = (7 + (3 * host.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above

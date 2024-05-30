@@ -29,7 +29,7 @@ public class Bullet extends Projectile {
     @Override
     public void updateStats() {
         // Calculate bullet stats
-        setCollisionFactors(bulletStats.absorbtionFactor, (7.f / 3 + host.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
+        setCollisionFactors(bulletStats.absorbtionFactor, 0.8f*(7.f / 3 + host.getStat(Stats.BULLET_DAMAGE)) * bulletStats.damage * bulletStats.absorbtionFactor);
 
         // https://github.com/ABCxFF/diepindepth/blob/b035291bd0bed436d0ffbe2eb707fb96ed5f2bf4/extras/stats.md?plain=1#L34
         float damage = (7 + (3 * host.getStat(Stats.BULLET_DAMAGE))) * bulletStats.damage;  // src: link above

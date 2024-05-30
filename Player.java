@@ -51,15 +51,19 @@ public class Player extends Tank {
         usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - textDimensions.getY() * 0.5f - BAR_HEIGHT);
 
         // Set upgrade paths
-        //setUpgradePath(TankBuild.getRandomUpgradePath());
-        setUpgradePath(new String[]{"auto 3", "auto 5"});
+        setUpgradePath(TankBuild.getRandomUpgradePath());
+        //setUpgradePath(new String[]{"auto 3", "auto 5"});
     }
 
     @Override
     public void initTankBuild(TankBuild tankBuild) {
         super.initTankBuild(tankBuild);
         TextureLoader.pendingAdd(this.tankBuild.name, this.fillCol, this.strokeCol);
-        formattedBuildName = NameGenerator.formatNameCase(tankBuild.name);
+        formattedBuildName = NameGenerator.formatNameCase(this.tankBuild.name);
+
+        if (levelBar != null)
+            levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
+
         targetZoom = getZoom();
         initUpgradeBars();
     }

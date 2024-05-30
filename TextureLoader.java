@@ -35,7 +35,6 @@ public class TextureLoader {
 
     public static void pendingAdd(String buildName, Color fillCol, Color strokeCol) {
         pendingTankTexture.add(new TextureInfo(buildName, fillCol, strokeCol));
-        System.out.println("Pending add: " + buildName + " " + fillCol);
     }
 
     public static Texture2D getTankTexture(String buildName, Color fillCol) {

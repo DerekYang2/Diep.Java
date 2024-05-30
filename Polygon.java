@@ -10,6 +10,7 @@ public class Polygon extends GameObject {
     /** The velocity of the shape's orbits. */
     final static float BASE_VELOCITY = 0.5f*1 * 25.f/120;
     public static int count = 0, nestCount = 0;
+    public static int multiplier = 3;
 
     float rotation;
     float direction;
@@ -132,7 +133,7 @@ public class Polygon extends GameObject {
 
     @Override
     protected float getScoreReward() {
-        return scoreReward;
+        return scoreReward * multiplier;
     }
 
     public static Polygon spawnRandomPolygon() {

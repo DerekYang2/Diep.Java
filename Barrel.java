@@ -1,7 +1,6 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 public class Barrel {
-    boolean noDamageAnimation = false;  // Flag to disable damage animation
     protected boolean deleted = false;  // Flag to delete the barrel
 
     Vector2 pos;
@@ -136,6 +135,10 @@ public class Barrel {
         if (recoilFrames < 0) {
             recoilFrames = 0;
         }
+    }
+
+    public void setDirection(double tankAngle) {
+        angleAbsolute = tankAngle + angleRelative;
     }
 
     public void draw() {

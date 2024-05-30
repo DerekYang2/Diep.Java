@@ -69,7 +69,7 @@ public class Player extends Tank {
     }
 
     public void initBars() {
-        levelBarPos = new Vector2((Graphics.cameraWidth- BAR_WIDTH) * 0.5f, Graphics.cameraHeight - 2.5f * BAR_HEIGHT);
+        levelBarPos = new Vector2((Graphics.cameraWidth- BAR_WIDTH) * 0.5f, Graphics.cameraHeight - BAR_HEIGHT - 10);
 
         float levelStartScore = ScoreHandler.levelToScore(level), levelNextScore = ScoreHandler.levelToScore(level+1);
         float initialLevelPercentage = (level == ScoreHandler.maxPlayerLevel) ? 1 : (score-levelStartScore)/(levelNextScore-levelStartScore);
@@ -82,8 +82,8 @@ public class Player extends Tank {
     }
 
     public void initUpgradeBars() {
-        float yPos = Graphics.cameraHeight - 54;
         final float upgradeBarHeight = 22;
+        float yPos = Graphics.cameraHeight - upgradeBarHeight - 10;
         String[] upgradeText = {"Movement Speed", "Reload", "Bullet Damage", "Bullet Penetration", "Bullet Speed", "Body Damage", "Max Health", "Health Regen"};
         Color[] colors = {Graphics.MOVEMENT_SPEED, Graphics.RELOAD, Graphics.BULLET_DAMAGE, Graphics.BULLET_PENETRATION, Graphics.BULLET_SPEED, Graphics.BODY_DAMAGE, Graphics.MAX_HEALTH, Graphics.HEALTH_REGEN};
 

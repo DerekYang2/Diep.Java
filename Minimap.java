@@ -11,7 +11,7 @@ public class Minimap {
     public static void draw() {
         float inverseZoom = 1.f / Graphics.getCameraZoom();
         float strokeWidth = 5;
-        float miniX = Graphics.cameraWidth - miniMapSize - strokeWidth - PADDING, miniY = Graphics.cameraHeight - strokeWidth - miniMapSize - PADDING - 24;
+        float miniX = Graphics.cameraWidth - miniMapSize - strokeWidth - PADDING, miniY = Graphics.cameraHeight - strokeWidth - miniMapSize - PADDING;
         // Convert to game world coordinates
         Vector2 cornerPos = Graphics.getScreenToWorld2D(new Vector2(miniX, miniY), Graphics.camera);
 

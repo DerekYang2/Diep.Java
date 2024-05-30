@@ -108,7 +108,6 @@ public class Graphics extends Raylib {
         return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
     }
 
-
     public static void initialize(String title) {
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode monitor = gd.getDisplayMode();
@@ -124,7 +123,7 @@ public class Graphics extends Raylib {
         FPS = 60 * (2 - PERFORMANCE_MODE);
         // Screen dimensions (actual monitor pixels)
         screenWidth = monitor.getWidth() - insets.left - insets.right;
-        screenHeight = monitor.getHeight() - insets.top - insets.bottom;
+        screenHeight = monitor.getHeight() - 24 - insets.bottom;
 
         // Raylib window
         rlj = new Raylib();

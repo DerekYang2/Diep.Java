@@ -54,7 +54,7 @@ public class Main {
         TextureLoader.clear();
         Leaderboard.clear();
 
-        int spawn = 30;
+        int spawn = 2;
 
         polygonAmount = spawn * 30;
         pentagonNestAmount = spawn;

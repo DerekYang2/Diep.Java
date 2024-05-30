@@ -183,6 +183,8 @@ public class Player extends Tank {
         while (!killQueue.isEmpty() && Main.counter >= killQueue.peek().second) {  // If not empty and counter is past the expire time
             killQueue.remove();  // Remove the top element
         }
+
+        LeaderPointer.update();
     }
 
     @Override
@@ -228,9 +230,11 @@ public class Player extends Tank {
             upgradeFrames = (int) (UPGRADE_HUD_DURATION * PERCENT_FADE);  // Reset to start of being fully visible
     }
 
-/*    public void draw() {
+    public void draw() {
         super.draw();
-        if (!isDead && Main.onScreen(pos, radius * scale)) {
+        LeaderPointer.draw();
+
+/*        if (!isDead && Main.onScreen(pos, radius * scale)) {
             float inverseZoom = 1.f / Graphics.getCameraZoom();
             float scoreFont = levelBarFontSize * inverseZoom;
             float yPos = (pos.y - radius * scale);
@@ -238,8 +242,8 @@ public class Player extends Tank {
             yPos -= scoreFont;
             float usernameFont = 31 * inverseZoom;
             Graphics.drawTextCenteredOutline(username, (int) pos.x, (int) (yPos - usernameFont * 0.8f * 0.5f), (int) usernameFont, Color.WHITE);
-        }
-    }*/
+        }*/
+    }
 
     public void updateBars() {
         if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) != 0) return;  // Only update every other frame

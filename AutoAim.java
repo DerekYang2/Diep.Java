@@ -57,6 +57,9 @@ public class AutoAim {
         float minDistSquared = Float.MAX_VALUE;
         Vector2 closestTarget = null;  // Set to null if no target found
 
+        float minDistTank = Float.MAX_VALUE;
+        Vector2 closestTank = null;
+
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
             if (obj == null) continue;
@@ -75,13 +78,24 @@ public class AutoAim {
                         continue;
                     }
                 }
-
                 minDistSquared = distSquared;
                 closestTarget = shiftedTarget;  // Update closest target
             }
+            if ((obj instanceof Tank) && distSquared < minDistTank) {  // New closest tank
+                Vector2 shiftedTarget = getAdjustedTarget(obj, spawnPoint, bulletSpeed);  // Get the corrected target position
+                if (angleRange < 2 * Math.PI) {  // Check if within angle range
+                    double startAngle = sourceAngle - angleRange * 0.5, endAngle = sourceAngle + angleRange * 0.5;  // End angle is ccw
+                    double targetAngle = Math.atan2(shiftedTarget.y - sourcePos.y, shiftedTarget.x - sourcePos.x);  // Angle towards the target
+                    if (!Graphics.isAngleBetween(targetAngle, startAngle, endAngle)) {  // If target not within angle range, skip
+                        continue;
+                    }
+                }
+                minDistTank = distSquared;
+                closestTank = shiftedTarget;
+            }
         }
 
-        return closestTarget;
+        return closestTank != null ? closestTank : closestTarget;
     }
 
     /**
@@ -98,6 +112,10 @@ public class AutoAim {
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;
         Vector2 closestTarget = null;  // Set to null if no target found
+
+        float minDistTank = Float.MAX_VALUE;
+        Vector2 closestTank = null;
+
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
 
@@ -106,13 +124,22 @@ public class AutoAim {
             }
             Rectangle boundingBox = obj.boundingBox();
             float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
-            if (Graphics.isIntersecting(boundingBox, view) && distSquared < minDistSquared) {  // New closest target
-                minDistSquared = distSquared;
-                closestTarget = getAdjustedTarget(obj, spawnPoint, bulletSpeed);  // Update the closest target (adjusted)
+            if (Graphics.isIntersecting(boundingBox, view)) {  // New closest target
+                if (obj instanceof Tank) {
+                    if (distSquared < minDistTank) {  // New closest tank
+                        Vector2 shiftedTarget = getAdjustedTarget(obj, spawnPoint, bulletSpeed);  // Get the corrected target position
+                        minDistTank = distSquared;
+                        closestTank = shiftedTarget;
+                    }
+                } else if (distSquared < minDistSquared) {  // Potential closest target
+                    Vector2 shiftedTarget = getAdjustedTarget(obj, spawnPoint, bulletSpeed);  // Get the corrected target position
+                    minDistSquared = distSquared;
+                    closestTarget = shiftedTarget;  // Update closest target
+                }
             }
         }
 
-        return closestTarget;
+        return closestTank != null ? closestTank : closestTarget;
     }
 
     /**
@@ -122,6 +149,7 @@ public class AutoAim {
      * @param radius The radius of the view
      * @param group The group of the source
      * @return The closest target position
+     * TODO: similarly priotize tank like method below
      */
     public static Vector2 getClosestTarget(Vector2 currentPos, Vector2 viewOrigin, float radius, int group) {
         Rectangle view = new Rectangle(viewOrigin.x - radius, viewOrigin.y - radius, 2*radius, 2*radius);
@@ -160,6 +188,10 @@ public class AutoAim {
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;
         Integer closestId = null;  // Set to null if no target found
+
+        float minDistTank = Float.MAX_VALUE;
+        Integer closestTankId = null;
+
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
             if (obj.group == group || obj.isProjectile || obj.isInvisible()) {  // If same group or projectile OR not in view, skip
@@ -168,12 +200,17 @@ public class AutoAim {
             Rectangle boundingBox = obj.boundingBox();
             float distSquared = Graphics.distanceSq(sourcePos, obj.pos);
 
-            if (Graphics.isIntersecting(boundingBox, view) && distSquared < minDistSquared) {  // New closest target
-                minDistSquared = distSquared;
-                closestId = obj.id;  // Update the closest target (adjusted)
+            if (Graphics.isIntersecting(boundingBox, view)) {
+                if (distSquared < minDistSquared) {  // New closest target
+                    minDistSquared = distSquared;
+                    closestId = obj.id;  // Update the closest target (adjusted)
+                }
+                if ((obj instanceof Tank) && distSquared < minDistTank) {  // New closest tank
+                    minDistTank = distSquared;
+                    closestTankId = obj.id;
+                }
             }
         }
-
-        return closestId;
+        return closestTankId != null ? closestTankId : closestId;
     }
 }

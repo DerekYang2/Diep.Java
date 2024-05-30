@@ -31,7 +31,7 @@ public class Tank extends GameObject {
 
     // Upgrade path variables
     Queue<Pair<String, Integer>> upgradeBuilds;
-    int upgradeFrames = 0;
+    int updateStatFrames = 0;
     boolean resetFireDelay = true;
 
     boolean cullingOff = false;
@@ -143,8 +143,8 @@ public class Tank extends GameObject {
     }
 
     public void updateStatUpgrade() {
-       upgradeFrames = Math.max(0, upgradeFrames - 1);
-        if (upgradeFrames == 0 && !resetFireDelay) {
+       updateStatFrames = Math.max(0, updateStatFrames - 1);
+        if (updateStatFrames == 0 && !resetFireDelay) {
             tankBuild.resetFireManagerDelay();
             resetFireDelay = true;
         }
@@ -156,7 +156,7 @@ public class Tank extends GameObject {
             stats.setStat(statEnum, stats.getStat(statEnum) + 1);
             usedStatPoints++;
             if (statEnum == Stats.RELOAD) {
-                upgradeFrames = tankBuild.fireManager.getNextFireFrames();
+                updateStatFrames = tankBuild.fireManager.getNextFireFrames();
                 resetFireDelay = false;
             }
         }

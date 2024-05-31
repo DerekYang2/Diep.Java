@@ -1,5 +1,7 @@
 import com.raylib.java.raymath.Vector2;
 
+import java.util.HashSet;
+
 // TODO: auto turret should be auto fire mode, these guys turn too fast, maybe add lock on time
 public class BotController implements Controller {
     Tank host;
@@ -13,6 +15,8 @@ public class BotController implements Controller {
     final int SAFETY_FRAMES = 120 * 3;  // 3 second
     int safetyFireFrames;  // Extra number of frames to continue firing after target is lost
     Vector2 targetPos;
+
+    HashSet<Integer> targetSet;
 
     public BotController() {
         moveDir = (float) (Math.random() * 2 * Math.PI);
@@ -43,37 +47,45 @@ public class BotController implements Controller {
     @Override
     public void update() {
         if (frontBarrel != null) {
+
+            if (Main.counter % 2 == 0) {
+                targetSet = CollisionManager.queryBoundingBox(host.getView());
+            }
+
             safetyFireFrames = Math.max(0, safetyFireFrames - 1);  // Decrement safety fire frames
 
-            if (frontBarrel.canControlDrones) {
-                Integer targId = AutoAim.getClosestTargetId(host.pos, host.getView(), host.group);  // Get closest target unadjusted
+            if (Main.counter % 2 == 0) {
+                if (frontBarrel.canControlDrones) {
+                    Integer targId = AutoAim.getClosestTargetId(targetSet, host.pos, host.getView(), host.group);  // Get closest target unadjusted
 
-                if (targId != null) {
-                    GameObject targObj = Main.gameObjectPool.getObj(targId);
-                    if (Graphics.distanceSq(host.pos, targObj.pos) < 1500*1500)  // If target is close enough
-                        targetPos = AutoAim.getAdjustedTarget(targObj, frontBarrel.getSpawnPoint(), frontBulletSpeed);  // Adjust target position
-                    else
-                        targetPos = targObj.pos;  // Do not adjust target position
+                    if (targId != null) {
+                        GameObject targObj = Main.gameObjectPool.getObj(targId);
+                        if (Graphics.distanceSq(host.pos, targObj.pos) < 1500 * 1500)  // If target is close enough
+                            targetPos = AutoAim.getAdjustedTarget(targObj, frontBarrel.getSpawnPoint(), frontBulletSpeed);  // Adjust target position
+                        else
+                            targetPos = targObj.pos;  // Do not adjust target position
+                    } else {
+                        targetPos = null;  // No target
+                    }
                 } else {
-                    targetPos = null;  // No target
+                    targetPos = AutoAim.getAdjustedTarget(targetSet, host.pos, frontBarrel.getSpawnPoint(), host.getView(), host.group, frontBulletSpeed);  // Get closest target
                 }
-            } else {
-                targetPos = AutoAim.getAdjustedTarget(host.pos, frontBarrel.getSpawnPoint(), host.getView(), host.group, frontBulletSpeed);  // Get closest target
+
+                if (targetPos != null) {  // If there is a closest target
+                    if (reactionWatch.ms() > reactionTime) {  // If reaction time has passed
+                        targetDirection = (float) Math.atan2(targetPos.y - host.pos.y, targetPos.x - host.pos.x);
+                        shouldFire = Graphics.absAngleDistance(direction, targetDirection) < Math.toRadians(10);   // Only fire if direction is close to target direction
+                    }
+                    safetyFireFrames = SAFETY_FRAMES;  // Set safety fire frames to max
+                } else {
+                    if (safetyFireFrames == 0) {  // If safety frames has run out
+                        targetDirection = moveDir;  // Set target direction to move direction
+                        shouldFire = false;
+                        reactionWatch.start();  // Restart reaction watch when no target
+                    }
+                }
             }
 
-            if (targetPos != null) {  // If there is a closest target
-                if (reactionWatch.ms() > reactionTime) {  // If reaction time has passed
-                    targetDirection = (float) Math.atan2(targetPos.y - host.pos.y, targetPos.x - host.pos.x);
-                    shouldFire = Graphics.absAngleDistance(direction, targetDirection) < Math.toRadians(10);   // Only fire if direction is close to target direction
-                }
-                safetyFireFrames = SAFETY_FRAMES;  // Set safety fire frames to max
-            } else {
-                if (safetyFireFrames == 0) {  // If safety frames has run out
-                    targetDirection = moveDir;  // Set target direction to move direction
-                    shouldFire = false;
-                    reactionWatch.start();  // Restart reaction watch when no target
-                }
-            }
             direction = (float) Graphics.angle_lerp(direction, targetDirection, 0.1f);
         } else {
             direction = 0;

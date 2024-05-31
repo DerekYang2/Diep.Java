@@ -98,17 +98,7 @@ public class AutoAim {
         return closestTank != null ? closestTank : closestTarget;
     }
 
-    /**
-     * Get the closest target within the view (in a different group)
-     * @param sourcePos The position of the source
-     * @param spawnPoint The spawn point of the bullet
-     * @param view The view rectangle
-     * @param group The group of the source
-     * @param bulletSpeed The speed of the bullet
-     * @return The closest target position
-     */
-    public static Vector2 getAdjustedTarget(Vector2 sourcePos, Vector2 spawnPoint, Rectangle view, int group, float bulletSpeed) {
-        HashSet<Integer> targets = CollisionManager.queryBoundingBox(view);
+    public static Vector2 getAdjustedTarget(HashSet<Integer> targets, Vector2 sourcePos, Vector2 spawnPoint, Rectangle view, int group, float bulletSpeed) {
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;
         Vector2 closestTarget = null;  // Set to null if no target found
@@ -140,6 +130,19 @@ public class AutoAim {
         }
 
         return closestTank != null ? closestTank : closestTarget;
+    }
+
+    /**
+     * Get the closest target within the view (in a different group)
+     * @param sourcePos The position of the source
+     * @param spawnPoint The spawn point of the bullet
+     * @param view The view rectangle
+     * @param group The group of the source
+     * @param bulletSpeed The speed of the bullet
+     * @return The closest target position
+     */
+    public static Vector2 getAdjustedTarget(Vector2 sourcePos, Vector2 spawnPoint, Rectangle view, int group, float bulletSpeed) {
+        return getAdjustedTarget(CollisionManager.queryBoundingBox(view), sourcePos, spawnPoint, view, group, bulletSpeed);
     }
 
     /**
@@ -183,8 +186,7 @@ public class AutoAim {
      * @param group The group of the source
      * @return The closest target position
      */
-    public static Integer getClosestTargetId(Vector2 sourcePos, Rectangle view, int group) {
-        HashSet<Integer> targets = CollisionManager.queryBoundingBox(view);
+    public static Integer getClosestTargetId(HashSet<Integer> targets, Vector2 sourcePos, Rectangle view, int group) {
         // Get the closest target
         float minDistSquared = Float.MAX_VALUE;
         Integer closestId = null;  // Set to null if no target found

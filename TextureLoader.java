@@ -42,6 +42,9 @@ public class TextureLoader {
     }
 
     public static Texture2D getIconTexture(String buildName, Color fillCol) {
+        if (iconTextures.get(fillCol) == null) {
+            throw new IllegalArgumentException("Icon texture not found " + buildName);
+        }
         return iconTextures.get(fillCol).getOrDefault(buildName, null);
     }
 

@@ -44,7 +44,7 @@ public class Main {
     }
 
     public static void startGame() {
-        int spawn = 50;
+        int spawn = 1;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         System.out.println("Arena size: " + arenaWidth + "x" + arenaHeight);

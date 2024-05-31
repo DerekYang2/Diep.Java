@@ -63,7 +63,7 @@ public class Main {
             String buildName;
             //buildName = TankBuild.getRandomBuildName();
             buildName = "tank";
-            int group = -Graphics.randInt(0, 4);
+            int group = -1;
             Color fillCol, strokeCol;
             switch (group) {
                 case 0 -> {

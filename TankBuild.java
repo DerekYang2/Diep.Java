@@ -65,8 +65,8 @@ public class TankBuild
     public int getMaxStat(String stat) {
         if (maxStats.containsKey(stat)) {
             return maxStats.get(stat);
-        } else {
-            throw new IllegalArgumentException("Stat " + stat + " not found in maxStats");
+        } else {  // TODO: crashes caused by drone turrets having different stat names
+            throw new IllegalArgumentException("Stat " + stat + " not found in maxStats, name = " + name);
         }
     }
 

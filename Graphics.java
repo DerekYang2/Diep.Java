@@ -650,6 +650,9 @@ public class Graphics extends Raylib {
     public static void drawTextOutline(String text, Vector2 pos, int fontSize, float spacing, Color color) {
         rlj.text.DrawTextEx(fontSize < 25 ? outlineSmallFont: outlineFont, text, pos, fontSize, spacing, color);
     }
+    public static void drawTextOutline(String text, Vector2 pos, int fontSize, float radians, float spacing, Color color) {
+        rlj.text.DrawTextPro(fontSize < 25 ? outlineSmallFont: outlineFont, text, pos, new Vector2(0, 0), (float) Math.toDegrees(radians), fontSize, spacing, color);
+    }
 
     public static void unloadTexture(Texture2D texture) {
         rlj.textures.UnloadTexture(texture);

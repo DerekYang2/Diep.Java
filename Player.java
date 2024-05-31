@@ -51,8 +51,8 @@ public class Player extends Tank {
         usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - textDimensions.getY() * 0.5f - BAR_HEIGHT);
 
         // Set upgrade paths
-        setUpgradePath(TankBuild.getRandomUpgradePath());
-        //setUpgradePath(new String[]{"auto 3", "auto 5"});
+        //setUpgradePath(TankBuild.getRandomUpgradePath());
+        setUpgradePath(new String[]{"auto 3", "overlord"});
     }
 
     @Override
@@ -96,7 +96,7 @@ public class Player extends Tank {
                 upgradeBar[i] = null;
             }
         }
-        usagePos = new Vector2(10 + upgradeBar[0].getWidth(), yPos);
+        usagePos = new Vector2(10 + upgradeBar[0].getWidth() - 5, yPos + 5);
         for (int statEnum = 0; statEnum < 8; statEnum++) {
             if (upgradeBar[statEnum] != null) {
                 upgradeBar[statEnum].setRects(getStat(statEnum));
@@ -368,8 +368,8 @@ public class Player extends Tank {
                 bar.draw();
             }
         }
-        if (maxStatPoints - usedStatPoints > 0) {
-            Graphics.drawTextOutline("x" + (maxStatPoints - usedStatPoints), usagePos, 30, -2, Graphics.colAlpha(Color.WHITE, upgradeOpacity));
+        if (maxStatPoints - usedStatPoints >= 0) {
+            Graphics.drawTextOutline("x" + (maxStatPoints - usedStatPoints), usagePos, 30, (float) (-Math.PI/6), -2, Graphics.colAlpha(Color.WHITE, upgradeOpacity));
         }
     }
 }

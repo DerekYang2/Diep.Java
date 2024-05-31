@@ -11,7 +11,7 @@ public class LeaderPointer {
         }
         targetDirection = Graphics.normalizeAngle(targetDirection);
         //targetDirection = Graphics.normalizeAngle(Main.player.direction);
-        direction = Graphics.angle_lerp(direction, targetDirection, 0.03f);
+        direction = Graphics.angle_lerp(direction, targetDirection, 0.02f);
     }
     // https://www.desmos.com/calculator/topmpimq9v
     // TODO: if leader is on screen, do not draw
@@ -49,8 +49,8 @@ public class LeaderPointer {
                     r = -H / (float) Math.sin(direction);
                 }
                 r -= 35;
-                Vector2 pos = new Vector2(W + r * (float) Math.cos(direction), H + r * (float) Math.sin(direction));
-                Graphics.drawTriangle(Graphics.getScreenToWorld2D(pos, Graphics.camera), 13 * inverseZoom, 1f, (float) direction, Graphics.rgba(0, 0, 0, 50));
+                Vector2 pos = Graphics.getScreenToWorld2D(new Vector2(W + r * (float) Math.cos(direction), H + r * (float) Math.sin(direction)), Graphics.camera);
+                Graphics.drawTriangle(pos, 13 * inverseZoom, 1f, (float) direction, Graphics.rgba(0, 0, 0, 100));
             }
     }
 }

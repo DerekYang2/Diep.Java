@@ -1,7 +1,7 @@
 import com.raylib.java.raymath.Vector2;
 
 public class Crasher extends GameObject {
-    final static float aiRadius = 1800;
+    final static float aiRadius = 1700;
 
     boolean isLarge;
     private float baseAcceleration;
@@ -26,9 +26,9 @@ public class Crasher extends GameObject {
         setCollisionFactors(isLarge ? 0.1f : 2f, isLarge ? 8 : 6);
         setMaxHealth(isLarge ? 45 : 15);
         setDamage(8 * 25.f / 120);
-        scoreReward = isLarge ? 5 : 2;  // 25, 15 on diep, but nerfed in this version
+        scoreReward = isLarge ? 10 : 5;  // 25, 15 on diep, but nerfed in this version
 
-        float velocity = 1.414f*(isLarge ? 2.64f : 2.602f);
+        float velocity = 1.414f*(isLarge ? 2.7f : 2.65f);
         baseAcceleration = velocity * (1-friction);
         healthBar.setWidth(radius * scale * 2);
     }

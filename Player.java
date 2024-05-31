@@ -51,8 +51,8 @@ public class Player extends Tank {
         usernamePos = new Vector2((Graphics.cameraWidth - textDimensions.getX()) * 0.5f, levelBarPos.y - 0.8f * BAR_HEIGHT - textDimensions.getY() * 0.5f - BAR_HEIGHT);
 
         // Set upgrade paths
-        //setUpgradePath(TankBuild.getRandomUpgradePath());
-        setUpgradePath(new String[]{"auto 3", "overlord"});
+        setUpgradePath(TankBuild.getRandomUpgradePath());
+        //setUpgradePath(new String[]{"auto 3", "overlord"});
     }
 
     @Override
@@ -85,6 +85,10 @@ public class Player extends Tank {
         final float upgradeBarHeight = 22;
         float yPos = Graphics.cameraHeight - upgradeBarHeight - 10;
         String[] upgradeText = {"Movement Speed", "Reload", "Bullet Damage", "Bullet Penetration", "Bullet Speed", "Body Damage", "Max Health", "Health Regen"};
+        for (int i = 0; i < upgradeText.length; i++) {
+            upgradeText[i] = tankBuild.getProperStat(upgradeText[i]);  // Get proper stat name
+        }
+
         Color[] colors = {Graphics.MOVEMENT_SPEED, Graphics.RELOAD, Graphics.BULLET_DAMAGE, Graphics.BULLET_PENETRATION, Graphics.BULLET_SPEED, Graphics.BODY_DAMAGE, Graphics.MAX_HEALTH, Graphics.HEALTH_REGEN};
 
         for (int i = 0; i < 8; i++) {

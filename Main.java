@@ -58,7 +58,7 @@ public class Main {
         Spawner.reset();
 
         // new TestObj();
-        player = new Player(new Vector2(Main.arenaWidth * 0.5f,Main.arenaHeight * 0.5f), "tank");
+        player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank");
         for (int i = 0; i < spawn; i++) {
             String buildName;
             //buildName = TankBuild.getRandomBuildName();

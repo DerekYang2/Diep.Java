@@ -767,12 +767,12 @@ public class Graphics extends Raylib {
     /**
      * Returns a random integer between min and max (exclusive)
      * min <= randInt < max
-     * @param min The lower bound
+     * @param min The lower bound (inclusive)
      * @param max The upper bound (exclusive)
-     * @return A random integer between min and max (exclusive)
+     * @return A random integer between min and max
      */
     public static int randInt(int min, int max) {
-        return random.nextInt(max - min) + min;
+        return random.nextInt(min, max);
     }
 
     public static float distance(Vector2 vec1, Vector2 vec2) {

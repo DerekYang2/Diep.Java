@@ -62,6 +62,25 @@ public class TankBuild
         maxStats.put(stat, value);
     }
 
+    /**
+     * Receives the stat name in terms of bullets and returns the proper equivalent (could be bullet or drone or null)
+     * @param stat The stat name in terms of bullet ("bullet penetration")
+     * @return The proper stat name ("drone health")
+     */
+    public String getProperStat(String stat) {
+        String droneEquivalent = switch (stat) {
+            case "Bullet Penetration" -> "Drone Health";
+            case "Bullet Damage" -> "Drone Damage";
+            case "Bullet Speed" -> "Drone Speed";
+            default -> stat;
+        };
+        if (maxStats.containsKey(droneEquivalent)) {  // If the drone equivalent is in the max stats
+            return droneEquivalent;
+        } else {  // If the bullet stat is in the max stats
+            return stat;
+        }
+    }
+
     public int getMaxStat(String stat) {
         if (maxStats.containsKey(stat)) {
             return maxStats.get(stat);

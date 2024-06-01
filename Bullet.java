@@ -58,7 +58,7 @@ public class Bullet extends Projectile {
 
     @Override
     public void draw() {
-        final float scaledRadius = radius * scale;  // scale is always 1 until death animation
+        final float scaledRadius = getRadiusScaled();  // scale is always 1 until death animation
         if (Main.onScreen(pos, scaledRadius)) {
             Graphics.drawCircle(pos, scaledRadius, Graphics.strokeWidth, fillCol, strokeCol, opacity * opacity);
         }

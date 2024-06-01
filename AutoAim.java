@@ -215,4 +215,41 @@ public class AutoAim {
         }
         return closestTankId != null ? closestTankId : closestId;
     }
+
+    public static boolean willCollide(GameObject obj1, GameObject obj2) {
+        // TODO: custom case when vel.x is close to 0
+        double m1 = obj1.vel.y/obj1.vel.x, m2 = obj2.vel.y/obj2.vel.x;
+        double b1 = -m1* obj1.pos.x + obj1.pos.y, b2 = -m2 * obj2.pos.x + obj2.pos.y;
+
+        double x = (b2 - b1) / (m1 - m2);
+        double t = (x - obj1.pos.x) / obj1.vel.x;  // Time to collision
+        if (2*t <= Graphics.FPS) return false;
+        Vector2 pos1 = new Vector2((float) (obj1.pos.x + obj1.vel.x * t), (float) (obj1.pos.y + obj1.vel.y * t));
+        Vector2 pos2 = new Vector2((float) (obj2.pos.x + obj2.vel.x * t), (float) (obj2.pos.y + obj2.vel.y * t));
+        return Graphics.distance(pos1, pos2) < 1.2f*(obj1.getRadiusScaled() + obj2.getRadiusScaled());
+    }
+
+    public static GameObject getClosestTargetDefense(HashSet<Integer> targets, GameObject sourceObj, Rectangle view, int group) {
+        // Get the closest target
+        float minDistSquared = Float.MAX_VALUE;
+        GameObject closestObj = null;  // Set to null if no target found
+
+        for (int id : targets) {
+            GameObject obj = Main.gameObjectPool.getObj(id);
+            if (obj.group == group || obj.isInvisible() || obj.isPolygon) {  // If same group or projectile OR not in view, skip
+                continue;
+            }
+            Rectangle boundingBox = obj.boundingBox();
+            float distSquared = Graphics.distanceSq(sourceObj.pos, obj.pos);
+
+            if (Graphics.isIntersecting(boundingBox, view) && willCollide(sourceObj, obj)) {
+                if (distSquared < minDistSquared) {  // New closest target
+                    minDistSquared = distSquared;
+                    closestObj = obj;  // Update the closest target (adjusted)
+                }
+            }
+        }
+
+        return closestObj;
+    }
 }

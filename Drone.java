@@ -105,8 +105,8 @@ public class Drone extends Projectile {
 
     @Override
     public void draw() {
-        final float scaledRadius = (float)(radius * scale * Math.sqrt(2)/2);  // scale is always 1 until death animation
-        if (Main.onScreen(pos, radius * scale)) {  // Use larger radius for culling
+        final float scaledRadius = getRadiusScaled() * 0.7071067812f;  // sqrt2/2, scale is always 1 until death animation
+        if (Main.onScreen(pos, getRadiusScaled())) {  // Use larger radius for culling
             Graphics.drawTriangleRounded(pos, scaledRadius, direction, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(fillCol), opacity), Graphics.colAlpha(getDamageLerpColor(strokeCol), opacity));
         }
 

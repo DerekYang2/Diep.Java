@@ -66,7 +66,7 @@ public class Trap extends Projectile {
 
     @Override
     public void draw() {
-        final float scaledRadius = radius * scale * 0.74f;  // scale is always 1 until death animation
+        final float scaledRadius = getRadiusScaled() * 0.74f;  // scale is always 1 until death animation
         if (Main.onScreen(pos, scaledRadius)) {
             Graphics.drawTrap(pos, scaledRadius, (float)rotation, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(fillCol), opacity), Graphics.colAlpha(getDamageLerpColor(strokeCol), opacity));
         }

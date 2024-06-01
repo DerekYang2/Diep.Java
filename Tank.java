@@ -121,7 +121,7 @@ public class Tank extends GameObject {
         scale = (float)Math.pow(1.01, (level - 1));
 
         // Health bar size
-        healthBar.setWidth(radius * scale * 2);
+        healthBar.setWidth(getRadiusScaled() * 2);
 
         // The number of upgrade points the tank has
         maxStatPoints = Stats.getStatCount(level);

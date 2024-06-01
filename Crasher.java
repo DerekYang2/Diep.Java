@@ -30,7 +30,7 @@ public class Crasher extends GameObject {
 
         float velocity = 1.414f*(isLarge ? 2.7f : 2.65f);
         baseAcceleration = velocity * (1-friction);
-        healthBar.setWidth(radius * scale * 2);
+        healthBar.setWidth(getRadiusScaled() * 2);
     }
 
     @Override
@@ -38,6 +38,7 @@ public class Crasher extends GameObject {
         noInternalCollision = false;
         keepInArena = true;
         isProjectile = false;
+        isPolygon = true;
     }
 
     @Override
@@ -68,8 +69,8 @@ public class Crasher extends GameObject {
 
     @Override
     public void draw() {
-        if (Main.onScreen(pos, radius * scale * 2/3)) {
-            Graphics.drawTriangleRounded(pos, radius * scale * 2/3, (float) direction, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(Graphics.CRASHER), opacity), Graphics.colAlpha(getDamageLerpColor(Graphics.CRASHER_STROKE), opacity));
+        if (Main.onScreen(pos, getRadiusScaled() * 2/3)) {
+            Graphics.drawTriangleRounded(pos, getRadiusScaled() * 2/3, (float) direction, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(Graphics.CRASHER), opacity), Graphics.colAlpha(getDamageLerpColor(Graphics.CRASHER_STROKE), opacity));
         }
     }
 

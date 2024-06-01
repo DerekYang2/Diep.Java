@@ -16,6 +16,7 @@ public class BotController implements Controller {
     int safetyFireFrames;  // Extra number of frames to continue firing after target is lost
     Vector2 targetPos;
 
+    boolean defenseMode = true;
     HashSet<Integer> targetSet;
 
     public BotController() {
@@ -55,21 +56,7 @@ public class BotController implements Controller {
             safetyFireFrames = Math.max(0, safetyFireFrames - 1);  // Decrement safety fire frames
 
             if (Main.counter % 2 == 0) {
-                if (frontBarrel.canControlDrones) {
-                    Integer targId = AutoAim.getClosestTargetId(targetSet, host.pos, host.getView(), host.group);  // Get closest target unadjusted
-
-                    if (targId != null) {
-                        GameObject targObj = Main.gameObjectPool.getObj(targId);
-                        if (Graphics.distanceSq(host.pos, targObj.pos) < 1500 * 1500)  // If target is close enough
-                            targetPos = AutoAim.getAdjustedTarget(targObj, frontBarrel.getSpawnPoint(), frontBulletSpeed);  // Adjust target position
-                        else
-                            targetPos = targObj.pos;  // Do not adjust target position
-                    } else {
-                        targetPos = null;  // No target
-                    }
-                } else {
-                    targetPos = AutoAim.getAdjustedTarget(targetSet, host.pos, frontBarrel.getSpawnPoint(), host.getView(), host.group, frontBulletSpeed);  // Get closest target
-                }
+                updateTarget();
 
                 if (targetPos != null) {  // If there is a closest target
                     if (reactionWatch.ms() > reactionTime) {  // If reaction time has passed
@@ -86,9 +73,36 @@ public class BotController implements Controller {
                 }
             }
 
-            direction = (float) Graphics.angle_lerp(direction, targetDirection, 0.1f);
+            direction = (float) Graphics.angle_lerp(direction, targetDirection, 0.15f);
         } else {
             direction = 0;
+        }
+    }
+
+    public void updateTarget() {
+        if (defenseMode) {
+            GameObject targetObj = AutoAim.getClosestTargetDefense(targetSet, host, host.getView(), host.group);  // Get closest target unadjusted
+            if (targetObj != null) {
+                targetPos = AutoAim.getAdjustedTarget(targetObj, frontBarrel.getSpawnPoint(), frontBulletSpeed);  // Adjust target position
+            } else {  // No defense target, switch to default
+                targetPos = AutoAim.getAdjustedTarget(targetSet, host.pos, frontBarrel.getSpawnPoint(), host.getView(), host.group, frontBulletSpeed);  // Get closest target
+            }
+        } else {
+            if (frontBarrel.canControlDrones) {
+                Integer targId = AutoAim.getClosestTargetId(targetSet, host.pos, host.getView(), host.group);  // Get closest target unadjusted
+
+                if (targId != null) {
+                    GameObject targetObj = Main.gameObjectPool.getObj(targId);
+                    if (Graphics.distanceSq(host.pos, targetObj.pos) < 1500 * 1500)  // If target is close enough
+                        targetPos = AutoAim.getAdjustedTarget(targetObj, frontBarrel.getSpawnPoint(), frontBulletSpeed);  // Adjust target position
+                    else
+                        targetPos = targetObj.pos;  // Do not adjust target position
+                } else {
+                    targetPos = null;  // No target
+                }
+            } else {
+                targetPos = AutoAim.getAdjustedTarget(targetSet, host.pos, frontBarrel.getSpawnPoint(), host.getView(), host.group, frontBulletSpeed);  // Get closest target
+            }
         }
     }
 

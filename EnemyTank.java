@@ -42,7 +42,7 @@ public class EnemyTank extends Tank {
         while (usedStatPoints < maxStatPoints && !statUpgradeQueue.isEmpty()) {
             incrementStat(statUpgradeQueue.poll());
         }
-        if (hasUpdate) {
+        if (hasUpdate) {  // TODO: fix this fire manager delay
             tankBuild.resetFireManagerDelay();
         }
     }
@@ -52,7 +52,7 @@ public class EnemyTank extends Tank {
     public void draw() {
         super.draw();
         if (!isDead && Main.onScreen(pos, radius*scale) && !isInvisible()) {
-            float inverseZoom = 1.f / Graphics.getCameraZoom(), scoreFont = 22 * inverseZoom, yPos = (pos.y - radius * scale);
+            float inverseZoom = 1.f / Graphics.getCameraZoom(), scoreFont = 22 * inverseZoom, yPos = (pos.y - getRadiusScaled());
             Graphics.drawTextCenteredOutline(Leaderboard.formatScoreShort(score), (int) pos.x, (int) (yPos - 1.25f * scoreFont * 0.5f), (int) scoreFont, -8.f, Graphics.colAlpha(Color.WHITE, 0.75f));
             yPos -= scoreFont;
             float usernameFont = 30 * inverseZoom;

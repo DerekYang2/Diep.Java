@@ -238,10 +238,10 @@ public class Player extends Tank {
         super.draw();
         LeaderPointer.draw();
 
-/*        if (!isDead && Main.onScreen(pos, radius * scale)) {
+/*        if (!isDead && Main.onScreen(pos, getRadiusScaled())) {
             float inverseZoom = 1.f / Graphics.getCameraZoom();
             float scoreFont = levelBarFontSize * inverseZoom;
-            float yPos = (pos.y - radius * scale);
+            float yPos = (pos.y - getRadiusScaled());
             Graphics.drawTextCenteredOutline(Graphics.round(score / 1000, 1) + "k", (int) pos.x, (int) (yPos - scoreFont * 1.2f * 0.5f), (int) scoreFont, Color.WHITE);
             yPos -= scoreFont;
             float usernameFont = 31 * inverseZoom;

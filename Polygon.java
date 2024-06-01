@@ -68,7 +68,7 @@ public class Polygon extends GameObject {
             }
         }
         baseAcceleration = BASE_VELOCITY * (1-friction);
-        healthBar.setWidth(radius * scale * 2);
+        healthBar.setWidth(getRadiusScaled() * 2);
     }
 
     @Override
@@ -76,6 +76,7 @@ public class Polygon extends GameObject {
         noInternalCollision = false;
         keepInArena = true;
         isProjectile = false;
+        isPolygon = true;
     }
 
 
@@ -103,26 +104,26 @@ public class Polygon extends GameObject {
     public void draw() {
         switch (username) {
             case Polygon.SQUARE -> {
-                float sideLength = radius * scale * 2;
+                float sideLength = getRadiusScaled() * 2;
                 if (Main.onScreen(pos, sideLength)) {
                     Graphics.drawTextureCentered(Graphics.squarePolygon, pos, sideLength, sideLength, rotation, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
                 }
             }
             case Polygon.TRIANGLE -> {
-                if (Main.onScreen(pos, radius * scale * 2/3)) {
-                    Graphics.drawTriangleRounded(pos, radius * scale * 2/3, rotation, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(Graphics.TRIANGLE), opacity), Graphics.colAlpha(getDamageLerpColor(Graphics.TRIANGLE_STROKE), opacity));
+                if (Main.onScreen(pos, getRadiusScaled() * 2/3)) {
+                    Graphics.drawTriangleRounded(pos, getRadiusScaled() * 2/3, rotation, Graphics.strokeWidth, Graphics.colAlpha(getDamageLerpColor(Graphics.TRIANGLE), opacity), Graphics.colAlpha(getDamageLerpColor(Graphics.TRIANGLE_STROKE), opacity));
                 }
             }
             case Polygon.PENTAGON -> {
-                float height = (float) (radius * scale * 2.2360679775);
-                if (Main.onScreen(pos, radius * scale)) {
+                float height = (float) (getRadiusScaled() * 2.2360679775);
+                if (Main.onScreen(pos, getRadiusScaled())) {
                     Graphics.drawTextureCentered(Graphics.pentagonPolygon, pos, rotation,height/Graphics.pentagonPolygon.height, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
                 }
-                //Graphics.drawCircle(pos, radius * scale, Graphics.RED, 1);
+                //Graphics.drawCircle(pos, getRadiusScaled(), Graphics.RED, 1);
             }
             case Polygon.ALPHA_PENTAGON -> {
-                float height = (float) (radius * scale * 2.2360679775);
-                if (Main.onScreen(pos, radius * scale)) {
+                float height = (float) (getRadiusScaled() * 2.2360679775);
+                if (Main.onScreen(pos, getRadiusScaled())) {
                     Graphics.drawTextureCentered(Graphics.alphaPentagon, pos, rotation, height/Graphics.alphaPentagon.height, Graphics.colAlpha(getDamageLerpColor(Color.WHITE), opacity));
                 }
             }

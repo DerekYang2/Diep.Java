@@ -14,6 +14,7 @@ public abstract class GameObject implements Updatable, Drawable {
     boolean noInternalCollision = false;  // Object does not collide with objects only in the same group (applies to bullets for now)
     boolean keepInArena = true;  // Object does not go out of the arena
     boolean isProjectile;  // If object is projectile, used for collision cases
+    boolean isPolygon = false;
 
     // Technical physics
     protected Vector2 pos, vel;
@@ -75,7 +76,7 @@ public abstract class GameObject implements Updatable, Drawable {
      * Dependencies: radius, scale must be set
      */
     public void initHealthBar() {
-        healthBar = new Bar(radius * scale * 2, HEALTH_BAR_HEIGHT, HEALTH_BAR_STROKE, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE, .15f, 1);
+        healthBar = new Bar(getRadiusScaled() * 2, HEALTH_BAR_HEIGHT, HEALTH_BAR_STROKE, Graphics.HEALTH_BAR, Graphics.HEALTH_BAR_STROKE, .15f, 1);
         healthBar.forceHidden(true);
         healthBar.addToGameWorld();
     }
@@ -135,7 +136,7 @@ public abstract class GameObject implements Updatable, Drawable {
             healthBar.triggerHidden(health >= maxHealth);
             if (!healthBar.isHidden()) {
                 float healthBarX = pos.x - healthBar.width * 0.5f;
-                float healthBarY = pos.y + radius * scale + 40 - HEALTH_BAR_HEIGHT;
+                float healthBarY = pos.y + getRadiusScaled() + 40 - HEALTH_BAR_HEIGHT;
                 healthBar.update(new Vector2(healthBarX, healthBarY), health / maxHealth);
             }
         }
@@ -391,6 +392,10 @@ public abstract class GameObject implements Updatable, Drawable {
     }
 
     public boolean isInvisible() {
-        return opacity < 0.001f && healthBar.isHidden();
+        return opacity < 0.001f && (healthBar != null && healthBar.isHidden());
+    }
+
+    public float getRadiusScaled() {
+        return radius * scale;
     }
 }

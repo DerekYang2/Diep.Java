@@ -1,3 +1,4 @@
+import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 
 public class Minimap {
@@ -22,5 +23,8 @@ public class Minimap {
         float playerX = miniX + miniPos.x, playerY = miniY + miniPos.y;
         Vector2 playerPos = Graphics.getScreenToWorld2D(new Vector2(playerX, playerY), Graphics.camera);
         Graphics.drawTriangle(playerPos, 2.25f * inverseZoom, 1.5f, Main.player.direction, Graphics.colAlpha(Graphics.DARK_GREY_STROKE, 0.75f));
+
+        cornerPos.y -= 25 * inverseZoom;
+        Graphics.drawTextOutline(Leaderboard.tankList.size() + " Players", cornerPos, (int) (20 * inverseZoom), -4 * inverseZoom, Graphics.colAlpha(Color.WHITE, 0.75f));
     }
 }

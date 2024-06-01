@@ -35,7 +35,7 @@ public class Player extends Tank {
     Vector2 usagePos;
 
     public Player(Vector2 spawn, String buildName) {
-        super(spawn, new BotController(), new Stats(), 1);
+        super(spawn, new PlayerController(), new Stats(), 1);
 
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         initTankBuild(TankBuild.createTankBuild(buildName));
@@ -52,7 +52,7 @@ public class Player extends Tank {
 
         // Set upgrade paths
         setUpgradePath(TankBuild.getRandomUpgradePath());
-        setUpgradePath(new String[]{"smasher", "overlord"});
+        //setUpgradePath(new String[]{"twin", "twin flank", "triple twin"});
     }
 
     @Override

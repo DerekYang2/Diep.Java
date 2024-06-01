@@ -3,6 +3,7 @@ import com.raylib.java.raymath.Vector2;
 import java.util.HashSet;
 
 // TODO: auto turret should be auto fire mode, these guys turn too fast, maybe add lock on time
+// TODO: add offensive mode, try out negative fear factors for offensive tanks (triplet, sprayer, etc.)
 public class BotController implements Controller {
     Tank host;
     float targetMoveDir, moveDir, intendedDir, bounceDir;

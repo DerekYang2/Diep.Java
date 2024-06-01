@@ -8,6 +8,7 @@ public class TankImage extends Tank {
         setColor(fillCol, strokeCol);
         initTankBuild(TankBuild.createTankBuild(buildName));
         updateStats();
+        opacity = 1;  // Spawn with full opacity
     }
 
     @Override

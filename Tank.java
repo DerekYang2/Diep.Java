@@ -38,6 +38,7 @@ public class Tank extends GameObject {
     public Tank(Vector2 pos, Controller controller, Stats stats, int level) {
         super(pos, 50, 1.f, DrawPool.MIDDLE);
         username = NameGenerator.generateUsername();
+        initSpawnAnimation(60);
 
         this.level = level;
         score = ScoreHandler.levelToScore(level) + 0.01f;
@@ -57,6 +58,8 @@ public class Tank extends GameObject {
         super.noInternalCollision = false;
         super.keepInArena = true;
         super.isProjectile = false;
+        super.isPolygon = false;
+        super.spawnProtection = true;
     }
 
     @Override

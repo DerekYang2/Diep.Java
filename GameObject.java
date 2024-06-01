@@ -15,6 +15,7 @@ public abstract class GameObject implements Updatable, Drawable {
     boolean keepInArena = true;  // Object does not go out of the arena
     boolean isProjectile;  // If object is projectile, used for collision cases
     boolean isPolygon = false;
+    boolean spawnProtection = false;  // If object has spawn protection
 
     // Technical physics
     protected Vector2 pos, vel;
@@ -33,6 +34,9 @@ public abstract class GameObject implements Updatable, Drawable {
     float opacity = 1;
     final int DAMAGE_ANIMATION_FRAMES = 12;
     int damageAnimationFrames = 0;
+
+    int spawnFrames;
+    int SPAWN_FRAMES;
 
     // Colors
     Color fillCol = Graphics.RED;
@@ -57,6 +61,12 @@ public abstract class GameObject implements Updatable, Drawable {
         addToPools();
         group = id;
         setFlags();
+    }
+
+    protected void initSpawnAnimation(int animationFrames) {
+        opacity = 0;
+        SPAWN_FRAMES = animationFrames;
+        spawnFrames = SPAWN_FRAMES;
     }
 
     protected void setCollisionFactors(float absorptionFactor, float pushFactor) {
@@ -116,6 +126,13 @@ public abstract class GameObject implements Updatable, Drawable {
                 delete();
             }
             return;
+        }
+
+        // Spawn opacity
+        spawnFrames = Math.max(0, spawnFrames - 1);
+        if (spawnFrames > 0) {
+            opacity += 1.0f/SPAWN_FRAMES;
+            opacity = Math.min(opacity, 1);  // Ensure opacity does not exceed 1
         }
 
         // Damage animation

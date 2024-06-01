@@ -10,6 +10,7 @@ public class Crasher extends GameObject {
     Vector2 spawnPoint;
     public Crasher(Vector2 pos, boolean isLarge) {
         super(pos, (int) (0.5 * Math.sqrt(2) * (isLarge ? 55 : 35)), 1, DrawPool.BOTTOM);
+        initSpawnAnimation(40);
         spawnPoint = pos;
         group = Polygon.polyGroup;
         this.isLarge = isLarge;
@@ -24,7 +25,7 @@ public class Crasher extends GameObject {
     @Override
     public void updateStats() {
         setCollisionFactors(isLarge ? 0.1f : 2f, isLarge ? 8 : 6);
-        setMaxHealth(isLarge ? 45 : 15);
+        setMaxHealth(isLarge ? 30 : 10);
         setDamage(8 * 25.f / 120);
         scoreReward = isLarge ? 15 : 10;  // 25, 15 on diep, but nerfed in this version
 
@@ -39,6 +40,7 @@ public class Crasher extends GameObject {
         keepInArena = true;
         isProjectile = false;
         isPolygon = true;
+        spawnProtection = false;
     }
 
     @Override

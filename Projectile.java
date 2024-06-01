@@ -22,6 +22,7 @@ public abstract class Projectile extends GameObject {
      */
     public Projectile(Barrel hostBarrel, Vector2 spawnPos, float direction, float diameter, BulletStats bulletStats, Color fillCol, Color strokeCol, int drawLayer, float friction) {
         super(spawnPos, (int) (diameter * 0.5f), 1f, drawLayer);
+        initSpawnAnimation(40);
         this.direction = direction;  // Calculate direction (scatter angle already applied by Barrel.java)
         this.bulletStats = bulletStats;
         this.host = hostBarrel.host;

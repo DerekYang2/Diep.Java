@@ -25,6 +25,7 @@ public class Polygon extends GameObject {
             case Polygon.ALPHA_PENTAGON ->  2.666666 * 145.0/2.2360679775;
             default -> 0;
         }), 1, DrawPool.BOTTOM);
+        initSpawnAnimation(40);
         group = polyGroup;
         isNestPolygon = inNest;
 
@@ -77,6 +78,7 @@ public class Polygon extends GameObject {
         keepInArena = true;
         isProjectile = false;
         isPolygon = true;
+        spawnProtection = false;
     }
 
 

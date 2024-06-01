@@ -862,4 +862,16 @@ public class Graphics extends Raylib {
         float scale = (float)Math.pow(10, precision);
         return Math.round(f * scale) / scale;
     }
+
+    public static void normalize(Vector2 vec) {
+        float length = length(vec);
+        if (length != 0) {
+            vec.x /= length;
+            vec.y /= length;
+        }
+    }
+
+    public static float dot(Vector2 vec1, Vector2 vec2) {
+        return vec1.x * vec2.x + vec1.y * vec2.y;
+    }
 }

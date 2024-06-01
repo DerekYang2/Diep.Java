@@ -176,7 +176,8 @@ public abstract class GameObject implements Updatable, Drawable {
     }
 
     public void addForce(Vector2 force) {
-        vel = Raymath.Vector2Add(vel, force);
+        vel.x += force.x;
+        vel.y += force.y;
     }
 
     public void addForce(float forceMagnitude, float radians) {

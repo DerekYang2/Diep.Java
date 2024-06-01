@@ -15,7 +15,6 @@ public class EnemyTank extends Tank {
 
         // Set upgrade paths
         setUpgradePath(TankBuild.getRandomUpgradePath());
-
         // Set upgrade queue
         for (int i = 0; i < 7; i++)
             statUpgradeQueue.add(Stats.BULLET_PENETRATION);
@@ -42,9 +41,9 @@ public class EnemyTank extends Tank {
         while (usedStatPoints < maxStatPoints && !statUpgradeQueue.isEmpty()) {
             incrementStat(statUpgradeQueue.poll());
         }
-        if (hasUpdate) {  // TODO: fix this fire manager delay
+/*        if (hasUpdate) {  // TODO: fix this fire manager delay
             tankBuild.resetFireManagerDelay();
-        }
+        }*/
     }
 
     // TODO: always draw username in front

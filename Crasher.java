@@ -26,7 +26,7 @@ public class Crasher extends GameObject {
         setCollisionFactors(isLarge ? 0.1f : 2f, isLarge ? 8 : 6);
         setMaxHealth(isLarge ? 45 : 15);
         setDamage(8 * 25.f / 120);
-        scoreReward = isLarge ? 10 : 5;  // 25, 15 on diep, but nerfed in this version
+        scoreReward = isLarge ? 15 : 10;  // 25, 15 on diep, but nerfed in this version
 
         float velocity = 1.414f*(isLarge ? 2.7f : 2.65f);
         baseAcceleration = velocity * (1-friction);

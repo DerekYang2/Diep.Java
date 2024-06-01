@@ -5,7 +5,7 @@ import java.util.HashSet;
 // TODO: auto turret should be auto fire mode, these guys turn too fast, maybe add lock on time
 public class BotController implements Controller {
     Tank host;
-    float moveDir;
+    float targetMoveDir, moveDir, intendedDir;
     boolean shouldFire;
     Barrel frontBarrel;
     public float frontBulletSpeed;
@@ -15,12 +15,13 @@ public class BotController implements Controller {
     final int SAFETY_FRAMES = 120 * 3;  // 3 second
     int safetyFireFrames;  // Extra number of frames to continue firing after target is lost
     Vector2 targetPos;
+    Vector2 extForce = new Vector2(0, 0);
 
     boolean defenseMode = true;
     HashSet<Integer> targetSet;
 
     public BotController() {
-        moveDir = (float) (Math.random() * 2 * Math.PI);
+        targetMoveDir = moveDir = intendedDir = (float) (Math.random() * 2 * Math.PI);
     }
 
     @Override
@@ -126,15 +127,16 @@ public class BotController implements Controller {
 
     @Override
     public float moveDirection() {
-        if (host.getStat(Stats.BODY_DAMAGE) >= 6) {
+/*        if (host.getStat(Stats.BODY_DAMAGE) >= 6) {
             // Bot will chase the player
             Vector2 PlayerPos = Main.player.pos;
             moveDir = (float) Math.atan2(PlayerPos.y - host.pos.y, PlayerPos.x - host.pos.x);
             return moveDir;
-        }
+        }*/
+
         // Bot will bounce around the arena
-        float xComp = (float) Math.cos(moveDir);
-        float yComp = (float) Math.sin(moveDir);
+        float xComp = (float) Math.cos(intendedDir);
+        float yComp = (float) Math.sin(intendedDir);
         if (host.pos.x <= 0) {
             xComp = Math.abs(xComp);
         }
@@ -147,9 +149,80 @@ public class BotController implements Controller {
         if (host.pos.y >= Main.arenaHeight) {
             yComp = -Math.abs(yComp);
         }
-        moveDir = (float) Math.atan2(yComp, xComp);
+        intendedDir = (float) Math.atan2(yComp, xComp);
+
+        if (Main.counter % 2 == 0) {
+            extForce = getExternalForce();
+            Graphics.normalize(extForce);  // Normalize vector (unit vector)
+            extForce.x *= importanceFactor;
+            extForce.y *= importanceFactor;
+            extForce.x += xComp;
+            extForce.y += yComp;
+        }
+
+        targetMoveDir = (float) Math.atan2(extForce.y, extForce.x);
+
+        moveDir = (float) Graphics.angle_lerp(moveDir, targetMoveDir, 0.5f);
         //moveDir = -1;
         return moveDir;
+    }
+
+    float importanceFactor = 0;
+
+    private Vector2 getExternalForce() {
+        Vector2 netForce = new Vector2(0, 0);
+        if (targetSet == null) return netForce;
+
+        // Get closest target
+        float minDistSq = Float.MAX_VALUE;
+        GameObject closestTarget = null;
+
+
+        for (int id : targetSet) {
+            GameObject obj = Main.gameObjectPool.getObj(id);
+            if (obj == null ||  obj.group == host.group) continue;
+            float dist = Graphics.distanceSq(host.pos, obj.pos);
+
+            dist /= obj.getRadiusScaled();  // Larger objects are more important
+            if (obj.isProjectile) dist *= 0.2f;  // Projectiles are more important
+            if (dist < minDistSq) {
+                minDistSq = dist;
+                closestTarget = obj;
+            }
+        }
+
+        if (closestTarget == null) return netForce;
+        float hostVel = Graphics.length(host.vel);
+        float levelFactor = 818.182f * host.level + 3181.82f;
+
+        if (closestTarget.isProjectile) {
+            importanceFactor = 20*levelFactor/(minDistSq + hostVel*hostVel);  // closer proj or slower host, more importance
+            Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);
+            Vector2 perp1 = new Vector2(-distVec.y, distVec.x);  // Perpendicular vector
+            Vector2 perp2 = new Vector2(distVec.y, -distVec.x);  // Perpendicular vector
+            // Dot product with host velocity, take more negative? dot product
+            float dot1 = Graphics.dot(perp1, host.vel);
+            float dot2 = Graphics.dot(perp2, host.vel);
+            if (dot1 < dot2) {
+                // Also add a repulsion force
+                perp1.x -= 2f*distVec.x;
+                perp1.y -= 2f*distVec.y;
+                return perp1;
+            } else {
+                perp2.x -= 2f*distVec.x;
+                perp2.y -= 2f*distVec.y;
+                return perp2;
+            }
+        }
+
+        importanceFactor = levelFactor/(minDistSq + hostVel * hostVel);
+        Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);
+        Vector2 perp1 = new Vector2(-distVec.y, distVec.x);  // Perpendicular vector
+        Vector2 perp2 = new Vector2(distVec.y, -distVec.x);  // Perpendicular vector
+        // Dot product with host velocity, take more positive dot product
+        float dot1 = Graphics.dot(perp1, host.vel);
+        float dot2 = Graphics.dot(perp2, host.vel);
+        return dot1 > dot2 ? perp1 : perp2;
     }
 
     @Override

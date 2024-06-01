@@ -246,8 +246,8 @@ public abstract class GameObject implements Updatable, Drawable {
         float knockbackMagnitude = absorptionFactor * other.pushFactor * scaleFactor;
         float diffY = this.pos.y - other.pos.y, diffX = this.pos.x - other.pos.x;
         if (diffX == 0 && diffY == 0) {  // If objects are perfectly stacked
-            diffX = (float)Math.random() + 0.1f;  // Randomize
-            diffY = (float)Math.random() + 0.1f;
+            diffX = Graphics.randf() + 0.1f;  // Randomize
+            diffY = Graphics.randf() + 0.1f;
         }
         float knockbackAngle = (float) Math.atan2(diffY, diffX);
         addForce(knockbackMagnitude, knockbackAngle);

@@ -109,7 +109,7 @@ public class AutoAim {
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
 
-            if (obj.group == group || obj.isProjectile || obj.isInvisible()) {  // If same group or projectile OR not in view, skip
+            if (obj.group == group || obj.isDead || obj.isProjectile || obj.isInvisible()) {  // If same group or projectile OR not in view, skip
                 continue;
             }
             Rectangle boundingBox = obj.boundingBox();
@@ -164,7 +164,7 @@ public class AutoAim {
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
 
-            if (obj.group == group || obj.isProjectile || Graphics.distanceSq(viewOrigin, obj.pos) > radius * radius || obj.isInvisible()) {  // If same group or projectile OR too far, skip
+            if (obj.group == group || obj.isDead || obj.isProjectile || Graphics.distanceSq(viewOrigin, obj.pos) > radius * radius || obj.isInvisible()) {  // If same group or projectile OR too far, skip
                 continue;
             }
 
@@ -196,7 +196,7 @@ public class AutoAim {
 
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
-            if (obj.group == group || obj.isProjectile || obj.isInvisible()) {  // If same group or projectile OR not in view, skip
+            if (obj.group == group || obj.isDead || obj.isProjectile || obj.isInvisible()) {  // If same group or projectile OR not in view, skip
                 continue;
             }
             Rectangle boundingBox = obj.boundingBox();
@@ -231,7 +231,7 @@ public class AutoAim {
             pos1.y += obj1.vel.y * dT;
             pos2.x += obj2.vel.x * dT;
             pos2.y += obj2.vel.y * dT;
-            if (Graphics.distance(pos1, pos2) < 1.2f*(obj1.getRadiusScaled() + obj2.getRadiusScaled())) {
+            if (Graphics.distance(pos1, pos2) < (obj1.getRadiusScaled() + obj2.getRadiusScaled())) {
                 return true;
             }
         }
@@ -245,7 +245,7 @@ public class AutoAim {
 
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
-            if (obj.group == group || obj.isInvisible() || obj.isPolygon) {  // If same group or projectile OR not in view, skip
+            if (obj.group == group || obj.isDead || obj.isInvisible() || obj.isPolygon) {  // If same group or projectile OR not in view, skip
                 continue;
             }
             Rectangle boundingBox = obj.boundingBox();

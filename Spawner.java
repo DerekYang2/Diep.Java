@@ -21,7 +21,7 @@ public class Spawner {
 
     public static void reset() {
         // Reset nest and crasher zone
-        float nestSide = Main.arenaWidth / 6, crasherSide = nestSide * 2f;
+        float nestSide = Main.arenaWidth / 6.5f, crasherSide = nestSide * 2f;
         nestBox = new Rectangle(Main.arenaWidth/2 - nestSide/2, Main.arenaHeight/2 - nestSide/2, nestSide, nestSide);
         crasherZone = new Rectangle(Main.arenaWidth/2 - crasherSide/2, Main.arenaHeight/2 - crasherSide/2, crasherSide, crasherSide);
 
@@ -54,12 +54,27 @@ public class Spawner {
         count++;  // Increment the count of polygons
     }
 
-    /**
-     * Currently, polygons can even spawn on players, might leave this mechanic, adds additional risk to the nest.
-     */
     public static void spawnNestPolygon() {
-        Vector2 pos = new Vector2(Graphics.randf(nestBox.x, nestBox.x + nestBox.width), Graphics.randf(nestBox.y, nestBox.y + nestBox.height));
-        new Polygon(pos, Math.random() < 0.02 ? Polygon.ALPHA_PENTAGON : Polygon.PENTAGON, true);
+        Vector2 randPos;
+        boolean isOnPlayer;
+
+        // Ensure nest polygons do not spawn on top of players
+        do {
+            randPos = new Vector2(Graphics.randf(nestBox.x, nestBox.x + nestBox.width), Graphics.randf(nestBox.y, nestBox.y + nestBox.height));
+            if (Leaderboard.tankList == null) {
+                isOnPlayer = false;
+            } else {
+                isOnPlayer = false;
+                for (Tank tank : Leaderboard.tankList) {
+                    if (Graphics.distance(randPos, tank.pos) < 173 + tank.getRadiusScaled()) {  // Alpha pentagon radius + tank radius
+                        isOnPlayer = true;
+                        break;
+                    }
+                }
+            }
+        } while (isOnPlayer);
+
+        new Polygon(randPos, Math.random() < 0.02 ? Polygon.ALPHA_PENTAGON : Polygon.PENTAGON, true);
         nestCount++;  // Increment the count of nest polygons
     }
 

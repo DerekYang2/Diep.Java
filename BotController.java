@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 // TODO: auto turret should be auto fire mode, these guys turn too fast, maybe add lock on time
 // TODO: add offensive mode, try out negative fear factors for offensive tanks (triplet, sprayer, etc.)
+// TODO: AI for drone-based tanks
 public class BotController implements Controller {
     Tank host;
     float targetMoveDir, moveDir, intendedDir, bounceDir;
@@ -16,8 +17,11 @@ public class BotController implements Controller {
     final int SAFETY_FRAMES = 120 * 3;  // 3 second
     int safetyFireFrames;  // Extra number of frames to continue firing after target is lost
     Vector2 targetPos, currentPos;
+    GameObject targetObj;
     Vector2 extForce = new Vector2(0, 0);
 
+    int targetLockFrames = 0;
+    final int TARGET_LOCK_TIME = 3;  // 3 frames
     boolean defenseMode = true;
     HashSet<Integer> targetSet;
 
@@ -35,6 +39,7 @@ public class BotController implements Controller {
         reactionWatch.start();
         safetyFireFrames = 0;
     }
+
     @Override
     public void updateTankBuild() {
         frontBarrel = host.tankBuild.getFrontBarrel();
@@ -59,39 +64,50 @@ public class BotController implements Controller {
 
             safetyFireFrames = Math.max(0, safetyFireFrames - 1);  // Decrement safety fire frames
 
-        if (Main.counter % 2 == 0) {
-            updateTarget();
+            if (Main.counter % 2 == 0) {
+                updateTarget();
 
-            if (targetPos != null) {  // If there is a closest target
-                if (reactionWatch.ms() > reactionTime) {  // If reaction time has passed
-                    currentPos.x += (targetPos.x - currentPos.x) * 0.2f;
-                    currentPos.y += (targetPos.y - currentPos.y) * 0.2f;
-                    //shouldFire = Graphics.distanceSq(currentPos, targetPos) < 100 * 100;  // If close enough, fire
-                    shouldFire = true;
-                }
-                safetyFireFrames = SAFETY_FRAMES;  // Set safety fire frames to max
-            } else {
-                if (safetyFireFrames == 0) {  // If safety frames has run out
-                    targetPos = new Vector2(host.pos.x - host.vel.x, host.pos.y - host.vel.y);  // Point backwards to boost
+                if (targetPos != null) {  // If there is a closest target
+                    if (reactionWatch.ms() > reactionTime) {  // If reaction time has passed
+                        currentPos.x += (targetPos.x - currentPos.x) * 0.2f;
+                        currentPos.y += (targetPos.y - currentPos.y) * 0.2f;
+                        //shouldFire = Graphics.distanceSq(currentPos, targetPos) < 100 * 100;  // If close enough, fire
+                        shouldFire = true;
+                    }
+                    safetyFireFrames = SAFETY_FRAMES;  // Set safety fire frames to max
+                } else {
+                    if (safetyFireFrames == 0) {  // If safety frames has run out
+                        targetPos = new Vector2(host.pos.x - host.vel.x, host.pos.y - host.vel.y);  // Point backwards to boost
 
-                    currentPos.x += (targetPos.x - currentPos.x) * 0.2f;
-                    currentPos.y += (targetPos.y - currentPos.y) * 0.2f;
+                        currentPos.x += (targetPos.x - currentPos.x) * 0.2f;
+                        currentPos.y += (targetPos.y - currentPos.y) * 0.2f;
 
-                    shouldFire = false;
-                    reactionWatch.start();  // Restart reaction watch when no target
+                        shouldFire = false;
+                        reactionWatch.start();  // Restart reaction watch when no target
+                    }
                 }
             }
+            direction = (float) Math.atan2(currentPos.y - host.pos.y, currentPos.x - host.pos.x);
+        } else {
+            direction = 0;
         }
-        direction = (float)Math.atan2(currentPos.y - host.pos.y, currentPos.x - host.pos.x);
-    } else {
-        direction = 0;
     }
-}
 
-public void updateTarget() {
+    public void updateTarget() {
         if (defenseMode) {
-            GameObject targetObj = AutoAim.getClosestTargetDefense(targetSet, host, host.getView(), host.group);  // Get closest target unadjusted
-            if (targetObj != null) {
+
+            GameObject newTarg = AutoAim.getClosestTargetDefense(targetSet, host, host.getView(), host.group);  // Get closest target unadjusted
+            if (newTarg != null) {  // If there is a target
+                targetObj = newTarg;
+                targetLockFrames = TARGET_LOCK_TIME;
+            } else {  // If no target
+                targetLockFrames = Math.max(0, targetLockFrames - 1);
+                if (targetLockFrames == 0) {
+                    targetObj = null;  // Reset target
+                }
+            }
+
+            if (targetObj != null) {  // If there is a target
                 targetPos = AutoAim.getAdjustedTarget(targetObj, frontBarrel.getSpawnPoint(), frontBulletSpeed);  // Adjust target position
             } else {  // No defense target, switch to default
                 targetPos = AutoAim.getAdjustedTarget(targetSet, host.pos, frontBarrel.getSpawnPoint(), host.getView(), host.group, frontBulletSpeed);  // Get closest target
@@ -117,17 +133,18 @@ public void updateTarget() {
 
     @Override
     public float barrelDirection() {
-    return direction;
+        return direction;
     }
 
     /**
      * For drones
+     *
      * @return
      */
     @Override
     public Vector2 getTarget() {
         if (targetPos == null) {  // Return host position plus its direction vector
-            float vel = host.radius * host.scale + 20*Graphics.length(host.vel);  // Multiply by some amount so drones stay in front
+            float vel = host.radius * host.scale + 20 * Graphics.length(host.vel);  // Multiply by some amount so drones stay in front
             return new Vector2(host.pos.x + vel * (float) Math.cos(moveDir), host.pos.y + vel * (float) Math.sin(moveDir));
         }
         return targetPos;
@@ -196,7 +213,7 @@ public void updateTarget() {
 
         for (int id : targetSet) {
             GameObject obj = Main.gameObjectPool.getObj(id);
-            if (obj == null ||  obj.group == host.group) continue;
+            if (obj == null || obj.group == host.group) continue;
             float dist = Math.max(250, Graphics.distanceSq(host.pos, obj.pos));
 
             dist /= obj.getRadiusScaled();  // Larger objects are more important
@@ -212,14 +229,14 @@ public void updateTarget() {
         float levelFactor = 818.182f * host.level + 3181.82f;
 
         if (closestTarget.isProjectile) {
-            importanceFactor = 15*levelFactor/(minDistSq + hostVel*hostVel);  // closer proj or slower host, more importance
+            importanceFactor = 15 * levelFactor / (minDistSq + hostVel * hostVel);  // closer proj or slower host, more importance
             Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);
             Vector2 perp1 = new Vector2(-distVec.y, distVec.x);  // Perpendicular vector
             Vector2 perp2 = new Vector2(distVec.y, -distVec.x);  // Perpendicular vector
             // Dot product with host velocity, take more negative? dot product
             float dot1 = Graphics.dot(perp1, host.vel);
             float dot2 = Graphics.dot(perp2, host.vel);
-            final float fearFactor = 1.2f*(45-host.level)/44;
+            final float fearFactor = 1.2f * (45 - host.level) / 44;
             if (dot1 < dot2) {
                 // Also add a repulsion force
                 perp1.x -= fearFactor * distVec.x;
@@ -232,7 +249,7 @@ public void updateTarget() {
             }
         }
 
-        importanceFactor = levelFactor/(minDistSq + hostVel * hostVel);
+        importanceFactor = levelFactor / (minDistSq + hostVel * hostVel);
         Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);
         Vector2 perp1 = new Vector2(-distVec.y, distVec.x);  // Perpendicular vector
         Vector2 perp2 = new Vector2(distVec.y, -distVec.x);  // Perpendicular vector

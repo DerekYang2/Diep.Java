@@ -759,6 +759,10 @@ public class Graphics extends Raylib {
         // Return normalized angle
         return normalizeAngle(fromRadians + (toRadians - fromRadians) * percentage);
     }
+    
+    public static float randf() {
+        return (float) Math.random();
+    }
 
     public static float randf(double min, double max) {
         return (float) (Math.random() * (max - min) + min);

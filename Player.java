@@ -52,7 +52,7 @@ public class Player extends Tank {
 
         // Set upgrade paths
         setUpgradePath(TankBuild.getRandomUpgradePath());
-        //setUpgradePath(new String[]{"twin", "twin flank", "triple twin"});
+        //setUpgradePath(new String[]{"sniper"});
     }
 
     @Override

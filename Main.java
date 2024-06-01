@@ -83,7 +83,7 @@ public class Main {
                     strokeCol = Graphics.PURPLE_STROKE;
                 }
             }
-            Tank t = new EnemyTank(new Vector2((float) Math.random() * arenaWidth, (float) Math.random() * arenaHeight), buildName, fillCol, strokeCol);
+            Tank t = new EnemyTank(new Vector2(Graphics.randf() * arenaWidth, Graphics.randf() * arenaHeight), buildName, fillCol, strokeCol);
             t.group = group;
             if (t.group == 0) t.group = player.group;
         }

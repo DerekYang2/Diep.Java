@@ -53,7 +53,7 @@ public class Main {
         drawablePool.clear();
         gameObjectPool.clear();
         idServer.reset();
-        TextureLoader.clear();
+        //TextureLoader.clear();  // TODO: should this be kept, ram will take a hit
         Leaderboard.clear();
         Spawner.reset();
 

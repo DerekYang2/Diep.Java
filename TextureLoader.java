@@ -70,7 +70,6 @@ public class TextureLoader {
                 Graphics.unloadTexture(texture);
             }
         }
-
         tankTextures.clear();
         iconTextures.clear();
         pendingTankTexture.clear();

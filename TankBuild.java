@@ -223,17 +223,41 @@ public class TankBuild
     public static HashMap<String, JSONObject> tankDefinitions;
     public static String[] buildName = new String[100];  // The build name for a given ID
     public static final String DEFINITIONS_PATH = "config/TankDefinitions.json";
+    public static final HashMap<String, ArrayList<String>> prerequisite = new HashMap<>();
+    public static final ArrayList<String> finalUpgrades = new ArrayList<>();
 
     public static void loadTankDefinitions() {
         tankDefinitions = new HashMap<>();
         try {
             JSONArray jsonArray = new JSONArray(TankBuild.readFile(DEFINITIONS_PATH, Charset.defaultCharset()));
             for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String nameStr = jsonObject.getString("name").trim().toLowerCase();
-                tankDefinitions.put(nameStr, jsonObject);
-                buildName[jsonObject.getInt("id")] = nameStr;  // Store the build name for a given ID
+                JSONObject jsonTank = jsonArray.getJSONObject(i);
+                String nameStr = jsonTank.getString("name").trim().toLowerCase();
+                tankDefinitions.put(nameStr, jsonTank);
+                buildName[jsonTank.getInt("id")] = nameStr;  // Store the build name for a given ID
             }
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonTank = jsonArray.getJSONObject(i);
+                String nameStr = jsonTank.getString("name").trim().toLowerCase();
+
+                if (jsonTank.getInt("levelRequirement") == 45) {  // If the tank is a final upgrade
+                    finalUpgrades.add(nameStr);
+                }
+
+                JSONArray jsonUpgrades = jsonTank.getJSONArray("upgrades");
+                for (int j = 0; j < jsonUpgrades.length(); j++) {
+                    String upgradeName = buildName[jsonUpgrades.getInt(j)];  // Get the upgrade name
+                    if (!prerequisite.containsKey(upgradeName)) {  // If the upgrade name is not in the map, add it
+                        prerequisite.put(upgradeName, new ArrayList<>());
+                    }
+                    prerequisite.get(upgradeName).add(nameStr);  // Add the prerequisite to the upgrade name
+                }
+            }
+
+            // TODO: when tank functionalities added, remove these lines
+            finalUpgrades.remove("necromancer");
+            finalUpgrades.remove("factory");
         } catch (IOException e) {
             System.out.println("Error reading TankDefinitions.json: " + e.getMessage());
         }
@@ -319,20 +343,25 @@ public class TankBuild
     }
 
     public static Queue<Pair<String, Integer>> getRandomUpgradePath() {
-        Queue<Pair<String, Integer>> upgradePath = new LinkedList<>();
-        Pair<String, Integer> currentTank = new Pair<>("tank", 1);
-        do {
-            JSONObject jsonTank = tankDefinitions.get(currentTank.first);
-            JSONArray jsonUpgrades = jsonTank.getJSONArray("upgrades");
+        ArrayList<Pair<String, Integer>> upgradePath = new ArrayList<>();
 
-            int randId = jsonUpgrades.getInt(Graphics.randInt(0, jsonUpgrades.length()));
-            String upgradeName = buildName[randId];
+        String randFinal = finalUpgrades.get(Graphics.randInt(0, finalUpgrades.size()));
+        Pair<String, Integer> currentTank = new Pair<>(randFinal, 45);
+        upgradePath.add(currentTank);
 
-            currentTank = new Pair<>(upgradeName, getLevelRequirement(upgradeName));
+        while (!currentTank.first.equals("tank")) {
+            ArrayList<String> preBuilds = prerequisite.get(currentTank.first);
+            String preBuild = preBuilds.get(Graphics.randInt(0, preBuilds.size()));
+
+            currentTank = new Pair<>(preBuild, getLevelRequirement(preBuild));
             upgradePath.add(currentTank);
-        } while (currentTank.second < 45);
+        }
 
-        return upgradePath;
+        Queue<Pair<String, Integer>> upgradeQueue  = new LinkedList<>();
+        for (int i = upgradePath.size() - 1; i >= 0; i--) {  // Add the upgrade path in reverse order
+            upgradeQueue.add(upgradePath.get(i));
+        }
+        return upgradeQueue;
     }
 
     public static int getLevelRequirement(String name) {

@@ -137,6 +137,9 @@ public class Tank extends GameObject {
         if (newLevel != level) {
             level = newLevel;
             updateStats();
+            if (level == 45) {
+                updateStatFrames = 120;
+            }
         }
     }
 
@@ -154,7 +157,7 @@ public class Tank extends GameObject {
             stats.setStat(statEnum, stats.getStat(statEnum) + 1);
             usedStatPoints++;
             if (statEnum == Stats.RELOAD) {
-                updateStatFrames = tankBuild.fireManager.getNextFireFrames();
+                updateStatFrames = Math.max(1, tankBuild.fireManager.getNextFireFrames()-1);
                 resetFireDelay = false;
             }
         }

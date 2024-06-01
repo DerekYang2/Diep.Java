@@ -56,13 +56,13 @@ public class Polygon extends GameObject {
             }
             case Polygon.PENTAGON -> {
                 setCollisionFactors(0.5f, 11);
-                setMaxHealth(100);
+                setMaxHealth(130);  // 100, buffed to 130
                 setDamage(12 * 25.f/120);
                 scoreReward = 130;
             }
             case Polygon.ALPHA_PENTAGON -> {
                 setCollisionFactors(0.05f, 11);
-                setMaxHealth(3000);
+                setMaxHealth(4000);  // 3000, but buffed
                 setDamage(20 * 25.f/120);
                 scoreReward = 3000;
             }

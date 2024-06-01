@@ -218,15 +218,24 @@ public class AutoAim {
 
     public static boolean willCollide(GameObject obj1, GameObject obj2) {
         // TODO: custom case when vel.x is close to 0
-        double m1 = obj1.vel.y/obj1.vel.x, m2 = obj2.vel.y/obj2.vel.x;
-        double b1 = -m1* obj1.pos.x + obj1.pos.y, b2 = -m2 * obj2.pos.x + obj2.pos.y;
+        float m1 = obj1.vel.y/obj1.vel.x, m2 = obj2.vel.y/obj2.vel.x;
+        float b1 = -m1* obj1.pos.x + obj1.pos.y, b2 = -m2 * obj2.pos.x + obj2.pos.y;
 
-        double x = (b2 - b1) / (m1 - m2);
-        double t = (x - obj1.pos.x) / obj1.vel.x;  // Time to collision
-        if (2*t <= Graphics.FPS) return false;
-        Vector2 pos1 = new Vector2((float) (obj1.pos.x + obj1.vel.x * t), (float) (obj1.pos.y + obj1.vel.y * t));
-        Vector2 pos2 = new Vector2((float) (obj2.pos.x + obj2.vel.x * t), (float) (obj2.pos.y + obj2.vel.y * t));
-        return Graphics.distance(pos1, pos2) < 1.2f*(obj1.getRadiusScaled() + obj2.getRadiusScaled());
+        float x = (b2 - b1) / (m1 - m2);
+        float T = (x - obj1.pos.x) / obj1.vel.x;  // Time to collision
+        float dT = 60;
+        Vector2 pos1 = new Vector2(obj1.pos.x + obj1.vel.x * (T-3*dT), obj1.pos.y + obj1.vel.y * (T-3*dT));
+        Vector2 pos2 = new Vector2(obj2.pos.x + obj2.vel.x * (T-3*dT), obj2.pos.y + obj2.vel.y * (T-3*dT));
+        for (int i = 0; i < 5; i++) {
+            pos1.x += obj1.vel.x * dT;
+            pos1.y += obj1.vel.y * dT;
+            pos2.x += obj2.vel.x * dT;
+            pos2.y += obj2.vel.y * dT;
+            if (Graphics.distance(pos1, pos2) < 1.2f*(obj1.getRadiusScaled() + obj2.getRadiusScaled())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static GameObject getClosestTargetDefense(HashSet<Integer> targets, GameObject sourceObj, Rectangle view, int group) {

@@ -156,7 +156,7 @@ public class BotController implements Controller {
         }*/
 
         // Bot will go towards the center of the map (for now)
-        if (false && host.level < 45) {
+        if (host.level < 45) {
             intendedDir = (float) Math.atan2(Main.arenaHeight / 2 - host.pos.y, Main.arenaWidth / 2 - host.pos.x);
         } else {
             String buildName = host.tankBuild.name;
@@ -252,35 +252,40 @@ public class BotController implements Controller {
 
         if (closestTarget == null) return netForce;
         float objRad = closestTarget.getRadiusScaled();
-        float levelFactor = (float) (Math.sqrt(Graphics.length(host.vel)) * 500 * objRad); /*818.182f * host.level + 3181.82f*/;
+        float levelFactor = (float) (Math.sqrt(Graphics.length(host.vel)) * 800 * objRad); /*818.182f * host.level + 3181.82f*/;
 
         if (closestTarget.isProjectile) {
             importanceFactor = levelFactor/minDistSq;  // closer proj or slower host, more importance
-            Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);
-            Vector2 perp1 = new Vector2(-distVec.y, distVec.x);  // Perpendicular vector
-            Vector2 perp2 = new Vector2(distVec.y, -distVec.x);  // Perpendicular vector
-            // Dot product with host velocity, take more negative? dot product
-            float dot1 = Graphics.dot(perp1, host.vel);
-            float dot2 = Graphics.dot(perp2, host.vel);
+            Vector2 repelVec = new Vector2(host.pos.x - closestTarget.pos.x, host.pos.y - closestTarget.pos.y);  // Vector from projectile to host
+            Graphics.normalize(repelVec);
 
-            float fearFactor = 1.f * (45 - host.level) / 44;
+            Vector2 perp1 = new Vector2(-closestTarget.vel.y, closestTarget.vel.x);  // Perpendicular vector of projectile vel
+            Vector2 perp2 = new Vector2(closestTarget.vel.y, -closestTarget.vel.x);  // Perpendicular vector of projectile vel
+            Graphics.normalize(perp1);
+            Graphics.normalize(perp2);
+            // Dot product with repelVec, take more positive dot product
+            float dot1 = Graphics.dot(perp1, repelVec);
+            float dot2 = Graphics.dot(perp2, repelVec);
 
-            if (dot1 < dot2) {
+            float fearFactor = 0.707f * (0.4f * (45 - host.level) / 44 + 0.1f);
+/** 1.f * (45 - host.level) / 44*/
+            if (dot1 > dot2) {
                 // Also add a repulsion force
-                perp1.x -= fearFactor * distVec.x;
-                perp1.y -= fearFactor * distVec.y;
+                perp1.x += fearFactor * repelVec.x;
+                perp1.y += fearFactor * repelVec.y;
                 return perp1;
             } else {
-                perp2.x -= fearFactor * distVec.x;
-                perp2.y -= fearFactor * distVec.y;
+                perp2.x += fearFactor * repelVec.x;
+                perp2.y += fearFactor * repelVec.y;
                 return perp2;
             }
         }
 
         importanceFactor = levelFactor / (minDistSq);
-/*        if (Main.counter % 20 == 0)
-            Main.debugText = String.valueOf(importanceFactor);*/
+        if (Main.counter % 20 == 0)
+            Main.debugText = String.valueOf(importanceFactor);
         Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);
+        Graphics.normalize(distVec);
         Vector2 perp1 = new Vector2(-distVec.y, distVec.x);  // Perpendicular vector
         Vector2 perp2 = new Vector2(distVec.y, -distVec.x);  // Perpendicular vector
         // Dot product with host velocity, take more positive dot product

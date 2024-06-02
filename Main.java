@@ -28,7 +28,7 @@ public class Main {
         pendingReset = true;
         lastReset.start();
     }
-
+    static String debugText = "";
     // TEMP: Debugging/analysis
     static float percentage;
     static Stopwatch stopwatch = new Stopwatch();
@@ -49,7 +49,7 @@ public class Main {
     }
 
     public static void startGame() {
-        int spawn = 50;
+        int spawn = 1;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         System.out.println("Arena size: " + arenaWidth + "x" + arenaHeight);
@@ -235,7 +235,7 @@ public class Main {
 
     private static void drawDeathScreen() {
         Graphics.drawRectangle(0, 0, Graphics.cameraWidth, Graphics.cameraHeight, Graphics.rgba(0, 0, 0, Math.min(100, deathScreenFrames)));
-        Graphics.drawTextCenteredOutline("You were killed by:", Graphics.cameraWidth/2, Graphics.cameraHeight/2 - 35, 30, -4, Color.WHITE);
+        Graphics.drawTextCenteredOutline("You were killed by:", Graphics.cameraWidth/2, Graphics.cameraHeight/2 - 35, 30, -5, Color.WHITE);
         Graphics.drawTextCenteredOutline(NameGenerator.formatNameCase(killerName), Graphics.cameraWidth/2, Graphics.cameraHeight/2, 50, -5, Color.WHITE);
     }
 
@@ -279,6 +279,7 @@ public class Main {
             drawGrid();
             if (Graphics.PERFORMANCE_MODE == 1 && deathScreenFrames == 0) player.drawUpgradeBars();
             //Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
+            if (!debugText.isEmpty()) Graphics.drawText(debugText, 10, 30, 20, Color.WHITE);
             Graphics.beginCameraMode();
             drawBounds();
             draw();  // Main draw function

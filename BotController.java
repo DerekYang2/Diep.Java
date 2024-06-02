@@ -52,11 +52,10 @@ public class BotController implements Controller {
 
     @Override
     public void update() {
+        if (Main.counter % 2 == 0) {
+            targetSet = CollisionManager.queryBoundingBox(host.getView());
+        }
         if (frontBarrel != null) {
-
-            if (Main.counter % 2 == 0) {
-                targetSet = CollisionManager.queryBoundingBox(host.getView());
-            }
 
             safetyFireFrames = Math.max(0, safetyFireFrames - 1);  // Decrement safety fire frames
 
@@ -157,7 +156,7 @@ public class BotController implements Controller {
         }*/
 
         // Bot will go towards the center of the map (for now)
-        if (host.level < 45) {
+        if (false && host.level < 45) {
             intendedDir = (float) Math.atan2(Main.arenaHeight / 2 - host.pos.y, Main.arenaWidth / 2 - host.pos.x);
         } else {
             String buildName = host.tankBuild.name;
@@ -213,6 +212,8 @@ public class BotController implements Controller {
 
     float importanceFactor = 0;
 
+    // TODO: if trapped against wall, swap dot1 and dot2 and remove fear factor
+
     private Vector2 getExternalForce() {
         Vector2 netForce = new Vector2(0, 0);
         if (targetSet == null) return netForce;
@@ -224,14 +225,16 @@ public class BotController implements Controller {
         // Get closest tank
         float minDistTankSq = Float.MAX_VALUE;
         closestTank = null;
-
         for (int id : targetSet) {
             GameObject obj = Main.gameObjectPool.getObj(id);
             if (obj == null || obj.group == host.group) continue;
-            float dist = Math.max(250, Graphics.distanceSq(host.pos, obj.pos));
+            float dist = Graphics.distance(host.pos, obj.pos);
+            float totRad = host.getRadiusScaled() + obj.getRadiusScaled();
 
-            dist /= obj.getRadiusScaled();  // Larger objects are more important
-            if (obj.isProjectile) dist *= 0.1f;  // Projectiles are more important
+            if (obj.isProjectile) {
+                dist /= ((Projectile)obj).getMaxSpeed();  // Projectiles are more important
+            }
+            dist = (dist - totRad) * (dist - totRad);
             if (dist < minDistSq) {
                 minDistSq = dist;
                 closestTarget = obj;
@@ -248,11 +251,11 @@ public class BotController implements Controller {
         }
 
         if (closestTarget == null) return netForce;
-        float hostVel = Graphics.length(host.vel);
-        float levelFactor = 818.182f * host.level + 3181.82f;
+        float objRad = closestTarget.getRadiusScaled();
+        float levelFactor = (float) (Math.sqrt(Graphics.length(host.vel)) * 500 * objRad); /*818.182f * host.level + 3181.82f*/;
 
         if (closestTarget.isProjectile) {
-            importanceFactor = 17 * levelFactor / (minDistSq + hostVel * hostVel);  // closer proj or slower host, more importance
+            importanceFactor = levelFactor/minDistSq;  // closer proj or slower host, more importance
             Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);
             Vector2 perp1 = new Vector2(-distVec.y, distVec.x);  // Perpendicular vector
             Vector2 perp2 = new Vector2(distVec.y, -distVec.x);  // Perpendicular vector
@@ -260,8 +263,7 @@ public class BotController implements Controller {
             float dot1 = Graphics.dot(perp1, host.vel);
             float dot2 = Graphics.dot(perp2, host.vel);
 
-            float fearFactor = 1.1f * (45 - host.level) / 44 + 0.5f;
-            if (host.tankBuild.name.equals("triplet")) fearFactor = -0.5f;
+            float fearFactor = 1.f * (45 - host.level) / 44;
 
             if (dot1 < dot2) {
                 // Also add a repulsion force
@@ -275,7 +277,9 @@ public class BotController implements Controller {
             }
         }
 
-        importanceFactor = levelFactor / (minDistSq + hostVel * hostVel);
+        importanceFactor = levelFactor / (minDistSq);
+/*        if (Main.counter % 20 == 0)
+            Main.debugText = String.valueOf(importanceFactor);*/
         Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);
         Vector2 perp1 = new Vector2(-distVec.y, distVec.x);  // Perpendicular vector
         Vector2 perp2 = new Vector2(distVec.y, -distVec.x);  // Perpendicular vector

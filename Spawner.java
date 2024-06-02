@@ -3,7 +3,7 @@ import com.raylib.java.shapes.Rectangle;
 
 public class Spawner {
     public static int count = 0, nestCount = 0, crasherCount = 0;  // Current amount of polygons
-    public static int polygonAmount = 0, pentagonNestAmount = 0, crasherAmount = 0;  // Target amount of polygons
+    public static int polygonAmount = 0, pentagonNestAmount = 0, crasherAmount = 0, alphaCount = 0;  // Target amount of polygons
     public static Rectangle nestBox, crasherZone;
 
     // Static polygon spawning methods ---------------------------------------------------------------------------------
@@ -32,6 +32,7 @@ public class Spawner {
         count = 0;
         nestCount = 0;
         crasherCount = 0;
+        alphaCount = 0;
     }
 
     public static void spawnRandomPolygon() {
@@ -73,9 +74,11 @@ public class Spawner {
                 }
             }
         } while (isOnPlayer);
-
-        new Polygon(randPos, Math.random() < 0.02 ? Polygon.ALPHA_PENTAGON : Polygon.PENTAGON, true);
+        boolean isAlpha = Math.random() < 0.02;
+        if (alphaCount >= 5) isAlpha = false;  // Limit the amount of alpha pentagons to 5
+        new Polygon(randPos, isAlpha ? Polygon.ALPHA_PENTAGON : Polygon.PENTAGON, true);
         nestCount++;  // Increment the count of nest polygons
+        if (isAlpha) alphaCount++;  // Increment the count of alpha pentagons
     }
 
     // Spawn between the crasher zone, or rectangle with a rectangular hole (pentagon nest) in the middle

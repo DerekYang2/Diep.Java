@@ -142,6 +142,9 @@ public class Polygon extends GameObject {
         super.delete();
         if (isNestPolygon) {
             Spawner.nestCount--;
+            if (username.equals(Polygon.ALPHA_PENTAGON)) {
+                Spawner.alphaCount--;
+            }
         } else {
             Spawner.count--;
         }

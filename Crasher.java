@@ -86,4 +86,13 @@ public class Crasher extends GameObject {
         super.delete();
         Spawner.crasherCount--;
     }
+
+    @Override
+    public void updateVictim(GameObject victim) {
+        super.updateVictim(victim);
+        if (victim == Main.player) {  // If killed player
+            Main.cameraHost = this;
+            Main.killerName = username;
+        }
+    }
 }

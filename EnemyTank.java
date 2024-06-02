@@ -58,4 +58,13 @@ public class EnemyTank extends Tank {
             Graphics.drawTextCenteredOutline(username, (int) pos.x, (int) (yPos - usernameFont * 0.8f * 0.5f), (int) usernameFont, -8.f, Graphics.colAlpha(Color.WHITE, 0.75f));
         }
     }
+
+    @Override
+    public void updateVictim(GameObject victim) {
+        super.updateVictim(victim);
+        if (victim == Main.player) {  // If killed player
+            Main.cameraHost = this;
+            Main.killerName = username;
+        }
+    }
 }

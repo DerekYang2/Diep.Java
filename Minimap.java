@@ -10,6 +10,7 @@ public class Minimap {
     }
 
     public static void draw() {
+        if (Main.deathScreenFrames > 0) return;
         float inverseZoom = 1.f / Graphics.getCameraZoom();
         float strokeWidth = 5;
         float miniX = Graphics.cameraWidth - miniMapSize - strokeWidth - PADDING, miniY = Graphics.cameraHeight - strokeWidth - miniMapSize - PADDING;

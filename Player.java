@@ -1,6 +1,4 @@
 import com.raylib.java.core.Color;
-import com.raylib.java.core.input.Keyboard;
-import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.text.rText;
 
@@ -12,7 +10,6 @@ import static com.raylib.java.core.input.Keyboard.*;
 public class Player extends Tank {
     float currentZoom;
     float targetZoom;
-    Vector2 cameraTarget;
     Stopwatch levelUpWatch = new Stopwatch();
 
     // Variables for HUD
@@ -40,7 +37,6 @@ public class Player extends Tank {
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         initTankBuild(TankBuild.createTankBuild(buildName));
         currentZoom = targetZoom;  // Spawn with right zoom level
-        cameraTarget = pos;
         Graphics.setZoom(currentZoom);  // Set zoom level
         initBars();
 
@@ -52,7 +48,7 @@ public class Player extends Tank {
 
         // Set upgrade paths
         setUpgradePath(TankBuild.getRandomUpgradePath());
-        //setUpgradePath(new String[]{"sniper"});
+        setUpgradePath(new String[]{"triplet"});
     }
 
     @Override
@@ -134,30 +130,6 @@ public class Player extends Tank {
         return (float) ((.55f * this.tankBuild.fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f));
     }
 
-    public void updateCamera() {
-        if (tankBuild.zoomAbility && controller.holdSpecial()) {
-            if (controller.pressSpecial()) {  // Only update target if the button is pressed
-                // TODO: check if predator zoom amount is right
-                cameraTarget = new Vector2((float) (Math.cos(direction) * 1000 * scale + pos.x), (float) (Math.sin(direction) * 1000 * scale + pos.y));
-            }
-        } else {
-            cameraTarget = pos;
-        }
-
-        Vector2 difference = Raymath.Vector2Subtract(cameraTarget, Graphics.getCameraTarget());
-        Graphics.shiftCameraTarget(Graphics.scale(difference, 0.05f));
-
-        // Zoom in and out feature (beta testing)
-        float delta = Graphics.getCameraZoom()/100;
-        if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() - delta);
-        }
-        if (Graphics.isKeyDown(Keyboard.KEY_UP)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() + delta);
-        }
-        // Cap the zoom level
-        Graphics.setCameraZoom(Math.max(0.1f, Math.min(10f, Graphics.getCameraZoom())));
-    }
 
     @Override
     public void update() {
@@ -167,7 +139,6 @@ public class Player extends Tank {
             currentZoom += (targetZoom - currentZoom) * 0.05f;
             Graphics.setZoom(currentZoom);
         }
-        updateCamera();
 
         if (pos.x > Main.ARENA_PADDING && !startedRace) {
             System.out.println("Started");
@@ -362,7 +333,7 @@ public class Player extends Tank {
     public void delete() {
         super.delete();
         levelBar.delete();
-        Main.resetGame();
+        Main.deathScreenFrames = 1;  // Begin death screen
     }
 
     public void drawUpgradeBars() {

@@ -1,5 +1,6 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.core.input.Keyboard;
+import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
@@ -10,11 +11,15 @@ public class Main {
     public final static float ARENA_PADDING = GRID_SIZE * 4;
 
     public static long counter = 0;
+    public static int deathScreenFrames = 0;
     public static DrawPool drawablePool;
     public static HashPool<GameObject> gameObjectPool;
     public static IdServer idServer;
     public static Stopwatch globalClock;
-    static Player player;
+    public static Player player;
+    public static GameObject cameraHost;
+    public static Vector2 cameraTarget;
+    public static String killerName;
 
     // Variables for game reset
     static Stopwatch lastReset = new Stopwatch();  // For resetting the game
@@ -56,7 +61,7 @@ public class Main {
         //TextureLoader.clear();  // TODO: should this be kept, ram will take a hit
         Leaderboard.clear();
         Spawner.reset();
-
+        deathScreenFrames = 0;
         // new TestObj();
         player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank");
         for (int i = 0; i < spawn; i++) {
@@ -88,7 +93,10 @@ public class Main {
             if (t.group == 0) t.group = player.group;
         }
 
-        Graphics.setCameraTarget(player.pos);
+        // Initialize camera
+        cameraHost = player;
+        cameraTarget = player.pos;
+        Graphics.setCameraTarget(cameraTarget);
         cameraBox = Graphics.getCameraWorld();
         //counter = 0;
     }
@@ -120,11 +128,42 @@ public class Main {
             gameObject.update();
         }
 
+        updateCamera();
+
         if (Main.counter % 120 == 0) {
             percentage = 100 * (float) stopwatch.ms() / (1000.f/120);  // Time taken / max time allowed
         }
 
         cameraBox = Graphics.getCameraWorld();
+    }
+
+    public static void updateCamera() {
+        if (cameraHost == player) {
+            if (player.tankBuild.zoomAbility && player.controller.holdSpecial()) {
+                if (player.controller.pressSpecial()) {  // Only update target if the button is pressed
+                    // TODO: check if predator zoom amount is right
+                    cameraTarget = new Vector2((float) (Math.cos(player.direction) * 1000 * player.scale + player.pos.x), (float) (Math.sin(player.direction) * 1000 * player.scale + player.pos.y));
+                }
+            } else {
+                cameraTarget = player.pos;
+            }
+        } else {
+            cameraTarget = cameraHost.pos;
+        }
+
+        Vector2 difference = Raymath.Vector2Subtract(cameraTarget, Graphics.getCameraTarget());
+        Graphics.shiftCameraTarget(Graphics.scale(difference, 0.05f));
+
+        // Zoom in and out feature (beta testing)
+        float delta = Graphics.getCameraZoom()/100;
+        if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
+            Graphics.setCameraZoom(Graphics.getCameraZoom() - delta);
+        }
+        if (Graphics.isKeyDown(Keyboard.KEY_UP)) {
+            Graphics.setCameraZoom(Graphics.getCameraZoom() + delta);
+        }
+        // Cap the zoom level
+        Graphics.setCameraZoom(Math.max(0.1f, Math.min(10f, Graphics.getCameraZoom())));
     }
 
     private static void drawGrid() {
@@ -194,6 +233,12 @@ public class Main {
         drawablePool.drawAll();
     }
 
+    private static void drawDeathScreen() {
+        Graphics.drawRectangle(0, 0, Graphics.cameraWidth, Graphics.cameraHeight, Graphics.rgba(0, 0, 0, Math.min(100, deathScreenFrames)));
+        Graphics.drawTextCenteredOutline("You were killed by:", Graphics.cameraWidth/2, Graphics.cameraHeight/2 - 35, 30, -4, Color.WHITE);
+        Graphics.drawTextCenteredOutline(NameGenerator.formatNameCase(killerName), Graphics.cameraWidth/2, Graphics.cameraHeight/2, 50, -5, Color.WHITE);
+    }
+
     public static void main(String[] args) {
         initialize();
         //--------------------------------------------------------------------------------------
@@ -206,15 +251,22 @@ public class Main {
                 startGame();
                 pendingReset = false;
             }
+            if (deathScreenFrames > 0) {  // If animation is playing
+                deathScreenFrames++;
+            }
             for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
                 // Compute required framebuffer scaling
                 Graphics.updateMouse();
                 update();
-                Minimap.update();
-                player.updateUpgradeBars();
+                if (deathScreenFrames == 0) {
+                    Minimap.update();
+                    player.updateUpgradeBars();
+                }
             }
             Leaderboard.update();
-            player.updateBars();
+            if (deathScreenFrames == 0) {
+                player.updateBars();
+            }
 
             TextureLoader.refreshTankTextures();
             // Draw
@@ -225,20 +277,26 @@ public class Main {
             //Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
             //Graphics.drawText(String.format("Score: %d\tLevel: %d", (int)player.score, (int)player.level), 10, 60, 20, Color.BLACK);
             drawGrid();
-            if (Graphics.PERFORMANCE_MODE == 1) player.drawUpgradeBars();
+            if (Graphics.PERFORMANCE_MODE == 1 && deathScreenFrames == 0) player.drawUpgradeBars();
             //Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
             Graphics.beginCameraMode();
             drawBounds();
             draw();  // Main draw function
             //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(the0, 0), Math.PI/4, 1, Color.WHITE);
             Minimap.draw();
-            player.drawKillQueue();
+            if (deathScreenFrames == 0) player.drawKillQueue();
             Graphics.drawFPS(Graphics.getScreenToWorld2D(new Vector2(10, 10), Graphics.camera), (int)(20/Graphics.getCameraZoom()), Color.WHITE);
             Graphics.endCameraMode();
-            if (Graphics.PERFORMANCE_MODE == 0) player.drawUpgradeBars();
+            if (Graphics.PERFORMANCE_MODE == 0 && deathScreenFrames == 0) player.drawUpgradeBars();
             Graphics.endTextureMode();
 
-            if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) == 0) {  // Every other frame
+            if (deathScreenFrames > 0) {
+                Graphics.beginUITexture();
+                Graphics.rlj.core.ClearBackground(Graphics.rgba(0, 0, 0, 0));  // Only clear on leaderboard refresh
+                Leaderboard.draw();
+                drawDeathScreen();
+                Graphics.endTextureMode();
+            } else if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) == 0) {  // Every other frame
                 Graphics.beginUITexture();
                 if (Main.counter % Graphics.FPS == 0) {
                     Graphics.rlj.core.ClearBackground(Graphics.rgba(0, 0, 0, 0));  // Only clear on leaderboard refresh

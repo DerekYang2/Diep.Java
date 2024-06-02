@@ -2,7 +2,7 @@ import com.raylib.java.raymath.Vector2;
 
 public class LeaderPointer {
     public static double direction = 0, targetDirection = 0;
-    private static Tank leader;
+    public static Tank leader;
 
     public static void update() {
         leader = Leaderboard.getTankRank(0);

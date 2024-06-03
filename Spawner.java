@@ -1,13 +1,20 @@
+import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
 public class Spawner {
-    public static int count = 0, nestCount = 0, crasherCount = 0;  // Current amount of polygons
-    public static int polygonAmount = 0, pentagonNestAmount = 0, crasherAmount = 0, alphaCount = 0;  // Target amount of polygons
+    public static int count = 0, nestCount = 0, crasherCount = 0, alphaCount = 0;  // Current amount of object
+    public static int[] enemyCount = {0, 0, 0, 0}, enemyAmount = {12, 12, 12, 12};
+    public static int polygonAmount = 0, pentagonNestAmount = 0, crasherAmount = 0;  // Target amount of polygons
     public static Rectangle nestBox, crasherZone;
 
     // Static polygon spawning methods ---------------------------------------------------------------------------------
     public static void updateSpawn() {
+        for (int team = 0; team < enemyAmount.length; team++) {
+            while (enemyCount[team] < enemyAmount[team]) {
+                spawnRandomEnemy(team);
+            }
+        }
         while (count < polygonAmount) {
             spawnRandomPolygon();
         }
@@ -33,6 +40,52 @@ public class Spawner {
         nestCount = 0;
         crasherCount = 0;
         alphaCount = 0;
+        for (int i = 0; i < enemyAmount.length; i++) {
+            enemyCount[i] = 0;
+        }
+    }
+
+    public static int getTeam(int group) {
+        if (group == Main.player.group) return 0;
+        return -group;
+    }
+
+    public static int getGroup(int team) {
+        if (team == 0) return Main.player.group;
+        return -team;
+    }
+
+    public static void spawnRandomEnemy(int team) {
+        Color fillCol, strokeCol;
+
+        switch (team) {
+            case 0 -> {
+                fillCol = Graphics.BLUE;
+                strokeCol = Graphics.BLUE_STROKE;
+            }
+            case 1 -> {
+                fillCol = Graphics.RED;
+                strokeCol = Graphics.RED_STROKE;
+            }
+            case 2 -> {
+                fillCol = Graphics.GREEN;
+                strokeCol = Graphics.GREEN_STROKE;
+            }
+            default -> {
+                fillCol = Graphics.PURPLE;
+                strokeCol = Graphics.PURPLE_STROKE;
+            }
+        }
+
+        // Generate position outside of crasher zone
+        Vector2 randPos;
+        do {
+            randPos = new Vector2(Graphics.randf(0, Main.arenaWidth), Graphics.randf(0, Main.arenaHeight));
+        } while (Graphics.isIntersecting(randPos, Spawner.crasherZone));
+
+        Tank t = new EnemyTank(randPos, "tank", fillCol, strokeCol);
+        t.group = getGroup(team);
+        enemyCount[team]++;
     }
 
     public static void spawnRandomPolygon() {

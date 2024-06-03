@@ -259,7 +259,7 @@ public class BotController implements Controller {
 
         if (closestTarget == null) return netForce;
         float objRad = closestTarget.getRadiusScaled();
-        float levelFactor = (float) (Math.sqrt(Graphics.length(host.vel)) * 750 * objRad); /*818.182f * host.level + 3181.82f*/;
+        float levelFactor = (float) (Math.sqrt(Graphics.length(host.vel)) * 750 * objRad * (1 - (confidence + teamConfidence) * 0.5f)); /*818.182f * host.level + 3181.82f*/;
         importanceFactor = levelFactor / minDistSq;  // closer proj or slower host, more importance
 
         if (closestTarget.isProjectile) {
@@ -273,7 +273,7 @@ public class BotController implements Controller {
             // Dot product with repelVec, take more positive dot product (perp vector more aligned with repelVec)
             float dot1 = Graphics.dot(perp1, repelVec), dot2 = Graphics.dot(perp2, repelVec);
 
-            float fearFactor = 0.707f * (Math.max(0.4f * (45 - host.level) / 44 + 0.1f - teamConfidence, 0)) - confidence;  // Higher level, less fear
+            float fearFactor = 0.707f * (Math.max(0.4f * (45 - host.level) / 44 - teamConfidence - confidence, 0) + 0.1f);  // Higher level, less fear
             // Also add a repulsion force scaled by fear
             if (dot1 > dot2) {
                 perp1.x += fearFactor * repelVec.x;

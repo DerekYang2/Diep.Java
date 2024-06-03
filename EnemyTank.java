@@ -67,4 +67,10 @@ public class EnemyTank extends Tank {
             Main.killerName = username;
         }
     }
+
+    @Override
+    public void delete() {
+        super.delete();
+        Spawner.enemyCount[Spawner.getTeam(group)]--;  // Decrement enemy count
+    }
 }

@@ -64,41 +64,6 @@ public class Main {
         deathScreenFrames = 0;
         // new TestObj();
         player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank");
-        for (int i = 0; i < spawn; i++) {
-            String buildName;
-            //buildName = TankBuild.getRandomBuildName();
-            buildName = "tank";
-            int group = -Graphics.randInt(0, 4);
-            Color fillCol, strokeCol;
-            switch (group) {
-                case 0 -> {
-                    fillCol = Graphics.BLUE;
-                    strokeCol = Graphics.BLUE_STROKE;
-                }
-                case -1 -> {
-                    fillCol = Graphics.RED;
-                    strokeCol = Graphics.RED_STROKE;
-                }
-                case -2 -> {
-                    fillCol = Graphics.GREEN;
-                    strokeCol = Graphics.GREEN_STROKE;
-                }
-                default -> {
-                    fillCol = Graphics.PURPLE;
-                    strokeCol = Graphics.PURPLE_STROKE;
-                }
-            }
-
-            // Generate position outside of crasher zone
-            Vector2 randPos;
-            do {
-                randPos = new Vector2(Graphics.randf(0, Main.arenaWidth), Graphics.randf(0, Main.arenaHeight));
-            } while (Graphics.isIntersecting(randPos, Spawner.crasherZone));
-
-            Tank t = new EnemyTank(randPos, buildName, fillCol, strokeCol);
-            t.group = group;
-            if (t.group == 0) t.group = player.group;
-        }
 
         // Initialize camera
         cameraHost = player;

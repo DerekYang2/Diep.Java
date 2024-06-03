@@ -42,6 +42,8 @@ public class Leaderboard {
     public static void update() {
         if (Main.counter % Graphics.FPS != 0) return;  // Only update every second
         tankList.clear();  // Clear tankList
+        // Remove null items from tankIds
+        tankIds.removeIf(id -> Main.gameObjectPool.getObj(id) == null);
         tankIds.forEach(id -> tankList.add((Tank) Main.gameObjectPool.getObj(id)));  // Fill tankList with tanks from tankIds
         tankList.sort((tankA, tankB) -> Float.compare(tankB.score, tankA.score));  // Sort by greatest to least score
 

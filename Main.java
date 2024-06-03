@@ -88,7 +88,14 @@ public class Main {
                     strokeCol = Graphics.PURPLE_STROKE;
                 }
             }
-            Tank t = new EnemyTank(new Vector2(Graphics.randf() * arenaWidth, Graphics.randf() * arenaHeight), buildName, fillCol, strokeCol);
+
+            // Generate position outside of crasher zone
+            Vector2 randPos;
+            do {
+                randPos = new Vector2(Graphics.randf(0, Main.arenaWidth), Graphics.randf(0, Main.arenaHeight));
+            } while (Graphics.isIntersecting(randPos, Spawner.crasherZone));
+
+            Tank t = new EnemyTank(randPos, buildName, fillCol, strokeCol);
             t.group = group;
             if (t.group == 0) t.group = player.group;
         }

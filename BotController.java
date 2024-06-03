@@ -7,7 +7,7 @@ import java.util.HashSet;
 // TODO: AI for drone-based tanks
 public class BotController implements Controller {
     Tank host;
-    float targetMoveDir, moveDir, intendedDir, bounceDir;
+    float moveDir, intendedDir, bounceDir;
     boolean shouldFire;
     Barrel frontBarrel;
     public float frontBulletSpeed;
@@ -19,12 +19,13 @@ public class BotController implements Controller {
     Tank closestTank;  // Closest enemy tank
     Vector2 extForce = new Vector2(0, 0);
 
+    float confidence = 0;  // confidence lowers fear factor
     boolean defenseMode = true;
     HashSet<Integer> targetSet;
 
 
     public BotController() {
-        bounceDir = targetMoveDir = moveDir = intendedDir = (float) (Math.random() * 2 * Math.PI);
+        bounceDir = moveDir = intendedDir = (float) (Math.random() * 2 * Math.PI);
         targetPos = null;
         currentPos = new Vector2(0, 0);
     }
@@ -55,16 +56,16 @@ public class BotController implements Controller {
         if (Main.counter % 2 == 0) {
             targetSet = CollisionManager.queryBoundingBox(host.getView());
         }
-        if (frontBarrel != null) {
 
+        if (frontBarrel != null) {  // If front barrel exists
             safetyFireFrames = Math.max(0, safetyFireFrames - 1);  // Decrement safety fire frames
 
             if (Main.counter % 2 == 0) {
                 updateTarget();
 
                 if (targetPos != null) {  // If there is a closest target
-                    currentPos.x += (targetPos.x - currentPos.x) * 0.3f;
-                    currentPos.y += (targetPos.y - currentPos.y) * 0.3f;
+                    currentPos.x += (targetPos.x - currentPos.x) * 0.15f;
+                    currentPos.y += (targetPos.y - currentPos.y) * 0.15f;
                     //shouldFire = Graphics.distanceSq(currentPos, targetPos) < 100 * 100;  // If close enough, fire
                     shouldFire = true;
                     safetyFireFrames = SAFETY_FRAMES;  // Set safety fire frames to max
@@ -75,8 +76,8 @@ public class BotController implements Controller {
                         } else {
                             targetPos = new Vector2(host.pos.x - host.vel.x, host.pos.y - host.vel.y);  // Point backwards to boost
                         }
-                        currentPos.x += (targetPos.x - currentPos.x) * 0.3f;
-                        currentPos.y += (targetPos.y - currentPos.y) * 0.3f;
+                        currentPos.x += (targetPos.x - currentPos.x) * 0.15f;
+                        currentPos.y += (targetPos.y - currentPos.y) * 0.15f;
 
                         shouldFire = false;
                     }
@@ -163,11 +164,14 @@ public class BotController implements Controller {
             boolean bulletSpammer = buildName.contains("triplet") || buildName.contains("sprayer") || buildName.contains("auto gunner") || buildName.contains("streamliner");
             boolean bounce = true;
 
-            if (bulletSpammer) {  // Chase leader
-                if (LeaderPointer.leader != null && LeaderPointer.leader != host) {
-                    intendedDir = (float) Math.atan2(LeaderPointer.leader.pos.y - host.pos.y, LeaderPointer.leader.pos.x - host.pos.x);
-                    bounce = false;  // No need to pick random direction
-                }
+            if (bulletSpammer) {
+                confidence = 0.2f;
+            }
+            if (host == LeaderPointer.leader) confidence = 0.5f;  // Leader is confident
+
+            if (LeaderPointer.leader != null && LeaderPointer.leader != host) {  // Chase leader
+                intendedDir = (float) Math.atan2(LeaderPointer.leader.pos.y - host.pos.y, LeaderPointer.leader.pos.x - host.pos.x);
+                bounce = false;  // No need to pick random direction
             }
 
             if (bounce) {  // Randomly bounce around the map
@@ -203,9 +207,7 @@ public class BotController implements Controller {
             extForce.y += yComp;
         }
 
-        targetMoveDir = (float) Math.atan2(extForce.y, extForce.x);
-
-        moveDir = (float) Graphics.angle_lerp(moveDir, targetMoveDir, 0.5f);
+        moveDir = (float) Math.atan2(extForce.y, extForce.x);
         //moveDir = -1;
         return moveDir;
     }
@@ -222,55 +224,58 @@ public class BotController implements Controller {
         float minDistSq = Float.MAX_VALUE;
         GameObject closestTarget = null;
 
-        // Get closest tank
+        // Get closest tank while at it
         float minDistTankSq = Float.MAX_VALUE;
         closestTank = null;
+
+        float teamConfidence = 0;  // Confidence from teammates
+
         for (int id : targetSet) {
             GameObject obj = Main.gameObjectPool.getObj(id);
-            if (obj == null || obj.group == host.group) continue;
-            float dist = Graphics.distance(host.pos, obj.pos);
-            float totRad = host.getRadiusScaled() + obj.getRadiusScaled();
 
-            if (obj.isProjectile) {
-                dist /= ((Projectile)obj).getMaxSpeed();  // Projectiles are more important
-            }
-            dist = (dist - totRad) * (dist - totRad);
-            if (dist < minDistSq) {
-                minDistSq = dist;
-                closestTarget = obj;
-            }
-
-            // Get closest tank
-            if (obj instanceof Tank) {
+            // Get closest tank (different group)
+            if (obj instanceof Tank && obj != host) {
                 float distTank = Graphics.distanceSq(host.pos, obj.pos);
-                if (distTank < minDistTankSq) {
+                if (distTank < minDistTankSq && obj.group != host.group) {
                     minDistTankSq = distTank;
                     closestTank = (Tank) obj;
                 }
+                if (obj.group == host.group && distTank < 500 * 500) teamConfidence += 0.05f;  // Close-by teammates increase confidence
+            }
+
+            if (obj == null || obj.group == host.group) continue;
+            float dist = Graphics.distance(host.pos, obj.pos);
+            float totRad = host.getRadiusScaled() + obj.getRadiusScaled();
+            if (obj.isProjectile) {
+                dist /= ((Projectile)obj).getMaxSpeed();  // Projectiles are more important
+            }
+            dist = (dist - totRad) * (dist - totRad);  // Square distance
+
+            if (dist < minDistSq) {
+                minDistSq = dist;
+                closestTarget = obj;
             }
         }
 
         if (closestTarget == null) return netForce;
         float objRad = closestTarget.getRadiusScaled();
-        float levelFactor = (float) (Math.sqrt(Graphics.length(host.vel)) * 800 * objRad); /*818.182f * host.level + 3181.82f*/;
+        float levelFactor = (float) (Math.sqrt(Graphics.length(host.vel)) * 750 * objRad); /*818.182f * host.level + 3181.82f*/;
+        importanceFactor = levelFactor / minDistSq;  // closer proj or slower host, more importance
 
         if (closestTarget.isProjectile) {
-            importanceFactor = levelFactor/minDistSq;  // closer proj or slower host, more importance
             Vector2 repelVec = new Vector2(host.pos.x - closestTarget.pos.x, host.pos.y - closestTarget.pos.y);  // Vector from projectile to host
             Graphics.normalize(repelVec);
 
-            Vector2 perp1 = new Vector2(-closestTarget.vel.y, closestTarget.vel.x);  // Perpendicular vector of projectile vel
-            Vector2 perp2 = new Vector2(closestTarget.vel.y, -closestTarget.vel.x);  // Perpendicular vector of projectile vel
+            Vector2 perp1 = new Vector2(-closestTarget.vel.y, closestTarget.vel.x);  // Perpendicular vector of projectile velocity
+            Vector2 perp2 = new Vector2(closestTarget.vel.y, -closestTarget.vel.x);  // Perpendicular vector of projectile velocity
             Graphics.normalize(perp1);
             Graphics.normalize(perp2);
-            // Dot product with repelVec, take more positive dot product
-            float dot1 = Graphics.dot(perp1, repelVec);
-            float dot2 = Graphics.dot(perp2, repelVec);
+            // Dot product with repelVec, take more positive dot product (perp vector more aligned with repelVec)
+            float dot1 = Graphics.dot(perp1, repelVec), dot2 = Graphics.dot(perp2, repelVec);
 
-            float fearFactor = 0.707f * (0.4f * (45 - host.level) / 44 + 0.1f);
-/** 1.f * (45 - host.level) / 44*/
+            float fearFactor = 0.707f * (Math.max(0.4f * (45 - host.level) / 44 + 0.1f - teamConfidence, 0)) - confidence;  // Higher level, less fear
+            // Also add a repulsion force scaled by fear
             if (dot1 > dot2) {
-                // Also add a repulsion force
                 perp1.x += fearFactor * repelVec.x;
                 perp1.y += fearFactor * repelVec.y;
                 return perp1;
@@ -281,16 +286,15 @@ public class BotController implements Controller {
             }
         }
 
-        importanceFactor = levelFactor / (minDistSq);
-        if (Main.counter % 20 == 0)
+      if (Main.counter % 20 == 0)
             Main.debugText = String.valueOf(importanceFactor);
-        Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);
+
+        Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);  // Vector from host to target
         Graphics.normalize(distVec);
         Vector2 perp1 = new Vector2(-distVec.y, distVec.x);  // Perpendicular vector
         Vector2 perp2 = new Vector2(distVec.y, -distVec.x);  // Perpendicular vector
         // Dot product with host velocity, take more positive dot product
-        float dot1 = Graphics.dot(perp1, host.vel);
-        float dot2 = Graphics.dot(perp2, host.vel);
+        float dot1 = Graphics.dot(perp1, host.vel), dot2 = Graphics.dot(perp2, host.vel);
         return dot1 > dot2 ? perp1 : perp2;
     }
 

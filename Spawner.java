@@ -127,7 +127,7 @@ public class Spawner {
                 }
             }
         } while (isOnPlayer);
-        boolean isAlpha = Math.random() < 0.02;
+        boolean isAlpha = Math.random() < 0.01;
         if (alphaCount >= 5) isAlpha = false;  // Limit the amount of alpha pentagons to 5
         new Polygon(randPos, isAlpha ? Polygon.ALPHA_PENTAGON : Polygon.PENTAGON, true);
         nestCount++;  // Increment the count of nest polygons

@@ -267,7 +267,11 @@ public class BotController implements Controller {
             float dist = Graphics.distance(host.pos, obj.pos);
             float totRad = host.getRadiusScaled() + obj.getRadiusScaled();
             if (obj.isProjectile) {
-                dist /= ((Projectile)obj).getMaxSpeed();  // Projectiles are more important
+                if (AutoAim.willCollide(obj, host)) {
+                    dist /= ((Projectile) obj).getMaxSpeed();  // Projectiles are more important
+                } else {
+                    dist /= 3;
+                }
             }
             dist = (dist - totRad) * (dist - totRad);  // Square distance
 
@@ -280,7 +284,7 @@ public class BotController implements Controller {
         if (closestTarget == null) return netForce;
         float objRad = closestTarget.getRadiusScaled();
 
-        float levelFactor = (float) Math.max(0, (Math.sqrt(Graphics.length(host.vel)) * 750 * objRad * (1 - (confidence + teamConfidence)))); /*818.182f * host.level + 3181.82f*/;
+        float levelFactor = (float) Math.max(0, (Math.sqrt(Graphics.length(host.vel)) * 750 * objRad * (1-(confidence+teamConfidence) * 0.4f))); /*818.182f * host.level + 3181.82f*/;
 
 
         importanceFactor = levelFactor / minDistSq;  // closer proj or slower host, more importance

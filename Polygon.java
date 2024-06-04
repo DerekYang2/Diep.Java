@@ -8,7 +8,7 @@ public class Polygon extends GameObject {
     final static float BASE_ORBIT = 0.5f*0.005f * 25.f/120;
     /** The velocity of the shape's orbits. */
     final static float BASE_VELOCITY = 0.5f*1 * 25.f/120;
-    public static int multiplier = 2;
+    public static int multiplier = 1;
     public static int polyGroup = Integer.MIN_VALUE;
     float rotation;
     float direction;

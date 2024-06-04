@@ -22,12 +22,13 @@ public class BotController implements Controller {
     float confidence = 0;  // confidence lowers fear factor
     boolean defenseMode = true;
     HashSet<Integer> targetSet;
-
+    double circleMovement;
 
     public BotController() {
         bounceDir = moveDir = intendedDir = (float) (Math.random() * 2 * Math.PI);
         targetPos = null;
         currentPos = new Vector2(0, 0);
+        circleMovement = Math.random();  // 40% of tanks do not go to center
     }
 
     @Override
@@ -158,18 +159,36 @@ public class BotController implements Controller {
 
         // Bot will go towards the center of the map (for now)
         if (host.level < 45) {
-            intendedDir = (float) Math.atan2(Main.arenaHeight / 2 - host.pos.y, Main.arenaWidth / 2 - host.pos.x);
+            if (circleMovement < 0.5 || host.level < 10) {  // 40% of tanks do not go to center or if too low level
+                if (circleMovement < 0.2) {  // Corners
+                    if (circleMovement < 0.05) {  // Top left
+                        intendedDir = (float) Math.atan2(0 + 0.3f * Main.arenaWidth * Math.cos( Main.counter / 1200F) - host.pos.y, 0 + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 1200F) - host.pos.x);
+                    } else if (circleMovement < 0.1) {  // Top right
+                        intendedDir = (float) Math.atan2(Main.arenaWidth + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 1200F) - host.pos.y, 0 + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 1200F) - host.pos.x);
+                    } else if (circleMovement < 0.15) {  // Bottom right
+                        intendedDir = (float) Math.atan2(Main.arenaWidth + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 1200F) - host.pos.y, Main.arenaHeight + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 1200F) - host.pos.x);
+                    } else {  // Bottom left
+                        intendedDir = (float) Math.atan2(0 + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 1200F) - host.pos.y, Main.arenaHeight + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 1200F) - host.pos.x);
+                    }
+                } else {
+                    int dir = Math.random() < 0.5 ? 1 : -1;
+                    intendedDir = (float) Math.atan2(Main.arenaWidth / 2 + 0.7f * Main.arenaWidth * Math.cos((1 - circleMovement) * dir * Main.counter / 1200F) - host.pos.y, Main.arenaHeight / 2 + 0.7f * Main.arenaHeight * Math.sin((1 - circleMovement) * dir * Main.counter / 1200F) - host.pos.x);
+                }
+            } else {
+                intendedDir = (float) Math.atan2(Main.arenaHeight / 2 - host.pos.y, Main.arenaWidth / 2 - host.pos.x);
+            }
         } else {
             String buildName = host.tankBuild.name;
             boolean bulletSpammer = buildName.contains("triplet") || buildName.contains("sprayer") || buildName.contains("auto gunner") || buildName.contains("streamliner");
             boolean bounce = true;
-
+            if (host.level == 45)
+                confidence = 0.3f;
             if (bulletSpammer) {
-                confidence = 0.2f;
+                confidence = 0.4f;
             }
-            if (host == LeaderPointer.leader) confidence = 0.5f;  // Leader is confident
+            if (host == LeaderPointer.leader) confidence = 0.7f;  // Leader is confident
 
-            if (LeaderPointer.leader != null && LeaderPointer.leader != host) {  // Chase leader
+            if (LeaderPointer.leader != null && LeaderPointer.leader.group != host.group) {  // Chase leader
                 intendedDir = (float) Math.atan2(LeaderPointer.leader.pos.y - host.pos.y, LeaderPointer.leader.pos.x - host.pos.x);
                 bounce = false;  // No need to pick random direction
             }
@@ -203,8 +222,9 @@ public class BotController implements Controller {
             Graphics.normalize(extForce);  // Normalize vector (unit vector)
             extForce.x *= importanceFactor;
             extForce.y *= importanceFactor;
-            extForce.x += xComp;
-            extForce.y += yComp;
+            // More confidence, move in intended direction
+            extForce.x += xComp * (1+confidence);
+            extForce.y += yComp * (1+confidence);
         }
 
         moveDir = (float) Math.atan2(extForce.y, extForce.x);
@@ -240,7 +260,7 @@ public class BotController implements Controller {
                     minDistTankSq = distTank;
                     closestTank = (Tank) obj;
                 }
-                if (obj.group == host.group && distTank < 500 * 500) teamConfidence += 0.05f;  // Close-by teammates increase confidence
+                teamConfidence += 0.1f;  // Close-by teammates increase confidence
             }
 
             if (obj == null || obj.group == host.group) continue;
@@ -259,9 +279,13 @@ public class BotController implements Controller {
 
         if (closestTarget == null) return netForce;
         float objRad = closestTarget.getRadiusScaled();
-        float levelFactor = (float) (Math.sqrt(Graphics.length(host.vel)) * 750 * objRad * (1 - (confidence + teamConfidence) * 0.5f)); /*818.182f * host.level + 3181.82f*/;
-        importanceFactor = levelFactor / minDistSq;  // closer proj or slower host, more importance
 
+        float levelFactor = (float) Math.max(0, (Math.sqrt(Graphics.length(host.vel)) * 750 * objRad * (1 - (confidence + teamConfidence)))); /*818.182f * host.level + 3181.82f*/;
+
+
+        importanceFactor = levelFactor / minDistSq;  // closer proj or slower host, more importance
+/*        if (Main.counter % 120 == 0)
+            System.out.println(importanceFactor);*/
         if (closestTarget.isProjectile) {
             Vector2 repelVec = new Vector2(host.pos.x - closestTarget.pos.x, host.pos.y - closestTarget.pos.y);  // Vector from projectile to host
             Graphics.normalize(repelVec);
@@ -273,7 +297,7 @@ public class BotController implements Controller {
             // Dot product with repelVec, take more positive dot product (perp vector more aligned with repelVec)
             float dot1 = Graphics.dot(perp1, repelVec), dot2 = Graphics.dot(perp2, repelVec);
 
-            float fearFactor = 0.707f * (Math.max(0.4f * (45 - host.level) / 44 - teamConfidence - confidence, 0) + 0.1f);  // Higher level, less fear
+            float fearFactor = 0.707f * (Math.max(0.5f * (45 - host.level) / 44 - teamConfidence - confidence, 0));  // Higher level, less fear
             // Also add a repulsion force scaled by fear
             if (dot1 > dot2) {
                 perp1.x += fearFactor * repelVec.x;
@@ -286,8 +310,8 @@ public class BotController implements Controller {
             }
         }
 
-      if (Main.counter % 20 == 0)
-            Main.debugText = String.valueOf(importanceFactor);
+/*      if (Main.counter % 20 == 0)
+            Main.debugText = String.valueOf(importanceFactor);*/
 
         Vector2 distVec = new Vector2(closestTarget.pos.x - host.pos.x, closestTarget.pos.y - host.pos.y);  // Vector from host to target
         Graphics.normalize(distVec);

@@ -162,20 +162,20 @@ public class BotController implements Controller {
             if (circleMovement < 0.5 || host.level < 10) {  // 40% of tanks do not go to center or if too low level
                 if (circleMovement < 0.2) {  // Corners
                     if (circleMovement < 0.05) {  // Top left
-                        intendedDir = (float) Math.atan2(0 + 0.3f * Main.arenaWidth * Math.cos( Main.counter / 1200F) - host.pos.y, 0 + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 1200F) - host.pos.x);
+                        intendedDir = (float) Math.atan2(0 + 0.3f * Main.arenaWidth * Math.cos( Main.counter / 3000F) - host.pos.y, 0 + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 3000F) - host.pos.x);
                     } else if (circleMovement < 0.1) {  // Top right
-                        intendedDir = (float) Math.atan2(Main.arenaWidth + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 1200F) - host.pos.y, 0 + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 1200F) - host.pos.x);
+                        intendedDir = (float) Math.atan2(Main.arenaWidth + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 3000F) - host.pos.y, 0 + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 3000F) - host.pos.x);
                     } else if (circleMovement < 0.15) {  // Bottom right
-                        intendedDir = (float) Math.atan2(Main.arenaWidth + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 1200F) - host.pos.y, Main.arenaHeight + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 1200F) - host.pos.x);
+                        intendedDir = (float) Math.atan2(Main.arenaWidth + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 3000F) - host.pos.y, Main.arenaHeight + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 3000F) - host.pos.x);
                     } else {  // Bottom left
-                        intendedDir = (float) Math.atan2(0 + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 1200F) - host.pos.y, Main.arenaHeight + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 1200F) - host.pos.x);
+                        intendedDir = (float) Math.atan2(0 + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 3000F) - host.pos.y, Main.arenaHeight + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 3000F) - host.pos.x);
                     }
                 } else {
                     int dir = Math.random() < 0.5 ? 1 : -1;
                     intendedDir = (float) Math.atan2(Main.arenaWidth / 2 + 0.7f * Main.arenaWidth * Math.cos((1 - circleMovement) * dir * Main.counter / 1200F) - host.pos.y, Main.arenaHeight / 2 + 0.7f * Main.arenaHeight * Math.sin((1 - circleMovement) * dir * Main.counter / 1200F) - host.pos.x);
                 }
             } else {
-                intendedDir = (float) Math.atan2(Main.arenaHeight / 2 - host.pos.y, Main.arenaWidth / 2 - host.pos.x);
+                intendedDir = (float) Math.atan2(Main.arenaHeight / 2 - host.pos.y + 300 * Math.cos(circleMovement*Main.counter/1200F), Main.arenaWidth / 2 - host.pos.x + 300 * Math.sin(circleMovement*Main.counter/1200F));
             }
         } else {
             String buildName = host.tankBuild.name;
@@ -189,7 +189,7 @@ public class BotController implements Controller {
             if (host == LeaderPointer.leader) confidence = 0.7f;  // Leader is confident
 
             if (LeaderPointer.leader != null && LeaderPointer.leader.group != host.group) {  // Chase leader
-                intendedDir = (float) Math.atan2(LeaderPointer.leader.pos.y - host.pos.y, LeaderPointer.leader.pos.x - host.pos.x);
+                intendedDir = (float) Math.atan2(LeaderPointer.leader.pos.y - host.pos.y + 300 * Math.cos(circleMovement*Main.counter/(1200F)), LeaderPointer.leader.pos.x - host.pos.x + 300 * Math.sin(circleMovement*Main.counter/(1200F)));
                 bounce = false;  // No need to pick random direction
             }
 

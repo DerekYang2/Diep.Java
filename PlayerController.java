@@ -6,10 +6,12 @@ import static com.raylib.java.core.input.Keyboard.*;
 import static com.raylib.java.core.input.Keyboard.KEY_D;
 
 public class PlayerController implements Controller {
+    final public static float ROT_SPEED = 1F/120;  // 1 rad per second
     ArrayList<Integer> keyQueue;
     Tank host;
-    boolean autoFire;
-    Stopwatch autoFireWatch = new Stopwatch();
+    boolean autoFire, autoSpin;
+    double shootDirection = 0;
+    Stopwatch autoFireWatch = new Stopwatch(), autoSpinWatch = new Stopwatch();
 
     public PlayerController() {
         keyQueue = new ArrayList<>();
@@ -18,11 +20,12 @@ public class PlayerController implements Controller {
     @Override
     public void setHost(Tank host) {
         this.host = host;
-        autoFire = false;
+        autoFire = autoSpin = false;
     }
 
     @Override
     public void update() {
+        if (host.isDead) return;
         // Push key to top of queue if pressed
         // Issue when performance mode on, added to queue twice
         if (Graphics.isKeyPressed(KEY_W)) {
@@ -59,9 +62,24 @@ public class PlayerController implements Controller {
             keyQueue.remove((Integer) KEY_D);
         }
 
-        if (autoFireWatch.ms() > 100 && Graphics.isKeyPressed(KEY_E)) {
+        if (autoFireWatch.ms() > 500 && Graphics.isKeyPressed(KEY_E)) {
+            if (Main.player != null) {
+                Main.player.addMessage("Auto Fire " + (autoFire ? "Disabled" : "Enabled"), 240);
+            }
             autoFire = !autoFire;
             autoFireWatch.start();
+        }
+
+        if (autoSpinWatch.ms() > 500 && Graphics.isKeyPressed(KEY_C)) {
+            if (Main.player != null) {
+                Main.player.addMessage("Auto Spin " + (autoSpin ? "Disabled" : "Enabled"), 240);
+            }
+            autoSpin = !autoSpin;
+            autoSpinWatch.start();
+        }
+
+        if (autoSpin) {
+            shootDirection = Main.player.direction + ROT_SPEED;
         }
     }
 
@@ -77,7 +95,7 @@ public class PlayerController implements Controller {
 
     @Override
     public float barrelDirection() {
-        return (float) Math.atan2(Graphics.getVirtualMouse().y - host.pos.y, Graphics.getVirtualMouse().x - host.pos.x);
+        return (float) (autoSpin ? shootDirection : Math.atan2(Graphics.getVirtualMouse().y - host.pos.y, Graphics.getVirtualMouse().x - host.pos.x));
     }
 
     @Override

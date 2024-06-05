@@ -21,7 +21,7 @@ public class Player extends Tank {
     float usernameSpacing;
     final int usernameFontSize = 48, levelBarFontSize = 22;
 
-    Queue<Pair<String, Long>> killQueue = new LinkedList<>();  // {message, expireTime (Main.counter)}
+    Queue<Pair<String, Long>> messageQueue = new LinkedList<>();  // {message, expireTime (Main.counter)}
     final private static int KILL_MESSAGE_DURATION = 3 * 120;  // 3 seconds
 
     UpgradeBar[] upgradeBar = new UpgradeBar[8];
@@ -142,8 +142,8 @@ public class Player extends Tank {
             score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) + 0.01f - score, 23000.f/(2 * 120)));  // 2 seconds
         }
 
-        while (!killQueue.isEmpty() && Main.counter >= killQueue.peek().second) {  // If not empty and counter is past the expire time
-            killQueue.remove();  // Remove the top element
+        while (!messageQueue.isEmpty() && Main.counter >= messageQueue.peek().second) {  // If not empty and counter is past the expire time
+            messageQueue.remove();  // Remove the top element
         }
 
         LeaderPointer.update();
@@ -270,23 +270,23 @@ public class Player extends Tank {
         float textHeight = 22 * inverseZoom;
 
         float yPos = pos.y;
-        for (Pair<String, Long> killData : killQueue) {
-            int framesLeft = (int) (killData.second - Main.counter);
-            float opacity = killMessageOpacity(framesLeft);
-            Graphics.drawTextCenteredBackground("You killed " + killData.first, (int) pos.x, (int) (yPos + textHeight * 0.5f), (int)(22 * inverseZoom), -3 * inverseZoom, Graphics.colAlpha(Color.WHITE, opacity), Graphics.colAlpha(Graphics.BAR_GREY, opacity * 1.1f));
+        for (Pair<String, Long> dataPair : messageQueue) {
+            int framesLeft = (int) (dataPair.second - Main.counter);
+            float opacity = messageOpacity(framesLeft);
+            Graphics.drawTextCenteredBackground(dataPair.first, (int) pos.x, (int) (yPos + textHeight * 0.5f), (int)(22 * inverseZoom), -2.5f * inverseZoom, Graphics.colAlpha(Color.WHITE, opacity), Graphics.colAlpha(Graphics.BAR_GREY, opacity * 1.1f));
             yPos += textHeight + 3 * inverseZoom;  // Extra 3 spacing
         }
     }
 
 
     /**
-     * Function to calculate the opacity of the kill message
+     * Function to calculate the opacity of the message
      * <a href="https://www.desmos.com/calculator/x8adbicvxa">function graph</a>
-     * Assumes frames is between 0 and KILL_MESSAGE_DURATION
-     * @param frames The number of frames since the kill message was added
-     * @return The opacity of the kill message
+     * Assumes frames is between 0 and MESSAGE_DURATION
+     * @param frames The number of frames since the message was added
+     * @return The opacity of the  message
      */
-    private static float killMessageOpacity(int frames) {
+    private static float messageOpacity(int frames) {
         final float O_max = 0.75f, T = KILL_MESSAGE_DURATION, p = 0.07f;
         if (frames < T*p) {
             return O_max/(T*p) * frames;
@@ -308,11 +308,15 @@ public class Player extends Tank {
         }
     }
 
+    public void addMessage(String message, int duration) {
+        messageQueue.add(new Pair<>(message, Main.counter + duration));
+    }
+
     @Override
     public void updateVictim(GameObject victim) {
         super.updateVictim(victim);
         if (victim instanceof Tank) {  // Only add tanks to kill queue
-            killQueue.add(new Pair<>(victim.username, Main.counter + KILL_MESSAGE_DURATION));
+            addMessage("You killed " + victim.username, KILL_MESSAGE_DURATION);
         }
     }
 

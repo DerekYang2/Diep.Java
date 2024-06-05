@@ -58,7 +58,7 @@ public class AutoTurret {
             if (offset.x == 0 && offset.y == 0) {
                 targetDirection += PASSIVE_ROTATION;
             } else {
-                targetDirection = (float) Math.atan2(offset.y, offset.x);
+                targetDirection = (float) baseAngle;
             }
         }
 

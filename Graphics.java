@@ -451,7 +451,7 @@ public class Graphics extends Raylib {
         rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), 0, scale, Color.WHITE);
     }*/
 
-    public static void drawTextureCentered(Texture2D texture, Vector2 position, float width, float height, float radians, Color tint) {
+    public static void drawTextureCentered(Texture2D texture, Vector2 position, float width, float height, double radians, Color tint) {
 /*        float scale = Math.min(width / texture.width, height / texture.height);
         float tWidth = texture.width * scale, tHeight = texture.height * scale;
         rlj.textures.DrawTextureEx(texture, new Vector2(position.x - tWidth * 0.5f, position.y - tHeight * 0.5f), (float)Math.toDegrees(radians), scale, tint);*/
@@ -667,7 +667,6 @@ public class Graphics extends Raylib {
         TankImage tank = new TankImage(0, 0, buildName, fillCol, strokeCol);
 
         tank.setPos(new Vector2(tankTex.texture.getWidth() * 0.5f, tankTex.texture.getHeight() * 0.5f));
-        tank.tankBuild.update();  // Still update after death so turret positions are updated
 
         rlj.core.BeginTextureMode(tankTex);
         rlj.core.ClearBackground(rgba(0, 0, 0, 0));

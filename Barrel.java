@@ -138,6 +138,7 @@ public class Barrel {
     }
 
     public void setDirection(double tankAngle) {
+        pos = Graphics.rotatePoint(Graphics.scale(posOriginal, directHost().scale), new Vector2(0, 0), tankAngle);
         angleAbsolute = tankAngle + angleRelative;
     }
 

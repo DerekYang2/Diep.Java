@@ -3,6 +3,7 @@ import com.raylib.java.core.input.Keyboard;
 import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
+import com.raylib.java.textures.Texture2D;
 
 public class Main {
     final public static float GRID_SIZE = 50;
@@ -20,6 +21,8 @@ public class Main {
     public static GameObject cameraHost;
     public static Vector2 cameraTarget;
     public static String killerName;
+    public static Texture2D deathTexture;
+    public static String deathBuild, deathScore, deathLevel, aliveTime;
 
     // Variables for game reset
     static Stopwatch lastReset = new Stopwatch();  // For resetting the game
@@ -207,8 +210,28 @@ public class Main {
 
     private static void drawDeathScreen() {
         Graphics.drawRectangle(0, 0, Graphics.cameraWidth, Graphics.cameraHeight, Graphics.rgba(0, 0, 0, Math.min(100, deathScreenFrames)));
-        Graphics.drawTextCenteredOutline("You were killed by:", Graphics.cameraWidth/2, Graphics.cameraHeight/2 - 35, 30, -5, Color.WHITE);
-        Graphics.drawTextCenteredOutline(NameGenerator.formatNameCase(killerName), Graphics.cameraWidth/2, Graphics.cameraHeight/2, 50, -5, Color.WHITE);
+        float totHeight = 400;
+        float yPos = (Graphics.cameraHeight - totHeight) / 2;
+        Graphics.drawTextCenteredOutline("You were killed by:", Graphics.cameraWidth/2, (int) yPos, 28, -5, Color.WHITE);
+        yPos += 40;
+
+        Graphics.drawTextCenteredOutline(NameGenerator.formatNameCase(killerName), Graphics.cameraWidth/2, (int) yPos, 50, -5, Color.WHITE);
+        yPos += 50;
+
+        // Text
+        float gap = 38;
+        float padding = (250F - gap*3)/2;
+        float yPos2 = yPos + padding + 10, xPos = Graphics.cameraWidth/2 - 250F;
+        Graphics.drawTextOutline("Score:  " + deathScore, new Vector2(xPos, yPos2), 28, -5, Color.WHITE);
+        yPos2 += gap;
+        Graphics.drawTextOutline("Level:  " + deathLevel, new Vector2(xPos, yPos2), 28, -5, Color.WHITE);
+        yPos2 += gap;
+        Graphics.drawTextOutline("Time Alive:  " + aliveTime, new Vector2(xPos, yPos2), 28, -5, Color.WHITE);
+        // Tank texture
+        Graphics.drawTextureCentered(deathTexture, new Vector2(Graphics.cameraWidth/2 + 250F/2, yPos + 250F/2), 250, 250, -Math.PI/4, Color.WHITE);
+        yPos += 250;
+
+        Graphics.drawTextCenteredOutline(deathBuild, (int)(Graphics.cameraWidth/2 + 250F/2), (int) yPos, 30, -5, Color.WHITE);
     }
 
     public static void main(String[] args) {

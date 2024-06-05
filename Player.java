@@ -31,9 +31,12 @@ public class Player extends Tank {
     int upgradeFrames = UPGRADE_HUD_DURATION;
     Vector2 usagePos;
 
+    // How long the player has been alive
+    Stopwatch aliveTimer = new Stopwatch();
+
     public Player(Vector2 spawn, String buildName) {
         super(spawn, new PlayerController(), new Stats(), 1);
-
+        aliveTimer.start();
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         initTankBuild(TankBuild.createTankBuild(buildName));
         currentZoom = targetZoom;  // Spawn with right zoom level
@@ -48,7 +51,7 @@ public class Player extends Tank {
 
         // Set upgrade paths
         setUpgradePath(TankBuild.getRandomUpgradePath());
-        //setUpgradePath(new String[]{"booster"});
+        setUpgradePath(new String[]{"ranger"});
     }
 
     @Override
@@ -104,11 +107,6 @@ public class Player extends Tank {
         }
     }
 
-    // For timing speed
-    Stopwatch debug = new Stopwatch();
-    boolean startedRace = false;
-    boolean crossedFinish = false;
-
     @Override
     public void updateLevel() {
         // Update level
@@ -138,17 +136,6 @@ public class Player extends Tank {
         if (Math.abs(targetZoom - currentZoom) > 1e-3) {
             currentZoom += (targetZoom - currentZoom) * 0.05f;
             Graphics.setZoom(currentZoom);
-        }
-
-        if (pos.x > Main.ARENA_PADDING && !startedRace) {
-            System.out.println("Started");
-            debug.start();
-            startedRace = true;
-        }
-
-        if (pos.x > Main.arenaWidth - Main.ARENA_PADDING && !crossedFinish) {
-            System.out.format("Time: %.2f\n", debug.s());
-            crossedFinish = true;
         }
 
         if (Graphics.isKeyDown(KEY_K)) {
@@ -334,6 +321,17 @@ public class Player extends Tank {
         super.delete();
         levelBar.delete();
         Main.deathScreenFrames = 1;  // Begin death screen
+        Main.deathTexture = TextureLoader.getTankTexture(tankBuild.name, fillCol);
+        Main.deathBuild = NameGenerator.formatNameCase(tankBuild.name);
+        Main.deathScore = String.format("%,d", (int)score);   // Format score with commas
+        Main.deathLevel = String.valueOf(level);
+
+        int seconds = (int) aliveTimer.s();
+        int hours = seconds / 3600;
+        seconds %= 3600;
+        int minutes = seconds / 60;
+        seconds %= 60;
+        Main.aliveTime = (hours > 0 ? hours + "h " : "") + (minutes > 0 ? minutes + "m " : "") + seconds + "s";
     }
 
     public void drawUpgradeBars() {

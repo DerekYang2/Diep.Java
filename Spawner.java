@@ -28,13 +28,13 @@ public class Spawner {
 
     public static void reset() {
         // Reset nest and crasher zone
-        float nestSide = Main.arenaWidth / 6.5f, crasherSide = nestSide * 2f;
+        float nestSide = Main.arenaWidth / 6.3f, crasherSide = nestSide * 2f;
         nestBox = new Rectangle(Main.arenaWidth/2 - nestSide/2, Main.arenaHeight/2 - nestSide/2, nestSide, nestSide);
         crasherZone = new Rectangle(Main.arenaWidth/2 - crasherSide/2, Main.arenaHeight/2 - crasherSide/2, crasherSide, crasherSide);
 
         polygonAmount = (int) (Main.arenaWidth*Main.arenaWidth/(200*Main.GRID_SIZE*Main.GRID_SIZE));
-        pentagonNestAmount = (int) (nestSide*nestSide/(200*Main.GRID_SIZE*Main.GRID_SIZE));
-        crasherAmount = (int) (pentagonNestAmount * 1.5f);
+        pentagonNestAmount = (int) (nestSide*nestSide/(220*Main.GRID_SIZE*Main.GRID_SIZE));
+        crasherAmount = pentagonNestAmount;
         System.out.println("Polygon amount: " + polygonAmount + ", Nest amount: " + pentagonNestAmount);
         count = 0;
         nestCount = 0;

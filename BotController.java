@@ -3,8 +3,7 @@ import com.raylib.java.raymath.Vector2;
 import java.util.HashSet;
 
 // TODO: auto turret should be auto fire mode, these guys turn too fast, maybe add lock on time
-// TODO: add offensive mode, try out negative fear factors for offensive tanks (triplet, sprayer, etc.)
-// TODO: AI for drone-based tanks
+// TODO: AI for drone-based tanks, body damager
 public class BotController implements Controller {
     Tank host;
     float moveDir, intendedDir, bounceDir;
@@ -22,13 +21,13 @@ public class BotController implements Controller {
     float confidence = 0;  // confidence lowers fear factor
     boolean defenseMode = true;
     HashSet<Integer> targetSet;
-    double circleMovement;
+    double rand;
 
     public BotController() {
         bounceDir = moveDir = intendedDir = (float) (Math.random() * 2 * Math.PI);
         targetPos = null;
         currentPos = new Vector2(0, 0);
-        circleMovement = Math.random();  // 40% of tanks do not go to center
+        rand = Math.random();  // 40% of tanks do not go to center
     }
 
     @Override
@@ -159,37 +158,62 @@ public class BotController implements Controller {
 
         // Bot will go towards the center of the map (for now)
         if (host.level < 45) {
-            if (circleMovement < 0.5 || host.level < 10) {  // 40% of tanks do not go to center or if too low level
-                if (circleMovement < 0.2) {  // Corners
-                    if (circleMovement < 0.05) {  // Top left
-                        intendedDir = (float) Math.atan2(0 + 0.3f * Main.arenaWidth * Math.cos( Main.counter / 3000F) - host.pos.y, 0 + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 3000F) - host.pos.x);
-                    } else if (circleMovement < 0.1) {  // Top right
-                        intendedDir = (float) Math.atan2(Main.arenaWidth + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 3000F) - host.pos.y, 0 + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 3000F) - host.pos.x);
-                    } else if (circleMovement < 0.15) {  // Bottom right
-                        intendedDir = (float) Math.atan2(Main.arenaWidth + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 3000F) - host.pos.y, Main.arenaHeight + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 3000F) - host.pos.x);
+            if (rand < 0.4 || host.level < 15) {  // 40% of tanks do not go to center or if too low level
+                // Corner farmer
+                if (rand < 0.1f) {  // Corners
+                    if (rand < 0.025) {  // Top left
+                        intendedDir = (float) Math.atan2(0.1 * Main.arenaWidth + 0.1 * Main.arenaWidth * Math.cos(Main.counter / 1000F) - host.pos.y, 0.1 * Main.arenaHeight + 0.1f * Main.arenaHeight * Math.sin(Main.counter / 1000F) - host.pos.x);
+                    } else if (rand < 0.05) {  // Top right
+                        intendedDir = (float) Math.atan2(0.9 * Main.arenaWidth + 0.1 * Main.arenaWidth * Math.cos(Main.counter / 1000F) - host.pos.y, 0.1 * Main.arenaHeight + 0.1f * Main.arenaHeight * Math.sin(Main.counter / 1000F) - host.pos.x);
+                    } else if (rand < 0.075) {  // Bottom right
+                        intendedDir = (float) Math.atan2(0.9 * Main.arenaWidth + 0.1 * Main.arenaWidth * Math.cos(Main.counter / 1000F) - host.pos.y, 0.9 * Main.arenaHeight + 0.1f * Main.arenaHeight * Math.sin(Main.counter / 1000F) - host.pos.x);
                     } else {  // Bottom left
-                        intendedDir = (float) Math.atan2(0 + 0.3f * Main.arenaWidth * Math.cos(Main.counter / 3000F) - host.pos.y, Main.arenaHeight + 0.3f * Main.arenaHeight * Math.sin(Main.counter / 3000F) - host.pos.x);
+                        intendedDir = (float) Math.atan2(0.1 * Main.arenaWidth + 0.1 * Main.arenaWidth * Math.cos(Main.counter / 1000F) - host.pos.y, 0.9 * Main.arenaHeight + 0.1f * Main.arenaHeight * Math.sin(Main.counter / 1000F) - host.pos.x);
                     }
-                } else {
-                    int dir = Math.random() < 0.5 ? 1 : -1;
-                    intendedDir = (float) Math.atan2(Main.arenaWidth / 2 + 0.7f * Main.arenaWidth * Math.cos((1 - circleMovement) * dir * Main.counter / 1200F) - host.pos.y, Main.arenaHeight / 2 + 0.7f * Main.arenaHeight * Math.sin((1 - circleMovement) * dir * Main.counter / 1200F) - host.pos.x);
+                } else {  // Loop around the map (square)
+                    final Vector2 center = new Vector2(Main.arenaWidth / 2, Main.arenaHeight / 2);
+                    float radTarget = (float) (0.25f * (1.1f + rand) * Main.arenaWidth);  // Manhatten distance to center
+                    float currentRad = Graphics.manhattanDistance(host.pos, center);
+
+                    float angle = (float) Graphics.normalizeAngle(Math.atan2(host.pos.y - center.x, host.pos.x - center.y));
+                    if ((0 <= angle && angle < Math.PI / 4) || (7 * Math.PI / 4 <= angle && angle < 2 * Math.PI)) {  // up
+                        intendedDir = (float) Math.PI / 2;
+                    } else if (Math.PI / 4 <= angle && angle < 3 * Math.PI / 4) {  // left
+                        intendedDir = (float) Math.PI;
+                    } else if (3 * Math.PI / 4 <= angle && angle < 5 * Math.PI / 4) {  // down
+                        intendedDir = (float) -Math.PI / 2;
+                    } else {  // right
+                        intendedDir = 0;
+                    }
+                    if (rand < 0.2) {  // Half of the 40% rotate in opposite direction
+                        intendedDir *= -1;
+                    }
+
+                    // Tweak rotation radius
+                    if (currentRad < radTarget) {  // If inside target radius
+                        intendedDir = (float) Graphics.angle_lerp(intendedDir, Math.atan2(host.pos.y - center.x, host.pos.x - center.y), 0.5);  // Go away from center
+                    } else if (currentRad > radTarget + Main.arenaWidth / 8) {  // If too far outside target radius
+                        intendedDir = (float) Graphics.angle_lerp(intendedDir, Math.atan2(center.y - host.pos.y, center.x - host.pos.x), 0.5);  // Go towards center
+                    }
                 }
             } else {
-                intendedDir = (float) Math.atan2(Main.arenaHeight / 2 - host.pos.y + 300 * Math.cos(circleMovement*Main.counter/1200F), Main.arenaWidth / 2 - host.pos.x + 300 * Math.sin(circleMovement*Main.counter/1200F));
+                intendedDir = (float) Math.atan2(Main.arenaHeight / 2 - host.pos.y + 750 * Math.cos(Main.counter/1200F + rand), Main.arenaWidth / 2 - host.pos.x + 750 * Math.sin(Main.counter/1200F + rand));
             }
         } else {
             String buildName = host.tankBuild.name;
             boolean bulletSpammer = buildName.contains("triplet") || buildName.contains("sprayer") || buildName.contains("auto gunner") || buildName.contains("streamliner");
             boolean bounce = true;
+            Tank leader = Leaderboard.getTankRank(0);
+
             if (host.level == 45)
                 confidence = 0.3f;
             if (bulletSpammer) {
                 confidence = 0.4f;
             }
-            if (host == LeaderPointer.leader) confidence = 0.7f;  // Leader is confident
+            if (host == leader) confidence = 0.7f;  // Leader is confident
 
-            if (LeaderPointer.leader != null && LeaderPointer.leader.group != host.group) {  // Chase leader
-                intendedDir = (float) Math.atan2(LeaderPointer.leader.pos.y - host.pos.y + 300 * Math.cos(circleMovement*Main.counter/(1200F)), LeaderPointer.leader.pos.x - host.pos.x + 300 * Math.sin(circleMovement*Main.counter/(1200F)));
+            if (leader != null && leader.group != host.group) {  // Chase leader
+                intendedDir = (float) Math.atan2(leader.pos.y - host.pos.y + 300 * Math.cos(Main.counter/1200F + rand), leader.pos.x - host.pos.x + 300 * Math.sin(Main.counter/1200F + rand));
                 bounce = false;  // No need to pick random direction
             }
 
@@ -260,17 +284,17 @@ public class BotController implements Controller {
                     minDistTankSq = distTank;
                     closestTank = (Tank) obj;
                 }
-                teamConfidence += 0.1f;  // Close-by teammates increase confidence
+                teamConfidence += 0.05f;  // Close-by teammates increase confidence
             }
 
             if (obj == null || obj.group == host.group) continue;
             float dist = Graphics.distance(host.pos, obj.pos);
             float totRad = host.getRadiusScaled() + obj.getRadiusScaled();
             if (obj.isProjectile) {
-                if (AutoAim.willCollide(obj, host)) {
+                if (AutoAim.willCollide(obj, host) || obj instanceof Drone) {
                     dist /= ((Projectile) obj).getMaxSpeed();  // Projectiles are more important
                 } else {
-                    dist /= 3;
+                    dist /= 3f;
                 }
             }
             dist = (dist - totRad) * (dist - totRad);  // Square distance
@@ -301,7 +325,7 @@ public class BotController implements Controller {
             // Dot product with repelVec, take more positive dot product (perp vector more aligned with repelVec)
             float dot1 = Graphics.dot(perp1, repelVec), dot2 = Graphics.dot(perp2, repelVec);
 
-            float fearFactor = 0.707f * (Math.max(0.5f * (45 - host.level) / 44 - teamConfidence - confidence, 0));  // Higher level, less fear
+            float fearFactor = 0.707f * (Math.max(0.6f * (45 - host.level) / 44 + 0.1f - teamConfidence - confidence, 0));  // Higher level, less fear
             // Also add a repulsion force scaled by fear
             if (dot1 > dot2) {
                 perp1.x += fearFactor * repelVec.x;

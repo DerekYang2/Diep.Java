@@ -240,8 +240,11 @@ public class AutoAim {
 
     public static GameObject getClosestTargetDefense(HashSet<Integer> targets, GameObject sourceObj, Rectangle view, int group) {
         // Get the closest target
-        float minDistSquared = Float.MAX_VALUE;
+        float minDistSquared = Float.MAX_VALUE;  // Closest distance to projectile that will hit
         GameObject closestObj = null;  // Set to null if no target found
+
+        float minDistAll = Float.MAX_VALUE;  // Closest distance to projectile that may not hit
+        GameObject closestObjAll = null;  // Set to null if no target found
 
         for (int id : targets) {
             GameObject obj = Main.gameObjectPool.getObj(id);
@@ -251,14 +254,18 @@ public class AutoAim {
             Rectangle boundingBox = obj.boundingBox();
             float distSquared = Graphics.distanceSq(sourceObj.pos, obj.pos);
 
-            if (Graphics.isIntersecting(boundingBox, view) && willCollide(sourceObj, obj)) {
-                if (distSquared < minDistSquared) {  // New closest target
+            if (Graphics.isIntersecting(boundingBox, view)) {
+                if (distSquared < minDistSquared && willCollide(sourceObj, obj)) {  // New closest target that will collide
                     minDistSquared = distSquared;
                     closestObj = obj;  // Update the closest target (adjusted)
+                }
+                if (distSquared < minDistAll) {  // New closest target
+                    minDistAll = distSquared;
+                    closestObjAll = obj;  // Update the closest target (adjusted)
                 }
             }
         }
 
-        return closestObj;
+        return closestObj == null ? closestObjAll : closestObj;
     }
 }

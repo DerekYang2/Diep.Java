@@ -273,7 +273,7 @@ class AutoNAddOn extends AddOn {
     @Override
     public void setHost(Tank tank) {
         this.host = tank;
-        final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.35f, 1.2f, 1, 1, 1, 0.3f);
+        final BulletStats BULLET_STATS = new BulletStats("bullet", 1, 1, 0.3f, 1.2f, 1, 1, 1, 0.3f);
         for (int i = 0; i < numTurrets; i++) {
             Barrel barrel = new Barrel(BULLET_STATS, 42 * 0.8f, 55, 1,0, 0, false, false, false);
             barrel.setHost(tank);

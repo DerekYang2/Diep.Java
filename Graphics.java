@@ -787,6 +787,10 @@ public class Graphics extends Raylib {
         return (vec1.x - vec2.x) * (vec1.x - vec2.x)  + (vec1.y - vec2.y) * (vec1.y - vec2.y);
     }
 
+    public static float manhattanDistance(Vector2 vec1, Vector2 vec2) {
+        return Math.abs(vec1.x - vec2.x) + Math.abs(vec1.y - vec2.y);
+    }
+
     /**
      * Is angle between the angles start and end (going ccw)
      * @param angle The angle to check

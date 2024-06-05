@@ -8,6 +8,7 @@ public class EnemyTank extends Tank {
     // 33 upgrades available for level 45
     protected Queue<Integer> statUpgradeQueue = new LinkedList<Integer>();
 
+    // TODO: add different stat presets, body damager, glass cannon, etc.
     public EnemyTank(Vector2 spawn, String buildName, Color fillCol, Color strokeCol) {
         super(spawn, new BotController(), new Stats(), 1);
         setColor(fillCol, strokeCol);
@@ -16,16 +17,24 @@ public class EnemyTank extends Tank {
         // Set upgrade paths
         setUpgradePath(TankBuild.getRandomUpgradePath());
         // Set upgrade queue
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 6; i++)
             statUpgradeQueue.add(Stats.BULLET_PENETRATION);
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 6; i++)
             statUpgradeQueue.add(Stats.BULLET_DAMAGE);
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 6; i++)
             statUpgradeQueue.add(Stats.RELOAD);
-        for (int i = 0; i < 7; i++)
-            statUpgradeQueue.add(Stats.BULLET_SPEED);
         for (int i = 0; i < 5; i++)
-            statUpgradeQueue.add(Stats.MAX_HEALTH);
+            statUpgradeQueue.add(Stats.BULLET_SPEED);
+
+        statUpgradeQueue.add(Stats.BULLET_PENETRATION);
+        statUpgradeQueue.add(Stats.BULLET_DAMAGE);
+        statUpgradeQueue.add(Stats.RELOAD);
+        statUpgradeQueue.add(Stats.BULLET_SPEED);
+        statUpgradeQueue.add(Stats.BULLET_SPEED);
+
+        int finalStat = (Math.random() < 0.5) ? Stats.MOVEMENT_SPEED : Stats.MAX_HEALTH;
+        for (int i = 0; i < 5; i++)
+            statUpgradeQueue.add(finalStat);
     }
 
     @Override

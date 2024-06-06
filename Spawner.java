@@ -32,7 +32,7 @@ public class Spawner {
         nestBox = new Rectangle(Main.arenaWidth/2 - nestSide/2, Main.arenaHeight/2 - nestSide/2, nestSide, nestSide);
         crasherZone = new Rectangle(Main.arenaWidth/2 - crasherSide/2, Main.arenaHeight/2 - crasherSide/2, crasherSide, crasherSide);
 
-        polygonAmount = (int) (Main.arenaWidth*Main.arenaWidth/(200*Main.GRID_SIZE*Main.GRID_SIZE));
+        polygonAmount = (int) (Main.arenaWidth*Main.arenaWidth/(180*Main.GRID_SIZE*Main.GRID_SIZE));
         pentagonNestAmount = (int) (nestSide*nestSide/(220*Main.GRID_SIZE*Main.GRID_SIZE));
         crasherAmount = pentagonNestAmount;
         System.out.println("Polygon amount: " + polygonAmount + ", Nest amount: " + pentagonNestAmount);

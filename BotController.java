@@ -158,7 +158,7 @@ public class BotController implements Controller {
 
         // Bot will go towards the center of the map (for now)
         if (host.level < 45) {
-            if (rand < 0.4 || host.level < 15) {  // 40% of tanks do not go to center or if too low level
+            if (rand < 0.4 || host.level < 20) {  // 40% of tanks do not go to center or if too low level
                 // Corner farmer
                 if (rand < 0.1f) {  // Corners
                     if (rand < 0.025) {  // Top left

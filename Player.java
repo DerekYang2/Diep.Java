@@ -40,7 +40,6 @@ public class Player extends Tank {
      * @param spawn Spawn position of the player
      * @param buildName Name of player
      */
-
     public Player(Vector2 spawn, String buildName) {
         super(spawn, new PlayerController(), new Stats(), 1);
         aliveTimer.start();
@@ -81,7 +80,6 @@ public class Player extends Tank {
     /**
      * Initializes level and score bar for player
      */
-
     public void initBars() {
         //Calculate position of level bar
         levelBarPos = new Vector2((Graphics.cameraWidth- BAR_WIDTH) * 0.5f, Graphics.cameraHeight - BAR_HEIGHT - 10);
@@ -101,7 +99,6 @@ public class Player extends Tank {
     /**
      * Initializes upgrade bars of player
      */
-
     public void initUpgradeBars() {
         final float upgradeBarHeight = 22; //Height of upgrade bar
         float yPos = Graphics.cameraHeight - upgradeBarHeight - 10; //y-position of upgrade bar
@@ -152,21 +149,28 @@ public class Player extends Tank {
         targetZoom = getZoom();
     }
 
+    /**
+     * Calculates zoom level based on fieldFactor and level
+     * @return Calculated zoom level
+     */
     protected float getZoom() {
         return (float) ((.55f * this.tankBuild.fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f));
     }
 
-
+    /**
+     * Updates player's state and level
+     */
     @Override
     public void update() {
         super.update();
 
         if (Math.abs(targetZoom - currentZoom) > 1e-3) {
-            currentZoom += (targetZoom - currentZoom) * 0.05f;
+            currentZoom += (targetZoom - currentZoom) * 0.05f; //Adjusts camera
             Graphics.setZoom(currentZoom);
         }
 
-        if (Graphics.isKeyDown(KEY_K)) {
+        //For testing and faster matches
+        if (Graphics.isKeyDown(KEY_K)) { //Increases score if K is pressed
             score += Math.max(0, Math.min(ScoreHandler.levelToScore(45) + 0.01f - score, 23000.f/(2 * 120)));  // 2 seconds
         }
 
@@ -174,14 +178,18 @@ public class Player extends Tank {
             messageQueue.remove();  // Remove the top element
         }
 
-        LeaderPointer.update();
+        LeaderPointer.update(); //Update arrow pointing to leader
     }
 
+    /**
+     * Updates player's stats based on key pressed
+     */
     @Override
     public void updateStatUpgrade() {
         super.updateStatUpgrade();
         if (usedStatPoints == maxStatPoints) return;  // If no stat points to use
 
+        //Increments stats based on number key pressed
         if (Graphics.isKeyPressed(KEY_ONE)) {
             incrementStat(Stats.HEALTH_REGEN);
         }
@@ -208,18 +216,25 @@ public class Player extends Tank {
         }
     }
 
+    /**
+     * Increments specific stat if not at max value
+     * @param statEnum Index of stat
+     */
     public void incrementStat(int statEnum) {
         if (upgradeBar[statEnum] == null || getStat(statEnum) >= tankBuild.getMaxStat(upgradeBar[statEnum].text)) {  // If stat doesn't exist or is maxed
             return;
         }
         super.incrementStat(statEnum);
-        upgradeBar[statEnum].setRects(getStat(statEnum));
+        upgradeBar[statEnum].setRects(getStat(statEnum)); //Update display
         if (upgradeFrames >= UPGRADE_HUD_DURATION * (1-PERCENT_FADE))  // If bar is fading out
             upgradeFrames = UPGRADE_HUD_DURATION - upgradeFrames;  // Set frames to symmetric fading in
         else if (upgradeFrames >= UPGRADE_HUD_DURATION * PERCENT_FADE)  // If bar is fully visible
             upgradeFrames = (int) (UPGRADE_HUD_DURATION * PERCENT_FADE);  // Reset to start of being fully visible
     }
 
+    /**
+     * Draws player and pointer
+     */
     public void draw() {
         super.draw();
         LeaderPointer.draw();
@@ -235,18 +250,23 @@ public class Player extends Tank {
         }*/
     }
 
+    /**
+     * Updates level and score bar displayed on screen
+     * Calculates percentage compared to top scorer
+     */
     public void updateBars() {
         if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) != 0) return;  // Only update every other frame
 
+        //Score values
         float levelStartScore = ScoreHandler.levelToScore(level), levelNextScore = ScoreHandler.levelToScore(level+1);
-        if (level == ScoreHandler.maxPlayerLevel && levelUpWatch.ms() >= 1000) {
+        if (level == ScoreHandler.maxPlayerLevel && levelUpWatch.ms() >= 1000) { //Updates progress
             levelBar.update((float) (levelUpWatch.ms() - 1600) /1000);
         } else {
             levelBar.update(levelUpWatch.ms() < 1000? 1 : (score - levelStartScore) / (levelNextScore - levelStartScore));
         }
 
         Tank firstTank = Leaderboard.getTankRank(0);
-        if (Main.counter % 4 == 0) {
+        if (Main.counter % 4 == 0) { //Update text and progress
             scoreBar.setText(String.format("Score: %,d", (int)score), 20);
         }
         scoreBar.update((firstTank == null) ? 0 : score/firstTank.score);  // Percentage compared to top scorer
@@ -254,6 +274,9 @@ public class Player extends Tank {
 
     float prevUpgradeOpacity = 0;
 
+    /**
+     * Updates upgrade bars on screen
+     */
     public void updateUpgradeBars() {
         upgradeFrames++;
         upgradeFrames = Math.min(UPGRADE_HUD_DURATION, upgradeFrames);  // Cap the frames
@@ -270,7 +293,7 @@ public class Player extends Tank {
         prevUpgradeOpacity = upgradeOpacity;
         upgradeOpacity = upgradeBarOpacity(upgradeFrames);
 
-
+        //Update each individual bar with opacity
         for (UpgradeBar bar : upgradeBar) {
             if (bar != null) {
                 bar.update(upgradeOpacity);
@@ -278,6 +301,9 @@ public class Player extends Tank {
         }
     }
 
+    /**
+     * Draws level and score bar
+     */
     public void drawLevelBar() {
         levelBar.draw();
         //float reverseZoom = 1.f / Graphics.getCameraZoom();
@@ -285,13 +311,19 @@ public class Player extends Tank {
         scoreBar.draw();
     }
 
+    /**
+     * Draws username
+     */
     public void drawUsername() {
-        // Draw username
         Graphics.drawTextOutline(username, usernamePos, usernameFontSize, usernameSpacing, Color.WHITE);
         //Graphics.drawTextCenteredOutline(username, Graphics.cameraWidth/2, (int) (levelBarPos.y - 0.8f * BAR_HEIGHT - 20), 40, Color.WHITE);
     }
 
+    /**
+     * Draws kill messages on the screen with proper formatting
+     */
     public void drawKillQueue() {
+        //Calculates position
         float inverseZoom = 1.f / Graphics.getCameraZoom();
         float x = Graphics.cameraWidth * 0.5f, y = 10;
         Vector2 pos = Graphics.getScreenToWorld2D(new Vector2(x, y), Graphics.camera);
@@ -301,6 +333,7 @@ public class Player extends Tank {
         for (Pair<String, Long> dataPair : messageQueue) {
             int framesLeft = (int) (dataPair.second - Main.counter);
             float opacity = messageOpacity(framesLeft);
+            //Draws message
             Graphics.drawTextCenteredBackground(dataPair.first, (int) pos.x, (int) (yPos + textHeight * 0.5f), (int)(22 * inverseZoom), -2.5f * inverseZoom, Graphics.colAlpha(Color.WHITE, opacity), Graphics.colAlpha(Graphics.BAR_GREY, opacity * 1.1f));
             yPos += textHeight + 3 * inverseZoom;  // Extra 3 spacing
         }
@@ -312,7 +345,7 @@ public class Player extends Tank {
      * <a href="https://www.desmos.com/calculator/x8adbicvxa">function graph</a>
      * Assumes frames is between 0 and MESSAGE_DURATION
      * @param frames The number of frames since the message was added
-     * @return The opacity of the  message
+     * @return The opacity of the message
      */
     private static float messageOpacity(int frames) {
         final float O_max = 0.75f, T = KILL_MESSAGE_DURATION, p = 0.07f;
@@ -325,6 +358,12 @@ public class Player extends Tank {
         }
     }
 
+    /**
+     * Function to calculate the opacity of the bar
+     * Assumes frames is between 0 and UPGRADE_HUD_DURATION
+     * @param frames The number of frames since the bar was added
+     * @return The opacity of the bar
+     */
     private static float upgradeBarOpacity(int frames) {
         final float O_max = .8f, T = UPGRADE_HUD_DURATION, p = PERCENT_FADE;
         if (frames < T*p) {
@@ -336,10 +375,19 @@ public class Player extends Tank {
         }
     }
 
+    /**
+     * Adds a message to the kill queue
+     * @param message Message to be added to the queue
+     * @param duration Duration of the message's appearance in frames
+     */
     public void addMessage(String message, int duration) {
         messageQueue.add(new Pair<>(message, Main.counter + duration));
     }
 
+    /**
+     * Updates score and adds kill message to queue
+     * @param victim Tank that was killed
+     */
     @Override
     public void updateVictim(GameObject victim) {
         super.updateVictim(victim);
@@ -348,6 +396,10 @@ public class Player extends Tank {
         }
     }
 
+    /**
+     * Deletes player from game once killed
+     * Displays who killed the player, score, and time alive
+     */
     @Override
     public void delete() {
         super.delete();
@@ -358,6 +410,7 @@ public class Player extends Tank {
         Main.deathScore = String.format("%,d", (int)score);   // Format score with commas
         Main.deathLevel = String.valueOf(level);
 
+        //Time alive
         int seconds = (int) aliveTimer.s();
         int hours = seconds / 3600;
         seconds %= 3600;
@@ -366,14 +419,18 @@ public class Player extends Tank {
         Main.aliveTime = (hours > 0 ? hours + "h " : "") + (minutes > 0 ? minutes + "m " : "") + seconds + "s";
     }
 
+    /**
+     * Draws upgrade bars on the screen
+     */
     public void drawUpgradeBars() {
         if (upgradeOpacity < 0.01f) return;  // If opacity is too low, don't draw
         for (UpgradeBar bar : upgradeBar) {
-            if (bar != null) {
+            if (bar != null) { //If bar is non-null
                 bar.draw();
             }
         }
         if (maxStatPoints - usedStatPoints >= 0) {
+            //Draw remaining stats
             Graphics.drawTextOutline("x" + (maxStatPoints - usedStatPoints), usagePos, 30, (float) (-Math.PI/6), -2, Graphics.colAlpha(Color.WHITE, upgradeOpacity));
         }
     }

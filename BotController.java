@@ -27,7 +27,7 @@ public class BotController implements Controller {
         bounceDir = moveDir = intendedDir = (float) (Math.random() * 2 * Math.PI);
         targetPos = null;
         currentPos = new Vector2(0, 0);
-        rand = Math.random();  // 40% of tanks do not go to center
+        rand = Math.random();  // Persistent random number for a tank
     }
 
     @Override
@@ -172,7 +172,7 @@ public class BotController implements Controller {
                     }
                 } else {  // Loop around the map (square)
                     final Vector2 center = new Vector2(Main.arenaWidth / 2, Main.arenaHeight / 2);
-                    float radTarget = (float) (0.25f * (1.1f + rand) * Main.arenaWidth);  // Manhatten distance to center
+                    float radTarget = (float) (0.25f * (1.1f + rand) * Main.arenaWidth);  // Manhattan distance to center
                     float currentRad = Graphics.manhattanDistance(host.pos, center);
 
                     float angle = (float) Graphics.normalizeAngle(Math.atan2(host.pos.y - center.x, host.pos.x - center.y));

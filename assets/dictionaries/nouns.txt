@@ -412,7 +412,7 @@ bait
 bake
 baker
 bakery
-bakeware
+bakewaret
 balaclava
 balalaika
 balance

@@ -166,14 +166,14 @@ public class Bar implements Drawable {
 
     @Override
     public void addToPools() {
-        Main.drawablePool.addObj(this, DrawPool.TOP_UI);
+        Main.drawablePool[Scene.GAME.ordinal()].addObj(this, DrawPool.TOP_UI);
     }
 
     @Override
     public void delete() {
         if (inGameWorld) {
             Main.idServer.returnId(this.getId());
-            Main.drawablePool.deleteObj(this.getId(), DrawPool.TOP_UI);
+            Main.drawablePool[Scene.GAME.ordinal()].deleteObj(this.getId(), DrawPool.TOP_UI);
         }
     }
 }

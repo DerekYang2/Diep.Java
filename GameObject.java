@@ -385,7 +385,7 @@ public abstract class GameObject implements Updatable, Drawable {
     @Override
     public void addToPools() {
         Main.gameObjectPool.addObj(this);
-        Main.drawablePool.addObj(this, DRAW_LAYER);
+        Main.drawablePool[Scene.GAME.ordinal()].addObj(this, DRAW_LAYER);
     }
 
     public void triggerDelete() {
@@ -403,7 +403,7 @@ public abstract class GameObject implements Updatable, Drawable {
         // All added to wait lists
         Main.gameObjectPool.deleteObj(this.getId());
         // Delete from drawable pool
-        Main.drawablePool.deleteObj(this.getId(), DRAW_LAYER);
+        Main.drawablePool[Scene.GAME.ordinal()].deleteObj(this.getId(), DRAW_LAYER);
         // Delete health bar
         if (healthBar != null)
             healthBar.delete();

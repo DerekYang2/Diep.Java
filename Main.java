@@ -275,7 +275,6 @@ public class Main {
             if (scene == Scene.MENU) {
                 for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
                     if (Graphics.isKeyDown(Keyboard.KEY_SPACE)) {
-                        System.out.println("HERE");
                         pendingSceneChange = Scene.GAME;
                         startGame();
                     }

@@ -27,10 +27,16 @@ public class Main {
     // Variables for game reset
     static Stopwatch lastReset = new Stopwatch();  // For resetting the game
     static boolean pendingReset = false;
+
+    /**
+     * Initiates game reset and begins countdown
+     */
+
     public static void resetGame() {
         pendingReset = true;
         lastReset.start();
     }
+    
     static String debugText = "";
     // TEMP: Debugging/analysis
     static float percentage;
@@ -61,7 +67,7 @@ public class Main {
         drawablePool.clear();
         gameObjectPool.clear();
         idServer.reset();
-        //TextureLoader.clear();  // TODO: should this be kept, ram will take a hit
+        //TextureLoader.clear();  //TODO: should this be kept, ram will take a hit
         Leaderboard.clear();
         Spawner.reset();
         deathScreenFrames = 0;

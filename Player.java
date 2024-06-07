@@ -24,6 +24,7 @@ public class Player extends Tank {
     Queue<Pair<String, Long>> messageQueue = new LinkedList<>();  // {message, expireTime (Main.counter)}
     final private static int KILL_MESSAGE_DURATION = 3 * 120;  // 3 seconds
 
+    //Variables for upgrade
     UpgradeBar[] upgradeBar = new UpgradeBar[8];
     final static int UPGRADE_HUD_DURATION = 3 * 120;
     final static float PERCENT_FADE = 0.05f;
@@ -31,8 +32,14 @@ public class Player extends Tank {
     int upgradeFrames = UPGRADE_HUD_DURATION;
     Vector2 usagePos;
 
-    // How long the player has been alive
+    // New timer measuring how long the player has been alive
     Stopwatch aliveTimer = new Stopwatch();
+
+    /**
+     * Constructs new Tank with spawn position and build name
+     * @param spawn Spawn position of the player
+     * @param buildName Name of player
+     */
 
     public Player(Vector2 spawn, String buildName) {
         super(spawn, new PlayerController(), new Stats(), 1);
@@ -54,51 +61,69 @@ public class Player extends Tank {
         setUpgradePath(new String[]{"ranger"});
     }
 
+    /**
+     * Initializes Tank build for the player
+     * @param tankBuild Represents build for the player
+     */
     @Override
     public void initTankBuild(TankBuild tankBuild) {
         super.initTankBuild(tankBuild);
-        TextureLoader.pendingAdd(this.tankBuild.name, this.fillCol, this.strokeCol);
-        formattedBuildName = NameGenerator.formatNameCase(this.tankBuild.name);
-
+        TextureLoader.pendingAdd(this.tankBuild.name, this.fillCol, this.strokeCol); //Add tank build textures
+        formattedBuildName = NameGenerator.formatNameCase(this.tankBuild.name); //Format build name
+        //Update level bar text
         if (levelBar != null)
             levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
-
+        //Set zoom
         targetZoom = getZoom();
         initUpgradeBars();
     }
 
+    /**
+     * Initializes level and score bar for player
+     */
+
     public void initBars() {
+        //Calculate position of level bar
         levelBarPos = new Vector2((Graphics.cameraWidth- BAR_WIDTH) * 0.5f, Graphics.cameraHeight - BAR_HEIGHT - 10);
 
         float levelStartScore = ScoreHandler.levelToScore(level), levelNextScore = ScoreHandler.levelToScore(level+1);
         float initialLevelPercentage = (level == ScoreHandler.maxPlayerLevel) ? 1 : (score-levelStartScore)/(levelNextScore-levelStartScore);
+        //Initializes level bar
         levelBar = new Bar(levelBarPos, BAR_WIDTH, BAR_HEIGHT, 3, Graphics.LEVELBAR, Graphics.BAR_GREY, 0.08f, initialLevelPercentage);  // If level max level, prevent division by 0 -> infinity
         levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
         levelUpWatch.start();
 
+        //Initializes score bar
         final float scoreBarWidth = BAR_WIDTH*2/3, scoreBarHeight = BAR_HEIGHT*0.8f;
         scoreBar = new Bar(new Vector2((Graphics.cameraWidth - scoreBarWidth) * 0.5f, levelBarPos.y - scoreBarHeight - 3), scoreBarWidth, scoreBarHeight, 2, Graphics.SCORE_GREEN, Graphics.BAR_GREY, 0.08f, 0);
     }
 
+    /**
+     * Initializes upgrade bars of player
+     */
+
     public void initUpgradeBars() {
-        final float upgradeBarHeight = 22;
-        float yPos = Graphics.cameraHeight - upgradeBarHeight - 10;
-        String[] upgradeText = {"Movement Speed", "Reload", "Bullet Damage", "Bullet Penetration", "Bullet Speed", "Body Damage", "Max Health", "Health Regen"};
-        for (int i = 0; i < upgradeText.length; i++) {
+        final float upgradeBarHeight = 22; //Height of upgrade bar
+        float yPos = Graphics.cameraHeight - upgradeBarHeight - 10; //y-position of upgrade bar
+        String[] upgradeText = {"Movement Speed", "Reload", "Bullet Damage", "Bullet Penetration", "Bullet Speed", "Body Damage", "Max Health", "Health Regen"}; //Array of stats
+        for (int i = 0; i < upgradeText.length; i++) { 
             upgradeText[i] = tankBuild.getProperStat(upgradeText[i]);  // Get proper stat name
         }
 
+        //Color of each stat
         Color[] colors = {Graphics.MOVEMENT_SPEED, Graphics.RELOAD, Graphics.BULLET_DAMAGE, Graphics.BULLET_PENETRATION, Graphics.BULLET_SPEED, Graphics.BODY_DAMAGE, Graphics.MAX_HEALTH, Graphics.HEALTH_REGEN};
 
         for (int i = 0; i < 8; i++) {
             int maxStat = tankBuild.getMaxStat(upgradeText[i]);
             if (maxStat > 0) {
+                //Create upgrade bar
                 upgradeBar[i] = new UpgradeBar(10, yPos, 23, maxStat, upgradeBarHeight, 2, colors[i], upgradeText[i], "[" + (8 - i) + "]");
-                yPos -= upgradeBarHeight + 3;
+                yPos -= upgradeBarHeight + 3; //y-position for the upgrade bar
             } else {
                 upgradeBar[i] = null;
             }
         }
+        //Set position of text display
         usagePos = new Vector2(10 + upgradeBar[0].getWidth() - 5, yPos + 5);
         for (int statEnum = 0; statEnum < 8; statEnum++) {
             if (upgradeBar[statEnum] != null) {
@@ -107,17 +132,20 @@ public class Player extends Tank {
         }
     }
 
+    /**
+     * Updates player based on their score
+     */
     @Override
     public void updateLevel() {
         // Update level
         int newLevel = level;
         while (newLevel < ScoreHandler.maxPlayerLevel && score > ScoreHandler.levelToScore(newLevel + 1)) {  // If score is enough to level up
-            newLevel++;
+            newLevel++; //Levels up
         }
 
         if (newLevel != level) {
             level = newLevel;
-            updateStats();
+            updateStats(); //Update stats based on new level
             levelUpWatch.start();
             levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
         }

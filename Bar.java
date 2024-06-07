@@ -114,9 +114,9 @@ public class Bar implements Drawable {
     public void forceHidden(boolean isHidden) {
         this.isHiding = isHidden;
         if (isHidden) {
-            opacity = 0;
+            opacity = 0; //Hides object
         } else {
-            opacity = 1;
+            opacity = 1; //Shows object
         }
     }
     @Override

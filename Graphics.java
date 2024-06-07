@@ -104,12 +104,6 @@ public class Graphics extends Raylib {
             CRASHER = rgb(241, 119, 221),
             CRASHER_STROKE = rgb(180, 89, 165);
 
-
-
-    public static Color getColor(String hexStr) {
-        return rlj.textures.GetColor(Integer.parseInt(hexStr, 16));
-    }
-
     public static void initialize(String title) {
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode monitor = gd.getDisplayMode();

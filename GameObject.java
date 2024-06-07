@@ -50,7 +50,7 @@ public abstract class GameObject implements Updatable, Drawable {
     float regenPerFrame = 0;
 
     // Collision
-    float absorptionFactor = 1, pushFactor = 8;  // Default
+    float absorptionFactor = 1, pushFactor = 8;  // Default values
     public GameObject(Vector2 pos, int radius, float damageFactor, int drawLayer) {
         this.pos = pos;
         this.vel = new Vector2(0, 0);
@@ -205,22 +205,22 @@ public abstract class GameObject implements Updatable, Drawable {
 
     private void restrictPosition() {
         // Keep object within the arena
-        if (pos.x < 0) {
+        if (pos.x < 0) { //Checks x position
             pos.x = 0;
             // A bit of bounce right
             vel.x = Math.abs(vel.x * absorptionFactor * 0);
         }
-        if (pos.x > Main.arenaWidth) {
+        if (pos.x > Main.arenaWidth) { //Checks x position
             pos.x = Main.arenaWidth;
             // A bit of bounce left
             vel.x = -Math.abs(vel.x * absorptionFactor * 0);
         }
-        if (pos.y < 0) {
+        if (pos.y < 0) { //Checks y position
             pos.y = 0;
             // A bit of bounce down
             vel.y = Math.abs(vel.y * absorptionFactor * 0);
         }
-        if (pos.y > Main.arenaHeight) {
+        if (pos.y > Main.arenaHeight) { //Checks y position
             pos.y = Main.arenaHeight;
             // A bit of bounce up
             vel.y = -Math.abs(vel.y * absorptionFactor * 0);
@@ -271,7 +271,7 @@ public abstract class GameObject implements Updatable, Drawable {
         }
 
         health -= damage;
-        if (damageAnimationFrames <= 1)  // If basically finished damage animation
+        if (damageAnimationFrames <= 1)  // If finished damage animation
             damageAnimationFrames = DAMAGE_ANIMATION_FRAMES;  // Start damage animation
 
         if (health <= 1e-6) {  // Close enough to 0
@@ -310,7 +310,7 @@ public abstract class GameObject implements Updatable, Drawable {
             float scaleDown = a.health / bDamage;  // Scale down damage so that a just dies
             a.receiveDamage(scaleDown * bDamage);
             b.receiveDamage(scaleDown * aDamage);
-        } else {
+        } else { //No change
             a.receiveDamage(bDamage);
             b.receiveDamage(aDamage);
         }
@@ -392,7 +392,7 @@ public abstract class GameObject implements Updatable, Drawable {
         if (isDead) return;
         isDead = true;  // Begin deletion animation
         if (healthBar != null)
-            healthBar.forceHidden(true);
+            healthBar.forceHidden(true); //Hides health bar
         damageAnimationFrames = 0;  // Stop damage animation
     }
 

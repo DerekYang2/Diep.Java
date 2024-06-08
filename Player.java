@@ -8,8 +8,6 @@ import java.util.Queue;
 import static com.raylib.java.core.input.Keyboard.*;
 
 public class Player extends Tank {
-    float currentZoom;
-    float targetZoom;
     Stopwatch levelUpWatch = new Stopwatch();
 
     // Variables for HUD
@@ -45,8 +43,7 @@ public class Player extends Tank {
         aliveTimer.start();
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         initTankBuild(TankBuild.createTankBuild(buildName));
-        currentZoom = targetZoom;  // Spawn with right zoom level
-        Graphics.setZoom(currentZoom);  // Set zoom level
+        CameraManager.forceSetZoom(getZoom());  // Spawn with right zoom
         initBars();
 
         // Set username variables
@@ -73,7 +70,7 @@ public class Player extends Tank {
         if (levelBar != null)
             levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
         //Set zoom
-        targetZoom = getZoom();
+        CameraManager.setZoom(getZoom());
         initUpgradeBars();
     }
 
@@ -146,17 +143,12 @@ public class Player extends Tank {
             levelUpWatch.start();
             levelBar.setText("Lvl " + level + " " + formattedBuildName, levelBarFontSize);
         }
-        targetZoom = getZoom();
+        CameraManager.setZoom(getZoom());
     }
 
     @Override
     public void update() {
         super.update();
-
-        if (Math.abs(targetZoom - currentZoom) > 1e-3) {
-            currentZoom += (targetZoom - currentZoom) * 0.05f; //Adjusts camera
-            Graphics.setZoom(currentZoom);
-        }
 
         //For testing and faster matches
         if (Graphics.isKeyDown(KEY_K)) { //Increases score if K is pressed

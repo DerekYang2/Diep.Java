@@ -1,6 +1,5 @@
 import com.raylib.java.core.Color;
 import com.raylib.java.core.input.Keyboard;
-import com.raylib.java.raymath.Raymath;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.textures.Texture2D;
@@ -94,7 +93,10 @@ public class Main {
         // Initialize camera
         menuTargetWatch = new Stopwatch();
         menuTargetWatch.start();
-        cameraHost = Spawner.spawnRandomEnemy(0);
+
+        Tank randomEnemy = Spawner.spawnRandomEnemy(0);
+        CameraManager.setZoom(randomEnemy.getZoom());
+        cameraHost = randomEnemy;
         cameraTarget = cameraHost.pos;
         Graphics.setCameraTarget(cameraTarget);
         cameraBox = Graphics.getCameraWorld();
@@ -154,38 +156,9 @@ public class Main {
             }
         }
 
-        updateCamera();
+        CameraManager.update();
 
         cameraBox = Graphics.getCameraWorld();
-    }
-
-    public static void updateCamera() {
-        if (cameraHost == player) {
-            if (player.tankBuild.zoomAbility && player.controller.holdSpecial()) {
-                if (player.controller.pressSpecial()) {  // Only update target if the button is pressed
-                    // TODO: check if predator zoom amount is right
-                    cameraTarget = new Vector2((float) (Math.cos(player.direction) * 1000 * player.scale + player.pos.x), (float) (Math.sin(player.direction) * 1000 * player.scale + player.pos.y));
-                }
-            } else {
-                cameraTarget = player.pos;
-            }
-        } else {
-            cameraTarget = cameraHost.pos;
-        }
-
-        Vector2 difference = Raymath.Vector2Subtract(cameraTarget, Graphics.getCameraTarget());
-        Graphics.shiftCameraTarget(Graphics.scale(difference, 0.05f));
-
-        // Zoom in and out feature (beta testing)
-        float delta = Graphics.getCameraZoom()/100;
-        if (Graphics.isKeyDown(Keyboard.KEY_DOWN)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() - delta);
-        }
-        if (Graphics.isKeyDown(Keyboard.KEY_UP)) {
-            Graphics.setCameraZoom(Graphics.getCameraZoom() + delta);
-        }
-        // Cap the zoom level
-        Graphics.setCameraZoom(Math.max(0.1f, Math.min(10f, Graphics.getCameraZoom())));
     }
 
     private static void drawGrid() {
@@ -274,11 +247,11 @@ public class Main {
     }
 
     public static void menuUpdate() {
-        if (menuTargetWatch.s() > 5) {
+        if (menuTargetWatch.s() > 5 || cameraHost == null || cameraHost.isDead) {  // Switch camera target every 5 seconds or if the current target is dead
             Tank leaderTank = Leaderboard.getTankRank(0);  // Set camera to top player
             if (leaderTank != null) {
                 cameraHost = leaderTank;
-
+                CameraManager.setZoom(leaderTank.getZoom());
             }
             menuTargetWatch.start();
         }
@@ -304,7 +277,8 @@ public class Main {
         drawBounds();
         drawablePool[SceneManager.getScene()].drawAll();  // Draw all objects
         Graphics.endCameraMode();
-        Graphics.drawTextCenteredOutline("Press SPACE to start", Graphics.cameraWidth/2, Graphics.cameraHeight/2, 50, -5, Color.WHITE);
+        Graphics.drawRectangle(0, 0, Graphics.cameraWidth, Graphics.cameraHeight, Graphics.rgba(0, 0, 0, 150));
+        Graphics.drawTextCenteredOutline("DIEP.JAVA", Graphics.cameraWidth/2, Graphics.cameraHeight/2, 80, -6, Color.WHITE);
         Graphics.endTextureMode();
         Graphics.endDrawMode();
     }

@@ -55,10 +55,8 @@ public class EnemyTank extends Tank {
         }*/
     }
 
-    // TODO: always draw username in front
     @Override
-    public void draw() {
-        super.draw();
+    public void drawText() {
         if (!isDead && Main.onScreen(pos, radius*scale) && !isInvisible()) {
             float inverseZoom = 1.f / Graphics.getCameraZoom(), scoreFont = 22 * inverseZoom, yPos = (pos.y - getRadiusScaled());
             Graphics.drawTextCenteredOutline(Leaderboard.formatScoreShort(score), (int) pos.x, (int) (yPos - 1.25f * scoreFont * 0.5f), (int) scoreFont, -8.f, Graphics.colAlpha(Color.WHITE, 0.75f));
@@ -80,6 +78,6 @@ public class EnemyTank extends Tank {
     @Override
     public void delete() {
         super.delete();
-        Spawner.enemyCount[Spawner.getTeam(group)]--;  // Decrement enemy count
+        Spawner.enemyCount[group]--;  // Decrement enemy count
     }
 }

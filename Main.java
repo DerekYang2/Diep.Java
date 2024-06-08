@@ -6,41 +6,31 @@ import com.raylib.java.shapes.Rectangle;
 import com.raylib.java.textures.Texture2D;
 
 public class Main {
-    final public static float GRID_SIZE = 50;
-    static Rectangle cameraBox;
-    public static float arenaWidth = GRID_SIZE * 100, arenaHeight = GRID_SIZE * 100;
-    public final static float ARENA_PADDING = GRID_SIZE * 4;
-
+    final public static float GRID_SIZE = 50, ARENA_PADDING = GRID_SIZE * 4;
+    public static Rectangle cameraBox;
+    public static float arenaWidth, arenaHeight;
     public static long counter = 0;
     public static int deathScreenFrames = 0;
     public static DrawPool[] drawablePool;
     public static HashPool<GameObject> gameObjectPool;
     public static HashPool<UIObject> UIObjectPool;
     public static IdServer idServer;
-    public static Stopwatch globalClock;
     public static Player player;
     public static GameObject cameraHost;
     public static Vector2 cameraTarget;
-    public static String killerName;
     public static Texture2D deathTexture;
-    public static String deathBuild, deathScore, deathLevel, aliveTime;
+    public static String killerName, deathBuild, deathScore, deathLevel, aliveTime;
+    public static Stopwatch menuTargetWatch;  // Stopwatch for switching menu camera target
 
     // Variables for game reset
-    static Stopwatch lastReset = new Stopwatch();  // For resetting the game
-    static boolean pendingReset = false;
-
-    // Scene management
-    static Scene pendingSceneChange = null;
-    static Scene scene = Scene.MENU;
-
+    public static Stopwatch lastReset;
+    public static boolean pendingReset = false;
     public static void resetGame() {
         pendingReset = true;
         lastReset.start();
     }
-    static String debugText = "";
-    // TEMP: Debugging/analysis
-    static float percentage;
-    static Stopwatch stopwatch = new Stopwatch();
+    // Debugging/analysis
+    public static String debugText = "";
 
     // Called in GamePanel.java to initialize game
 
@@ -49,7 +39,7 @@ public class Main {
         TankBuild.loadTankDefinitions();  // Load tank definitions from TankDefinitions.json
         NameGenerator.initialize();
         ScoreHandler.initialize();
-        globalClock = new Stopwatch();
+        lastReset = new Stopwatch();  // For resetting the game
 
         drawablePool = new DrawPool[Scene.values().length];
         for (int i = 0; i < drawablePool.length; i++) {
@@ -60,17 +50,63 @@ public class Main {
         UIObjectPool = new HashPool<>();
         idServer = new IdServer();
         lastReset.start();
+
+        SceneManager.setSceneUpdate(Scene.MENU, Main::menuUpdate);
+        SceneManager.setSceneDraw(Scene.MENU, Main::menuDraw);
+        SceneManager.setSceneUpdate(Scene.GAME, Main::gameUpdate);
+        SceneManager.setSceneDraw(Scene.GAME, Main::gameDraw);
+
+        startMenuGame();
+    }
+
+    public static void main(String[] args) {
+        initialize();
+        //--------------------------------------------------------------------------------------
+        // Main game loop
+        while (!Graphics.shouldWindowClose())    // Detect window close button or ESC key
+        {
+            SceneManager.refreshScene();
+            SceneManager.updateScene();
+            SceneManager.drawScene();
+        }
+        // De-Initialization
+        //--------------------------------------------------------------------------------------
+        TextureLoader.clear();
+        Graphics.close();
+    }
+
+    public static void startMenuGame() {
+        int spawn = Spawner.getSpawnAmount();
+        // Set arena size
+        arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
+        // Game initialization
+        drawablePool[SceneManager.getScene()].clear();
+        gameObjectPool.clear();
+        UIObjectPool.clear();
+        idServer.reset();
+        //TextureLoader.clear();  // TODO: should this be kept, ram will take a hit
+        Leaderboard.clear();
+        Spawner.reset();
+        deathScreenFrames = 0;
+        // new TestObj();
+        player = null;
+
+        // Initialize camera
+        menuTargetWatch = new Stopwatch();
+        menuTargetWatch.start();
+        cameraHost = Spawner.spawnRandomEnemy(0);
+        cameraTarget = cameraHost.pos;
+        Graphics.setCameraTarget(cameraTarget);
+        cameraBox = Graphics.getCameraWorld();
     }
 
     public static void startGame() {
-        int spawn = 50;
+        int spawn = Spawner.getSpawnAmount() + 1;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
         System.out.println("Arena size: " + arenaWidth + "x" + arenaHeight);
         // Game initialization
-        globalClock.start();
-        for (int i = 0; i < Scene.values().length; i++)
-            drawablePool[i].clear();
+        drawablePool[SceneManager.getScene()].clear();
         gameObjectPool.clear();
         UIObjectPool.clear();
         idServer.reset();
@@ -80,7 +116,7 @@ public class Main {
         deathScreenFrames = 0;
         // new TestObj();
         player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank");
-
+        player.group = 0;  // Blue team
         // Initialize camera
         cameraHost = player;
         cameraTarget = player.pos;
@@ -97,12 +133,8 @@ public class Main {
 
         counter++;
 
-        if (Main.counter % 120 == 0) {
-            stopwatch.start();
-        }
-
         // Handle the pending operations
-        drawablePool[scene.ordinal()].refresh();
+        drawablePool[SceneManager.getScene()].refresh();
         Main.gameObjectPool.refresh();
         Main.UIObjectPool.refresh();
         Main.idServer.refresh();
@@ -117,16 +149,12 @@ public class Main {
             gameObject.update();
         }
         for (UIObject uiObject : UIObjectPool.getObjects()) {
-            if (uiObject.getScene() == scene) {
+            if (uiObject.getScene() == SceneManager.scene) {
                 uiObject.update();
             }
         }
 
         updateCamera();
-
-        if (Main.counter % 120 == 0) {
-            percentage = 100 * (float) stopwatch.ms() / (1000.f/120);  // Time taken / max time allowed
-        }
 
         cameraBox = Graphics.getCameraWorld();
     }
@@ -219,14 +247,6 @@ public class Main {
         return pos.x + radius > cameraBox.x && pos.x - radius < cameraBox.x + cameraBox.width && pos.y + radius > cameraBox.y && pos.y - radius < cameraBox.y + cameraBox.height;
     }
 
-    static float xt = 0;
-    private static void draw() {
-        //Graphics.drawCircle(xt, 100, 10, Color.RED, 1);
-        //xt += 6.25f;
-        // Draw all the drawable objects
-        drawablePool[scene.ordinal()].drawAll();
-    }
-
     private static void drawDeathScreen() {
         Graphics.drawRectangle(0, 0, Graphics.cameraWidth, Graphics.cameraHeight, Graphics.rgba(0, 0, 0, Math.min(100, deathScreenFrames)));
         float totHeight = 400;
@@ -253,96 +273,105 @@ public class Main {
         Graphics.drawTextCenteredOutline(deathBuild, (int)(Graphics.cameraWidth/2 + 250F/2), (int) yPos, 30, -5, Color.WHITE);
     }
 
-    public static void main(String[] args) {
-        initialize();
-        //--------------------------------------------------------------------------------------
-        // Main game loop
-        while (!Graphics.shouldWindowClose())    // Detect window close button or ESC key
-        {
-            // Update
-            //----------------------------------------------------------------------------------
-            if (pendingReset) {
-                startGame();
-                pendingReset = false;
-            }
-            if (pendingSceneChange != null) {
-                scene = pendingSceneChange;
-                pendingSceneChange = null;
-            }
-            if (deathScreenFrames > 0) {  // If animation is playing
-                deathScreenFrames++;
-            }
-            if (scene == Scene.MENU) {
-                for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
-                    if (Graphics.isKeyDown(Keyboard.KEY_SPACE)) {
-                        pendingSceneChange = Scene.GAME;
-                        startGame();
-                    }
-                }
-                Graphics.beginDrawMode();
-                Graphics.drawBackground(Graphics.GRID);
-                Graphics.endDrawMode();
-            } else if (scene == Scene.GAME) {
-                for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
-                    // Compute required framebuffer scaling
-                    Graphics.updateMouse();
-                    update();
-                    if (deathScreenFrames == 0) {
-                        Minimap.update();
-                        player.updateUpgradeBars();
-                    }
-                }
-                Leaderboard.update();
-                if (deathScreenFrames == 0) {
-                    player.updateBars();
-                }
-                TextureLoader.refreshTankTextures();
+    public static void menuUpdate() {
+        if (menuTargetWatch.s() > 5) {
+            Tank leaderTank = Leaderboard.getTankRank(0);  // Set camera to top player
+            if (leaderTank != null) {
+                cameraHost = leaderTank;
 
-                // Draw
-                //----------------------------------------------------------------------------------
-                Graphics.beginDrawMode();
+            }
+            menuTargetWatch.start();
+        }
+        for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
+            if (Graphics.isKeyDown(Keyboard.KEY_SPACE)) {
+                SceneManager.setScene(Scene.GAME);
+                pendingReset = true;
+            }
+            // Compute required framebuffer scaling
+            Graphics.updateMouse();
+            update();
+        }
+        Leaderboard.update();
+        TextureLoader.refreshTankTextures();
+    }
+
+    public static void menuDraw() {
+        Graphics.beginDrawMode();
+        Graphics.beginTargetTexture();
+        Graphics.drawBackground(Graphics.GRID);
+        drawGrid();
+        Graphics.beginCameraMode();
+        drawBounds();
+        drawablePool[SceneManager.getScene()].drawAll();  // Draw all objects
+        Graphics.endCameraMode();
+        Graphics.drawTextCenteredOutline("Press SPACE to start", Graphics.cameraWidth/2, Graphics.cameraHeight/2, 50, -5, Color.WHITE);
+        Graphics.endTextureMode();
+        Graphics.endDrawMode();
+    }
+
+    public static void gameUpdate() {
+        if (pendingReset) {
+            startGame();
+            pendingReset = false;
+        }
+        if (deathScreenFrames > 0) {  // If animation is playing
+            deathScreenFrames++;
+        }
+        for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
+            // Compute required framebuffer scaling
+            Graphics.updateMouse();
+            update();
+            if (deathScreenFrames == 0) {
+                Minimap.update();
+                player.updateUpgradeBars();
+            }
+        }
+        Leaderboard.update();
+        if (deathScreenFrames == 0) {
+            player.updateBars();
+        }
+        TextureLoader.refreshTankTextures();
+    }
+
+    public static void gameDraw() {
+        // Draw
+        //----------------------------------------------------------------------------------
+        Graphics.beginDrawMode();
+            Graphics.beginTargetTexture();
                 Graphics.drawBackground(Graphics.GRID);
-                // Graphics.drawText("Number of objects: " + gameObjectPool.getObjects().size(), 10, 25, 20, Color.BLACK);
-                //Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
-                //Graphics.drawText(String.format("Score: %d\tLevel: %d", (int)player.score, (int)player.level), 10, 60, 20, Color.BLACK);
                 drawGrid();
                 if (Graphics.PERFORMANCE_MODE == 1 && deathScreenFrames == 0) player.drawUpgradeBars();
-                //Graphics.drawText(String.format("Percentage %.2f", percentage), 10, 40, 20, Color.BLACK);
                 if (!debugText.isEmpty()) Graphics.drawText(debugText, 10, 30, 20, Color.WHITE);
                 Graphics.beginCameraMode();
-                drawBounds();
-                draw();  // Main draw function
-                //Graphics.drawTextureCentered(tankTextures.get(Graphics.BLUE).get("auto 5"), new Vector2(the0, 0), Math.PI/4, 1, Color.WHITE);
-                Minimap.draw();
-                if (deathScreenFrames == 0) player.drawKillQueue();
-                Graphics.drawFPS(Graphics.getScreenToWorld2D(new Vector2(10, 10), Graphics.camera), (int) (20 / Graphics.getCameraZoom()), Color.WHITE);
+                    drawBounds();
+                    drawablePool[SceneManager.getScene()].drawAll();  // Draw all objects
+                    for (int id : Leaderboard.tankIds) {
+                        Tank tank = (Tank) gameObjectPool.getObj(id);
+                        if (tank != null) tank.drawText();
+                    }
+                    Minimap.draw();
+                    if (deathScreenFrames == 0) player.drawKillQueue();
+                    Graphics.drawFPS(Graphics.getScreenToWorld2D(new Vector2(10, 10), Graphics.camera), (int) (20 / Graphics.getCameraZoom()), Color.WHITE);
                 Graphics.endCameraMode();
                 if (Graphics.PERFORMANCE_MODE == 0 && deathScreenFrames == 0) player.drawUpgradeBars();
-                Graphics.endTextureMode();
+            Graphics.endTextureMode();
 
-                if (deathScreenFrames > 0) {
-                    Graphics.beginUITexture();
-                    Graphics.rlj.core.ClearBackground(Graphics.rgba(0, 0, 0, 0));  // Only clear on leaderboard refresh
+            if (deathScreenFrames > 0) {  // If death screen is active
+                Graphics.beginUITexture();
+                    Graphics.rlj.core.ClearBackground(Graphics.CLEAR);  // Only clear on leaderboard refresh
                     Leaderboard.draw();
                     drawDeathScreen();
-                    Graphics.endTextureMode();
-                } else if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) == 0) {  // Every other frame
-                    Graphics.beginUITexture();
+                Graphics.endTextureMode();
+            } else if (Main.counter % (2 - Graphics.PERFORMANCE_MODE) == 0) {  // Normal Game UI, every other frame
+                Graphics.beginUITexture();
                     if (Main.counter % Graphics.FPS == 0) {
-                        Graphics.rlj.core.ClearBackground(Graphics.rgba(0, 0, 0, 0));  // Only clear on leaderboard refresh
+                        Graphics.rlj.core.ClearBackground(Graphics.CLEAR);  // Only clear on leaderboard refresh
                         Leaderboard.draw();
                         player.drawUsername();
                     }
                     player.drawLevelBar();
-                    Graphics.endTextureMode();
-                }
-                Graphics.endDrawMode();
+                Graphics.endTextureMode();
             }
-        }
-
-        // De-Initialization
-        //--------------------------------------------------------------------------------------
-        TextureLoader.clear();
-        Graphics.close();
+        Graphics.endDrawMode();
     }
 }

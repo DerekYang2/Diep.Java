@@ -16,7 +16,7 @@ public class Bar implements Drawable {
     float lerpFactor;
     boolean isHiding;
     boolean inGameWorld;
-
+    int scene;
     // Delay for bar to show
     int BEGIN_DELAY = 15;
     int delayFrames = 0;
@@ -41,6 +41,7 @@ public class Bar implements Drawable {
         isHiding = false;
         opacity = 1;
         inGameWorld = false;
+        scene = SceneManager.getScene();
     }
 
     public Bar(float width, float height, float strokeWidth, Color fillCol, Color strokeCol, float lerpFactor, float initialPercentage) {
@@ -55,6 +56,7 @@ public class Bar implements Drawable {
         isHiding = false;
         opacity = 1;
         inGameWorld = false;
+        scene = SceneManager.getScene();
     }
 
     public void setText(String text, int fontSize) {
@@ -166,14 +168,14 @@ public class Bar implements Drawable {
 
     @Override
     public void addToPools() {
-        Main.drawablePool[Scene.GAME.ordinal()].addObj(this, DrawPool.TOP_UI);
+        Main.drawablePool[scene].addObj(this, DrawPool.TOP_UI);
     }
 
     @Override
     public void delete() {
         if (inGameWorld) {
             Main.idServer.returnId(this.getId());
-            Main.drawablePool[Scene.GAME.ordinal()].deleteObj(this.getId(), DrawPool.TOP_UI);
+            Main.drawablePool[scene].deleteObj(this.getId(), DrawPool.TOP_UI);
         }
     }
 }

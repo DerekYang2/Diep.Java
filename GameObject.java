@@ -9,6 +9,7 @@ public abstract class GameObject implements Updatable, Drawable {
     // Objects always collide each other regardless of group (unless noInternalCollision is true)
     int group;  // Objects in different groups damage each other
     int DRAW_LAYER;
+    int scene;
 
     // Special flags
     boolean noInternalCollision = false;  // Object does not collide with objects only in the same group (applies to bullets for now)
@@ -52,6 +53,7 @@ public abstract class GameObject implements Updatable, Drawable {
     // Collision
     float absorptionFactor = 1, pushFactor = 8;  // Default values
     public GameObject(Vector2 pos, int radius, float damageFactor, int drawLayer) {
+        scene = SceneManager.getScene();
         this.pos = pos;
         this.vel = new Vector2(0, 0);
         this.radius = radius;
@@ -385,7 +387,7 @@ public abstract class GameObject implements Updatable, Drawable {
     @Override
     public void addToPools() {
         Main.gameObjectPool.addObj(this);
-        Main.drawablePool[Scene.GAME.ordinal()].addObj(this, DRAW_LAYER);
+        Main.drawablePool[scene].addObj(this, DRAW_LAYER);
     }
 
     public void triggerDelete() {
@@ -403,7 +405,7 @@ public abstract class GameObject implements Updatable, Drawable {
         // All added to wait lists
         Main.gameObjectPool.deleteObj(this.getId());
         // Delete from drawable pool
-        Main.drawablePool[Scene.GAME.ordinal()].deleteObj(this.getId(), DRAW_LAYER);
+        Main.drawablePool[scene].deleteObj(this.getId(), DRAW_LAYER);
         // Delete health bar
         if (healthBar != null)
             healthBar.delete();

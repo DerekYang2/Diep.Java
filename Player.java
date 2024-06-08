@@ -149,17 +149,6 @@ public class Player extends Tank {
         targetZoom = getZoom();
     }
 
-    /**
-     * Calculates zoom level based on fieldFactor and level
-     * @return Calculated zoom level
-     */
-    protected float getZoom() {
-        return (float) ((.55f * this.tankBuild.fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f));
-    }
-
-    /**
-     * Updates player's state and level
-     */
     @Override
     public void update() {
         super.update();

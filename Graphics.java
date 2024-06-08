@@ -71,7 +71,9 @@ public class Graphics extends Raylib {
      */
 
     // Colors
-    public static Color RED = rgb(241, 78, 84),
+    public static Color
+            CLEAR = rgba(0, 0, 0, 0),
+            RED = rgb(241, 78, 84),
             RED_STROKE = rgb(180, 58, 63),
             BLUE = rgb(0, 178, 225),
             BLUE_STROKE = rgb(0, 133, 168),
@@ -270,6 +272,9 @@ public class Graphics extends Raylib {
         rlj.core.BeginDrawing();
         rlj.core.ClearBackground(Color.BLACK);
         Graphics.rlj.core.BeginBlendMode(RL_BLEND_CUSTOM);
+   }
+
+    public static void beginTargetTexture() {
         rlj.core.BeginTextureMode(target);
     }
 

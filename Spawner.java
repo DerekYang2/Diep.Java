@@ -45,17 +45,7 @@ public class Spawner {
         }
     }
 
-    public static int getTeam(int group) {
-        if (group == Main.player.group) return 0;
-        return -group;
-    }
-
-    public static int getGroup(int team) {
-        if (team == 0) return Main.player.group;
-        return -team;
-    }
-
-    public static void spawnRandomEnemy(int team) {
+    public static Tank spawnRandomEnemy(int team) {
         Color fillCol, strokeCol;
 
         switch (team) {
@@ -84,8 +74,9 @@ public class Spawner {
         } while (Graphics.isIntersecting(randPos, Spawner.crasherZone));
 
         Tank t = new EnemyTank(randPos, "tank", fillCol, strokeCol);
-        t.group = getGroup(team);
+        t.group = team;
         enemyCount[team]++;
+        return t;
     }
 
     public static void spawnRandomPolygon() {
@@ -151,5 +142,13 @@ public class Spawner {
         
         new Crasher(pos, Math.random() < 0.2);
         crasherCount++;  // Increment the count of crashers
+    }
+
+    public static int getSpawnAmount() {
+        int sum = 0;
+        for (int a : enemyAmount) {
+            sum += a;
+        }
+        return sum;
     }
 }

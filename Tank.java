@@ -10,7 +10,7 @@ import java.util.Queue;
  * this.cameraEntity.cameraData.respawnLevel = Math.min(Math.max(this.cameraEntity.cameraData.values.level - 1, 1), Math.floor(Math.sqrt(this.cameraEntity.cameraData.values.level) * 3.2796));
  */
 // TODO: When upgrading tank, upgrade bars/max upgrade stats need to be upgraded
-public class Tank extends GameObject {
+public abstract class Tank extends GameObject {
     float score;
     int level;
     // 54.7766480515
@@ -88,7 +88,6 @@ public class Tank extends GameObject {
      * Initializes and configures Tank object 
      * @param tankBuild Defines the build of Tank
      */
-
     public void initTankBuild(TankBuild tankBuild) {
         this.tankBuild = tankBuild;
 
@@ -110,7 +109,6 @@ public class Tank extends GameObject {
      * Updates tank build if it is different
      * @param tankBuild Defines the build of Tank
      */
-
     public void changeTankBuild(TankBuild tankBuild) {
         if (!tankBuild.name.equals(this.tankBuild.name)) {  // If new tank build is different
             this.tankBuild.delete();  // Delete old tank build
@@ -122,7 +120,6 @@ public class Tank extends GameObject {
      * Sets up upgrade paths for the Tank.
      * @param upgradePaths Array of strings of names of upgrade paths
      */
-
     public void setUpgradePath(String[] upgradePaths) {
         upgradeBuilds = new LinkedList<>();
         for (String str: upgradePaths) {
@@ -134,7 +131,6 @@ public class Tank extends GameObject {
      * Sets up upgrade paths for the Tank.
      * @param upgradePaths Array of strings of names of upgrade paths
      */
-
     public void setUpgradePath(Queue<Pair<String, Integer>> upgradePaths) {
         upgradeBuilds = upgradePaths;
     }
@@ -170,7 +166,6 @@ public class Tank extends GameObject {
      /**
      * Updates level of tank based on current score
      */
-
     public void updateLevel() {
         // Update level
         int newLevel = level;
@@ -190,7 +185,6 @@ public class Tank extends GameObject {
     /**
      * Updates the frames for the remaining stat upgrades
      */
-
     public void updateStatUpgrade() {
        updateStatFrames = Math.max(0, updateStatFrames - 1); //Decrements counter
         if (updateStatFrames == 0 && !resetFireDelay) {
@@ -203,7 +197,6 @@ public class Tank extends GameObject {
      * Increments the specific stats of Tank if avaliable
      * @param statEnum Integer representing the stat to be incremented
      */
-
     public void incrementStat(int statEnum) {
         if (usedStatPoints < maxStatPoints) {
             stats.setStat(statEnum, stats.getStat(statEnum) + 1); //Increases stats
@@ -220,7 +213,6 @@ public class Tank extends GameObject {
      * Sets direction of the Tank
      * @param radians Angle in radians
      */
-
     protected void setDirection(double radians) {
         direction = (float) radians;
     }
@@ -271,7 +263,6 @@ public class Tank extends GameObject {
      * Sets and updates position of Tank 
      * @param pos Represents new position
      */
-
     public void setPos(Vector2 pos) {
         this.pos = pos;
         tankBuild.setPos(pos);
@@ -280,7 +271,6 @@ public class Tank extends GameObject {
     /**
      * Updates upgrade paths for Tank
      */
-
     public void updateUpgradePaths() {
         String newBuild = tankBuild.name; 
         //Processes each upgrade path 
@@ -297,7 +287,6 @@ public class Tank extends GameObject {
     /**
      * Draws tank on the screen based on opacity and type
      */
-    
     @Override
     public void draw() {
         String tankName = tankBuild.name; //Gets name of Tank
@@ -334,10 +323,13 @@ public class Tank extends GameObject {
         }
     }
 
+    protected float getZoom() {
+        return (float) ((.55f * this.tankBuild.fieldFactor) / Math.pow(1.01, (level - 1) * 0.5f));
+    }
+
     /**
      * Adjusts opacity of Tank and scales with frame rate
      */
-
     public void addOpacity(float opacityChange) {
         opacity += opacityChange * (25.f/120);  // Convert from 25 fps to 120 fps
         opacity = Math.min(1, Math.max(0, opacity)); //Ensures opacity is between 0 and 1
@@ -347,7 +339,6 @@ public class Tank extends GameObject {
      * Determines if Tank is firing
      * @return True if Tank is firing
      */
-
     public boolean isFiring() {
         return getAutoFire() || controller.fire();
     }
@@ -356,16 +347,14 @@ public class Tank extends GameObject {
      * Returns status of autofire mode
      * @return True if autofire mode is activated
      */
-
     public boolean getAutoFire() {
         return controller.autoFire();
     }
 
     /**
      * Checks if the special control is enabled
-     * @return True if autofire mode is activated
+     * @return True if special control is enabled
      */
-
     public boolean specialControl() {
         return controller.holdSpecial();
     }
@@ -380,8 +369,13 @@ public class Tank extends GameObject {
     }
 
     /**
-     * Updates the score by adding the score
-     * @param victim Increases score based on victim
+     * Draws any text for a tank (name, score, etc.)
+     */
+    public void drawText() {};
+
+    /**
+     * Updates the score after killing a GameObject
+     * @param victim GameObject that was killed
      */
     @Override
     public void updateVictim(GameObject victim) { score += victim.getScoreReward();}
@@ -400,7 +394,6 @@ public class Tank extends GameObject {
      * @param statEnum Integer representing stat to retrieve
      * @return Value of specified stat
      */
-
     public int getStat(int statEnum) {
         return stats.getStat(statEnum);
     }

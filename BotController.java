@@ -210,7 +210,7 @@ public class BotController implements Controller {
             if (bulletSpammer) {
                 confidence = 0.4f;
             }
-            if (host == leader) confidence = 0.7f;  // Leader is confident
+            if (host == leader && host.level == 45) confidence = 0.7f;  // Leader is confident
 
             if (leader != null && leader.group != host.group) {  // Chase leader
                 intendedDir = (float) Math.atan2(leader.pos.y - host.pos.y + 300 * Math.cos(Main.counter/1200F + rand), leader.pos.x - host.pos.x + 300 * Math.sin(Main.counter/1200F + rand));

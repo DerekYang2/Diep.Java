@@ -20,6 +20,7 @@ public class Main {
     public static Texture2D deathTexture;
     public static String killerName, deathBuild, deathScore, deathLevel, aliveTime;
     public static Stopwatch menuTargetWatch;  // Stopwatch for switching menu camera target
+    public static int menuFrames = 0;
 
     // Variables for game reset
     public static Stopwatch lastReset;
@@ -34,7 +35,14 @@ public class Main {
     // Called in GamePanel.java to initialize game
 
     public static void initialize() {
-        Graphics.initialize("DiepJava");
+        Graphics.initialize("Diep.Java");
+        // Draw a black background while game initializes
+        Graphics.beginDrawMode();
+        Graphics.beginTargetTexture();
+        Graphics.drawBackground(Color.BLACK);
+        Graphics.endTextureMode();
+        Graphics.endDrawMode();
+
         TankBuild.loadTankDefinitions();  // Load tank definitions from TankDefinitions.json
         NameGenerator.initialize();
         ScoreHandler.initialize();
@@ -56,6 +64,11 @@ public class Main {
         SceneManager.setSceneDraw(Scene.GAME, Main::gameDraw);
 
         startMenuGame();
+
+        int iterations = 120 * 10 / (1 + Graphics.PERFORMANCE_MODE);
+        for (int i = 0; i < iterations; i++) {  // pre-simulate 10 seconds of menu game
+            menuUpdate();
+        }
     }
 
     public static void main(String[] args) {
@@ -75,6 +88,7 @@ public class Main {
     }
 
     public static void startMenuGame() {
+        Polygon.setRewardMultiplier(4);
         int spawn = Spawner.getSpawnAmount();
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
@@ -87,6 +101,7 @@ public class Main {
         Leaderboard.clear();
         Spawner.reset();
         deathScreenFrames = 0;
+        menuFrames = 0;
         // new TestObj();
         player = null;
 
@@ -103,6 +118,7 @@ public class Main {
     }
 
     public static void startGame() {
+        Polygon.setRewardMultiplier(1);
         int spawn = Spawner.getSpawnAmount() + 1;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
@@ -269,6 +285,7 @@ public class Main {
     }
 
     public static void menuDraw() {
+        menuFrames++;
         Graphics.beginDrawMode();
         Graphics.beginTargetTexture();
         Graphics.drawBackground(Graphics.GRID);
@@ -277,7 +294,7 @@ public class Main {
         drawBounds();
         drawablePool[SceneManager.getScene()].drawAll();  // Draw all objects
         Graphics.endCameraMode();
-        Graphics.drawRectangle(0, 0, Graphics.cameraWidth, Graphics.cameraHeight, Graphics.rgba(0, 0, 0, 150));
+        Graphics.drawRectangle(0, 0, Graphics.cameraWidth, Graphics.cameraHeight, Graphics.rgba(0, 0, 0, (int) Math.max(150, 255 - 0.5f * menuFrames)));
         Graphics.drawTextCenteredOutline("DIEP.JAVA", Graphics.cameraWidth/2, Graphics.cameraHeight/2, 80, -6, Color.WHITE);
         Graphics.endTextureMode();
         Graphics.endDrawMode();

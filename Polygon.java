@@ -158,4 +158,8 @@ public class Polygon extends GameObject {
             Main.killerName = username;
         }
     }
+
+    public static void setRewardMultiplier(int multiplier) {
+        Polygon.multiplier = multiplier;
+    }
 }

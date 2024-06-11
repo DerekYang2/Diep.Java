@@ -23,6 +23,7 @@ public class Main {
     public static Vector2 cameraTarget;
     public static Texture2D deathTexture;
     public static String killerName, deathBuild, deathScore, deathLevel, aliveTime;
+    public static int respawnGroup;
     public static Stopwatch menuTargetWatch;  // Stopwatch for switching menu camera target
     public static int menuFrames = 0;
 
@@ -47,7 +48,9 @@ public class Main {
         pendingReset = false;
         lastReset.start();
         player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank", respawnLevel);
-        player.group = 0;  // Blue team
+        player.group = respawnGroup;
+        player.setColor(Spawner.teamFillCol(player.group), Spawner.teamStrokeCol(player.group));
+
         // Initialize camera
         cameraHost = player;
         cameraTarget = player.pos;
@@ -108,16 +111,21 @@ public class Main {
 
         startMenuGame();
 
-        for (int i = 0; i < 120 * 10; i++) {  // pre-simulate 10 seconds of menu game
+        for (int i = 0; i < 120; i++) {  // pre-simulate 1 second of menu game
             menuUpdate();
             menuFrames--;  // Undo menu frame increment for simulation
         }
 
-        new Button(Scene.MENU, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 75), "Play", 35, Graphics.PLAY_BUTTON, () -> {
-            SceneManager.setScene(Scene.GAME);
-            pendingReset = true;
-        });
-        new ButtonGroup(Scene.GAME, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 250), new String[]{"Quit", "Continue"}, 25, Graphics.PLAY_BUTTON, new Runnable[]{Main::returnToMenu, Main::respawn});
+        new ButtonGroup(Scene.MENU, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 75), new String[]{"FFA", "2 teams", "4 Teams", "Tag", "Solo"}, 35, new Color[] {Graphics.AQUA_BUTTON, Graphics.RED_BUTTON, Graphics.YELLOW_BUTTON, Graphics.PURPLE_BUTTON, Graphics.PINK_BUTTON},
+                new Runnable[]{()->switchSceneGame(GameMode.FFA), ()->switchSceneGame(GameMode.TWO_TEAM), ()->switchSceneGame(GameMode.FOUR_TEAM), ()->switchSceneGame(GameMode.TAG), ()->switchSceneGame(GameMode.SOLO)});
+
+        new ButtonGroup(Scene.GAME, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 250), new String[]{"Quit", "Continue"}, 25, Graphics.AQUA_BUTTON, new Runnable[]{Main::returnToMenu, Main::respawn});
+    }
+
+    public static void switchSceneGame(GameMode mode) {
+        GameModeManager.setMode(mode);
+        SceneManager.setScene(Scene.GAME);
+        pendingReset = true;
     }
 
     /**
@@ -146,7 +154,7 @@ public class Main {
      * Starts the menu game by setting up initial game state and camera.
      */
     public static void startMenuGame() {
-        Polygon.setRewardMultiplier(5);
+        GameModeManager.setMode(GameMode.MENU);
         int spawn = Spawner.getSpawnAmount();
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
@@ -182,7 +190,6 @@ public class Main {
      * Starts the game by setting up initial game state and camera.
      */
     public static void startGame() {
-        Polygon.setRewardMultiplier(1);
         int spawn = Spawner.getSpawnAmount() + 1;
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
@@ -198,6 +205,8 @@ public class Main {
         // new TestObj();
         player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank", 1);
         player.group = 0;  // Blue team
+        player.setColor(Spawner.teamFillCol(player.group), Spawner.teamStrokeCol(player.group));
+
         // Initialize camera
         cameraHost = player;
         cameraTarget = player.pos;

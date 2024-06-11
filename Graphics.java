@@ -105,7 +105,11 @@ public class Graphics extends Raylib {
             TRIANGLE_STROKE = rgb(189, 88, 89),
             CRASHER = rgb(241, 119, 221),
             CRASHER_STROKE = rgb(180, 89, 165),
-            PLAY_BUTTON = rgb(163, 255, 251);
+            AQUA_BUTTON = rgb(163, 255, 251),
+            PURPLE_BUTTON = rgb(183, 136, 251),
+            YELLOW_BUTTON = rgb(250, 236, 147),
+            RED_BUTTON = rgb(255, 142, 144),
+            PINK_BUTTON = rgb(248, 135, 253);
 
     public static void initialize(String title) {
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();

@@ -8,6 +8,7 @@ public abstract class GameObject implements Updatable, Drawable {
 
     // Objects always collide each other regardless of group (unless noInternalCollision is true)
     int group;  // Objects in different groups damage each other
+    Integer killerGroup = null;  // Group that killed this object
     int DRAW_LAYER;
     int scene;
 

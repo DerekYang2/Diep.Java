@@ -52,14 +52,34 @@ public class Leaderboard {
         // Clear leaderboard
         Arrays.fill(tankBuilds, null);
 
-        for (int i = 0; i < Math.min(tankIds.size(), LEADERBOARD_SIZE); i++) {
-            Tank tank = tankList.get(i);
-            tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
-            scoreBars[i].update(new Vector2(cornerX, (cornerY/2 + titleDimensions.y + 10) + (i - 0.5f) * leaderboardGap), tankList.get(i).score/maxScore);
-            scoreBars[i].setText(tank.username + " - " + formatScoreShort(tank.score), 21);
+        if (GameModeManager.getMode() == GameMode.TAG) {
+            // TODO: Sort by player count, restart game when all players are on the same team
+            for (int i = 0; i < 4 && !tankIds.isEmpty(); i++) {
+                tankBuilds[i] = switch (i) {
+                    case 0 -> TextureLoader.getIconTexture("tank", Graphics.BLUE);
+                    case 1 -> TextureLoader.getIconTexture("tank", Graphics.RED);
+                    case 2 -> TextureLoader.getIconTexture("tank", Graphics.GREEN);
+                    default -> TextureLoader.getIconTexture("tank", Graphics.PURPLE);
+                };
 
-            final int finalI = i;
-            scoreBars[i].setCustomDraw((Rectangle rect) -> Graphics.drawTextureCentered(tankBuilds[finalI], new Vector2(rect.x + 11, rect.y + rect.height * 0.5f), 0, 1f, Color.WHITE));
+                scoreBars[i].update(new Vector2(cornerX, (cornerY/2 + titleDimensions.y + 10) + (i - 0.5f) * leaderboardGap), 1);
+                int teamCount = Spawner.enemyCount[i];
+                if (Main.player != null && i == Main.player.group && !Main.player.isDead) teamCount++;  // Add player to their own team
+                scoreBars[i].setText(teamCount + " Players", 21);
+
+                final int finalI = i;
+                scoreBars[i].setCustomDraw((Rectangle rect) -> Graphics.drawTextureCentered(tankBuilds[finalI], new Vector2(rect.x + 11, rect.y + rect.height * 0.5f), 0, 1f, Color.WHITE));
+            }
+        } else {
+            for (int i = 0; i < Math.min(tankIds.size(), LEADERBOARD_SIZE); i++) {
+                Tank tank = tankList.get(i);
+                tankBuilds[i] = TextureLoader.getIconTexture(tank.tankBuild.name, tank.fillCol);
+                scoreBars[i].update(new Vector2(cornerX, (cornerY/2 + titleDimensions.y + 10) + (i - 0.5f) * leaderboardGap), tankList.get(i).score/maxScore);
+                scoreBars[i].setText(tank.username + " - " + formatScoreShort(tank.score), 21);
+
+                final int finalI = i;
+                scoreBars[i].setCustomDraw((Rectangle rect) -> Graphics.drawTextureCentered(tankBuilds[finalI], new Vector2(rect.x + 11, rect.y + rect.height * 0.5f), 0, 1f, Color.WHITE));
+            }
         }
     }
 

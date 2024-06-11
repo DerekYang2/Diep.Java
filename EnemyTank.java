@@ -81,11 +81,19 @@ public class EnemyTank extends Tank {
     @Override
     public void delete() {
         super.delete();
-        Spawner.enemyCount[group]--;  // Decrement enemy count
+        if (GameModeManager.getMode() != GameMode.FFA) {  // If team mode
+            Spawner.enemyCount[group]--;  // Decrement enemy count
+        }
         // Respawn query
         if (Main.counter > 0) {
             int respawnLevel = (int) Math.min(Math.max(level - 1, 1), Math.floor(Math.sqrt(level) * 3.2796));
-            Spawner.addRespawn(username, group, respawnLevel);
+            int respawnGroup;
+            if (GameModeManager.getMode() == GameMode.TAG) {
+                respawnGroup = killerGroup == null ? group : killerGroup;  // Respawn in killer's group if tag mode
+            } else {
+                respawnGroup = group;
+            }
+            Spawner.addRespawn(username, respawnGroup, respawnLevel);
         }
     }
 }

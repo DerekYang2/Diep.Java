@@ -18,11 +18,44 @@ public class Spawner {
     }
 
     public static void spawnEnemiesInitial() {
-        for (int team = 0; team < enemyAmount.length; team++) {
-            while (enemyCount[team] < enemyAmount[team]) {
-                spawnRandomEnemy(team);
+        switch (GameModeManager.getMode()) {
+            case FFA -> {
+                int spawnAmount = getSpawnAmount();
+                for (int i = 0; i < spawnAmount; i++)
+                    spawnRandomEnemy(-1);  // FFA team does not matter
+            }
+            case TWO_TEAM -> {
+                int spawnAmount = getSpawnAmount();
+                for (int i = 1; i <= spawnAmount; i++) {
+                    spawnRandomEnemy(i % 2);
+                }
+            }
+            case SOLO -> {
+                int spawnAmount = getSpawnAmount();
+                for (int i = 0; i < spawnAmount; i++)
+                    spawnRandomEnemy(1);  // Spawn on team red (while player is on team blue)
+            }
+            default -> {
+                for (int team = 0; team < enemyAmount.length; team++) {
+                    while (enemyCount[team] < enemyAmount[team]) {
+                        spawnRandomEnemy(team);
+                    }
+                }
             }
         }
+/*            if (GameModeManager.getMode() == GameMode.TWO_TEAM) {
+                int spawnAmount = getSpawnAmount();
+                for (int i = 0; i < spawnAmount; i++) {
+                    spawnRandomEnemy(i % 2);
+                }
+            } else if ()
+            else {
+                for (int team = 0; team < enemyAmount.length; team++) {
+                    while (enemyCount[team] < enemyAmount[team]) {
+                        spawnRandomEnemy(team);
+                    }
+                }
+            }*/
     }
 
     public static void updateSpawn() {
@@ -61,27 +94,56 @@ public class Spawner {
         }
     }
 
-    public static Tank spawnRandomEnemy(int team) {
-        Color fillCol, strokeCol;
-
-        switch (team) {
-            case 0 -> {
-                fillCol = Graphics.BLUE;
-                strokeCol = Graphics.BLUE_STROKE;
-            }
-            case 1 -> {
-                fillCol = Graphics.RED;
-                strokeCol = Graphics.RED_STROKE;
-            }
-            case 2 -> {
-                fillCol = Graphics.GREEN;
-                strokeCol = Graphics.GREEN_STROKE;
-            }
-            default -> {
-                fillCol = Graphics.PURPLE;
-                strokeCol = Graphics.PURPLE_STROKE;
+    public static Color teamFillCol(int group) {
+        if (GameModeManager.getMode() == GameMode.FFA) {  // All tanks are red in FFA
+            if (Main.player != null && group == Main.player.group) {
+                return Graphics.BLUE;
+            } else {
+                return Graphics.RED;
             }
         }
+        switch (group) {
+            case 0 -> {
+                return Graphics.BLUE;
+            }
+            case 1 -> {
+                return Graphics.RED;
+            }
+            case 2 -> {
+                return Graphics.GREEN;
+            }
+            default -> {
+                return Graphics.PURPLE;
+            }
+        }
+    }
+
+    public static Color teamStrokeCol(int group) {
+        if (GameModeManager.getMode() == GameMode.FFA) {  // All tanks are red in FFA
+            if (Main.player != null && group == Main.player.group) {
+                return Graphics.BLUE_STROKE;
+            } else {
+                return Graphics.RED_STROKE;
+            }
+        }
+        switch (group) {
+            case 0 -> {
+                return Graphics.BLUE_STROKE;
+            }
+            case 1 -> {
+                return Graphics.RED_STROKE;
+            }
+            case 2 -> {
+                return Graphics.GREEN_STROKE;
+            }
+            default -> {
+                return Graphics.PURPLE_STROKE;
+            }
+        }
+    }
+
+    public static Tank spawnRandomEnemy(int team) {
+        Color fillCol = teamFillCol(team), strokeCol = teamStrokeCol(team);
 
         // Generate position outside of crasher zone
         Vector2 randPos;
@@ -89,9 +151,14 @@ public class Spawner {
             randPos = new Vector2(Graphics.randf(0, Main.arenaWidth), Graphics.randf(0, Main.arenaHeight));
         } while (Graphics.isIntersecting(randPos, Spawner.crasherZone));
 
-        Tank t = new EnemyTank(randPos, "tank", fillCol, strokeCol);
-        t.group = team;
-        enemyCount[team]++;
+        int spawnLevel = GameModeManager.getMode() == GameMode.MENU ? Graphics.randInt(1, 44) : 1;  // Random level between 1 and 44 for menu game
+        Tank t = new EnemyTank(randPos, "tank", fillCol, strokeCol, spawnLevel);
+        
+        if (GameModeManager.getMode() != GameMode.FFA) {  // Set team for team modes
+            t.group = team;
+            enemyCount[team]++;
+        }
+        
         return t;
     }
 
@@ -101,30 +168,15 @@ public class Spawner {
             randPos = new Vector2(Graphics.randf(0, Main.arenaWidth), Graphics.randf(0, Main.arenaHeight));
         } while (Graphics.isIntersecting(randPos, Spawner.crasherZone));
 
-        Color fillCol, strokeCol;
-        switch (query.group) {
-            case 0 -> {
-                fillCol = Graphics.BLUE;
-                strokeCol = Graphics.BLUE_STROKE;
-            }
-            case 1 -> {
-                fillCol = Graphics.RED;
-                strokeCol = Graphics.RED_STROKE;
-            }
-            case 2 -> {
-                fillCol = Graphics.GREEN;
-                strokeCol = Graphics.GREEN_STROKE;
-            }
-            default -> {
-                fillCol = Graphics.PURPLE;
-                strokeCol = Graphics.PURPLE_STROKE;
-            }
-        }
+        Color fillCol = teamFillCol(query.group), strokeCol = teamStrokeCol(query.group);
 
         Tank t = new EnemyTank(randPos, "tank", fillCol, strokeCol, query.level);
-        t.group = query.group;
         t.username = query.username;
-        enemyCount[query.group]++;
+        
+        if (GameModeManager.getMode() != GameMode.FFA) {  // Set team for team modes
+            t.group = query.group;
+            enemyCount[query.group]++;
+        }
         return t;
     }
 
@@ -194,11 +246,24 @@ public class Spawner {
     }
 
     public static int getSpawnAmount() {
-        int sum = 0;
-        for (int a : enemyAmount) {
-            sum += a;
+        switch (GameModeManager.getMode()) {
+            case FFA -> {
+                return 49;
+            }
+            case TWO_TEAM -> {
+                return 39;
+            }
+            case SOLO -> {
+                return 30;
+            }
+            default -> {
+                int sum = 0;
+                for (int a : enemyAmount) {
+                    sum += a;
+                }
+                return sum;
+            }
         }
-        return sum;
     }
 
     private static class SpawnQuery {

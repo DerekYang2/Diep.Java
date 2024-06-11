@@ -392,6 +392,12 @@ public class Player extends Tank {
         Main.deathScore = String.format("%,d", (int)score);   // Format score with commas
         Main.deathLevel = String.valueOf(level);
 
+        if (GameModeManager.getMode() == GameMode.TAG) {
+            Main.respawnGroup = killerGroup == null ? group : killerGroup;  // Respawn in killer's group if tag mode
+        } else {
+            Main.respawnGroup = group;
+        }
+
         //Time alive
         int seconds = (int) aliveTimer.s();
         int hours = seconds / 3600;

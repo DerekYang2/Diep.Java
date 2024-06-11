@@ -378,7 +378,10 @@ public abstract class Tank extends GameObject {
      * @param victim GameObject that was killed
      */
     @Override
-    public void updateVictim(GameObject victim) { score += victim.getScoreReward();}
+    public void updateVictim(GameObject victim) {
+        score += victim.getScoreReward();
+        victim.killerGroup = group;  // Set killer group of victim to this tank's group
+    }
 
     /**
      * Gets target position from controller

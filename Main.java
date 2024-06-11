@@ -39,6 +39,9 @@ public class Main {
 
     public static void respawn() {
         deathScreenFrames = 0;
+        killerName = deathBuild = deathScore = deathLevel = aliveTime = "";
+        pendingReset = false;
+        lastReset.start();
         // new TestObj();
         player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank");
         player.group = 0;  // Blue team
@@ -47,6 +50,13 @@ public class Main {
         cameraTarget = player.pos;
         Graphics.setCameraTarget(cameraTarget);
         cameraBox = Graphics.getCameraWorld();
+
+        // Draw UI on respawn
+        Graphics.beginUITexture();
+        Graphics.rlj.core.ClearBackground(Graphics.CLEAR);  // Only clear on leaderboard refresh
+        Leaderboard.draw();
+        player.drawUsername();
+        Graphics.endTextureMode();
     }
 
     public static void returnToMenu() {
@@ -98,12 +108,11 @@ public class Main {
             menuFrames--;  // Undo menu frame increment for simulation
         }
 
-        new Button(Scene.MENU, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 75), "Play", 40, () -> {
+        new Button(Scene.MENU, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 75), "Play", 35, Graphics.PLAY_BUTTON, () -> {
             SceneManager.setScene(Scene.GAME);
             pendingReset = true;
         });
-        new Button(Scene.GAME, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 250), "Return to Menu", 25, Main::returnToMenu);
-        new Button(Scene.GAME, new Vector2(Graphics.cameraWidth * 0.5f - 200, Graphics.cameraHeight * 0.5f + 250), "Respawn", 25, Main::respawn);
+        new ButtonGroup(Scene.GAME, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 250), new String[]{"Quit", "Continue"}, 25, Graphics.PLAY_BUTTON, new Runnable[]{Main::returnToMenu, Main::respawn});
     }
 
     /**
@@ -200,7 +209,9 @@ public class Main {
         counter++;
 
         // Handle the pending operations
-        drawablePool[SceneManager.getScene()].refresh();
+        for (int i = 0; i < drawablePool.length; i++) {
+            drawablePool[i].refresh();
+        }
         Main.gameObjectPool.refresh();
         Main.UIObjectPool.refresh();
         Main.idServer.refresh();
@@ -369,7 +380,7 @@ public class Main {
         drawablePool[SceneManager.getScene()].drawAll();  // Draw all objects
         Graphics.endCameraMode();
         Graphics.drawRectangle(0, 0, Graphics.cameraWidth, Graphics.cameraHeight, Graphics.rgba(0, 0, 0, (int) Math.max(150, 255 - 0.5f * menuFrames)));
-        Graphics.drawTextCenteredOutline("DIEP.JAVA", Graphics.cameraWidth/2, Graphics.cameraHeight/2, 80, -6, Color.WHITE);
+        Graphics.drawTextCenteredOutline("DIEP.JAVA", Graphics.cameraWidth/2, Graphics.cameraHeight/2, 60, -6, Color.WHITE);
         for (UIObject uiObject : UIObjectPool.getObjects()) {
             if (uiObject.active()) {
                 uiObject.draw();
@@ -401,8 +412,9 @@ public class Main {
             // Compute required framebuffer scaling
             Graphics.updateMouse();
             update();
+            Minimap.update();
+
             if (deathScreenFrames == 0) {
-                Minimap.update();
                 player.updateUpgradeBars();
             }
         }

@@ -385,6 +385,7 @@ public class Player extends Tank {
     public void delete() {
         super.delete();
         levelBar.delete();
+        System.out.println("DELETE!");
         Main.deathScreenFrames = 1;  // Begin death screen
         Main.deathTexture = TextureLoader.getTankTexture(tankBuild.name, fillCol);
         Main.deathBuild = NameGenerator.formatNameCase(tankBuild.name);

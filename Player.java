@@ -38,8 +38,9 @@ public class Player extends Tank {
      * @param spawn Spawn position of the player
      * @param buildName Name of player
      */
-    public Player(Vector2 spawn, String buildName) {
-        super(spawn, new PlayerController(), new Stats(), 1);
+    public Player(Vector2 spawn, String buildName, int level) {
+        super(spawn, new PlayerController(), new Stats(), level);
+        username = Main.playerUsername;  // Set to persistent username
         aliveTimer.start();
         setColor(Graphics.BLUE, Graphics.BLUE_STROKE);
         initTankBuild(TankBuild.createTankBuild(buildName));
@@ -385,7 +386,6 @@ public class Player extends Tank {
     public void delete() {
         super.delete();
         levelBar.delete();
-        System.out.println("DELETE!");
         Main.deathScreenFrames = 1;  // Begin death screen
         Main.deathTexture = TextureLoader.getTankTexture(tankBuild.name, fillCol);
         Main.deathBuild = NameGenerator.formatNameCase(tankBuild.name);

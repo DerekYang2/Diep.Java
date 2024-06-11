@@ -2,19 +2,30 @@ import com.raylib.java.core.Color;
 import com.raylib.java.raymath.Vector2;
 import com.raylib.java.shapes.Rectangle;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class Spawner {
     public static int count = 0, nestCount = 0, crasherCount = 0, alphaCount = 0;  // Current amount of object
-    public static int[] enemyCount = {0, 0, 0, 0}, enemyAmount = {12, 12, 12, 12};
+    public static int[] enemyCount = {0, 0, 0, 0}, enemyAmount = {11, 12, 12, 12};  // Team blue (0) has one less tank
     public static int polygonAmount = 0, pentagonNestAmount = 0, crasherAmount = 0;  // Target amount of polygons
     public static Rectangle nestBox, crasherZone;
+    private static Queue<SpawnQuery> respawnQueue = new LinkedList<>();
 
     // Static polygon spawning methods ---------------------------------------------------------------------------------
-    public static void updateSpawn() {
+    public static void addRespawn(String username, int group, int level) {
+        respawnQueue.add(new SpawnQuery(username, group, level));
+    }
+
+    public static void spawnEnemiesInitial() {
         for (int team = 0; team < enemyAmount.length; team++) {
             while (enemyCount[team] < enemyAmount[team]) {
                 spawnRandomEnemy(team);
             }
         }
+    }
+
+    public static void updateSpawn() {
         while (count < polygonAmount) {
             spawnRandomPolygon();
         }
@@ -24,9 +35,14 @@ public class Spawner {
         while (crasherCount < crasherAmount) {
             spawnCrasher();
         }
+        // Handle respawn queue
+        while (!respawnQueue.isEmpty()) {
+            spawnEnemy(respawnQueue.poll());
+        }
     }
 
     public static void reset() {
+        respawnQueue.clear();
         // Reset nest and crasher zone
         float nestSide = Main.arenaWidth / 6.3f, crasherSide = nestSide * 2f;
         nestBox = new Rectangle(Main.arenaWidth/2 - nestSide/2, Main.arenaHeight/2 - nestSide/2, nestSide, nestSide);
@@ -76,6 +92,39 @@ public class Spawner {
         Tank t = new EnemyTank(randPos, "tank", fillCol, strokeCol);
         t.group = team;
         enemyCount[team]++;
+        return t;
+    }
+
+    private static Tank spawnEnemy(SpawnQuery query) {
+        Vector2 randPos;
+        do {
+            randPos = new Vector2(Graphics.randf(0, Main.arenaWidth), Graphics.randf(0, Main.arenaHeight));
+        } while (Graphics.isIntersecting(randPos, Spawner.crasherZone));
+
+        Color fillCol, strokeCol;
+        switch (query.group) {
+            case 0 -> {
+                fillCol = Graphics.BLUE;
+                strokeCol = Graphics.BLUE_STROKE;
+            }
+            case 1 -> {
+                fillCol = Graphics.RED;
+                strokeCol = Graphics.RED_STROKE;
+            }
+            case 2 -> {
+                fillCol = Graphics.GREEN;
+                strokeCol = Graphics.GREEN_STROKE;
+            }
+            default -> {
+                fillCol = Graphics.PURPLE;
+                strokeCol = Graphics.PURPLE_STROKE;
+            }
+        }
+
+        Tank t = new EnemyTank(randPos, "tank", fillCol, strokeCol, query.level);
+        t.group = query.group;
+        t.username = query.username;
+        enemyCount[query.group]++;
         return t;
     }
 
@@ -150,5 +199,16 @@ public class Spawner {
             sum += a;
         }
         return sum;
+    }
+
+    private static class SpawnQuery {
+        public String username;
+        public int group;
+        public int level;
+        public SpawnQuery(String username, int group, int level) {
+            this.username = username;
+            this.group = group;
+            this.level = level;
+        }
     }
 }

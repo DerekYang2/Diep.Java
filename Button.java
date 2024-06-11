@@ -23,8 +23,8 @@ public class Button extends UIObject {
     public void update() {
         hover = Graphics.isIntersecting(Graphics.getMouse(), boundingBox);
         if (Graphics.isLeftMousePressed() && hover && pressWatch.ms() > 100) {
-            onClick.run();
             pressWatch.start();
+            onClick.run();
         }
     }
 

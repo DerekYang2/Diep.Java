@@ -10,7 +10,11 @@ public class EnemyTank extends Tank {
 
     // TODO: add different stat presets, body damager, glass cannon, etc.
     public EnemyTank(Vector2 spawn, String buildName, Color fillCol, Color strokeCol) {
-        super(spawn, new BotController(), new Stats(), 1);
+        this(spawn, buildName, fillCol, strokeCol, 1);
+    }
+
+    public EnemyTank(Vector2 spawn, String buildName, Color fillCol, Color strokeCol, int level) {
+        super(spawn, new BotController(), new Stats(), level);
         setColor(fillCol, strokeCol);
         initTankBuild(TankBuild.createTankBuild(buildName));
 
@@ -36,7 +40,6 @@ public class EnemyTank extends Tank {
         for (int i = 0; i < 5; i++)
             statUpgradeQueue.add(finalStat);
     }
-
     @Override
     public void initTankBuild(TankBuild build) {
         super.initTankBuild(build);
@@ -79,5 +82,10 @@ public class EnemyTank extends Tank {
     public void delete() {
         super.delete();
         Spawner.enemyCount[group]--;  // Decrement enemy count
+        // Respawn query
+        if (Main.counter > 0) {
+            int respawnLevel = (int) Math.min(Math.max(level - 1, 1), Math.floor(Math.sqrt(level) * 3.2796));
+            Spawner.addRespawn(username, group, respawnLevel);
+        }
     }
 }

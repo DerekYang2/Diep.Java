@@ -18,6 +18,7 @@ public class Main {
     public static HashPool<UIObject> UIObjectPool;
     public static IdServer idServer;
     public static Player player;
+    public static String playerUsername;
     public static GameObject cameraHost;
     public static Vector2 cameraTarget;
     public static Texture2D deathTexture;
@@ -39,11 +40,13 @@ public class Main {
 
     public static void respawn() {
         deathScreenFrames = 0;
+        int deathLevelInt = Integer.parseInt(deathLevel);
+        int respawnLevel = (int) Math.min(Math.max(deathLevelInt - 1, 1), Math.floor(Math.sqrt(deathLevelInt) * 3.2796));
+
         killerName = deathBuild = deathScore = deathLevel = aliveTime = "";
         pendingReset = false;
         lastReset.start();
-        // new TestObj();
-        player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank");
+        player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank", respawnLevel);
         player.group = 0;  // Blue team
         // Initialize camera
         cameraHost = player;
@@ -95,6 +98,9 @@ public class Main {
         idServer = new IdServer();
         lastReset.start();
 
+        // Create persistent random name for player
+        playerUsername = NameGenerator.generateUsername();
+
         SceneManager.setSceneUpdate(Scene.MENU, Main::menuUpdate);
         SceneManager.setSceneDraw(Scene.MENU, Main::menuDraw);
         SceneManager.setSceneUpdate(Scene.GAME, Main::gameUpdate);
@@ -102,8 +108,7 @@ public class Main {
 
         startMenuGame();
 
-        int iterations = 120 * 10 / (1 + Graphics.PERFORMANCE_MODE);
-        for (int i = 0; i < iterations; i++) {  // pre-simulate 10 seconds of menu game
+        for (int i = 0; i < 120 * 10; i++) {  // pre-simulate 10 seconds of menu game
             menuUpdate();
             menuFrames--;  // Undo menu frame increment for simulation
         }
@@ -141,7 +146,7 @@ public class Main {
      * Starts the menu game by setting up initial game state and camera.
      */
     public static void startMenuGame() {
-        Polygon.setRewardMultiplier(4);
+        Polygon.setRewardMultiplier(5);
         int spawn = Spawner.getSpawnAmount();
         // Set arena size
         arenaWidth = arenaHeight = (float) (Math.floor(32 * Math.sqrt(spawn + 1)) * GRID_SIZE * 2) + ARENA_PADDING * 2;
@@ -161,12 +166,16 @@ public class Main {
         menuTargetWatch = new Stopwatch();
         menuTargetWatch.start();
 
+        // Random initial target
         Tank randomEnemy = Spawner.spawnRandomEnemy(0);
         CameraManager.setZoom(randomEnemy.getZoom());
         cameraHost = randomEnemy;
         cameraTarget = cameraHost.pos;
         Graphics.setCameraTarget(cameraTarget);
         cameraBox = Graphics.getCameraWorld();
+
+        // Spawn enemies
+        Spawner.spawnEnemiesInitial();
     }
 
     /**
@@ -187,7 +196,7 @@ public class Main {
         Spawner.reset();
         deathScreenFrames = 0;
         // new TestObj();
-        player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank");
+        player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank", 1);
         player.group = 0;  // Blue team
         // Initialize camera
         cameraHost = player;
@@ -195,6 +204,9 @@ public class Main {
         Graphics.setCameraTarget(cameraTarget);
         cameraBox = Graphics.getCameraWorld();
         //counter = 0;
+
+        // Spawn enemies
+        Spawner.spawnEnemiesInitial();
     }
 
     /**
@@ -224,11 +236,6 @@ public class Main {
         // Update all the game objects
         for (Updatable gameObject : gameObjectPool.getObjects()) {
             gameObject.update();
-        }
-        for (UIObject uiObject : UIObjectPool.getObjects()) {
-            if (uiObject.active()) {
-                uiObject.update();
-            }
         }
 
         CameraManager.update();
@@ -363,6 +370,11 @@ public class Main {
             Graphics.updateMouse();
             update();
         }
+        for (UIObject uiObject : UIObjectPool.getObjects()) {
+            if (uiObject.active()) {
+                uiObject.update();
+            }
+        }
         Leaderboard.update();
         TextureLoader.refreshTankTextures();
     }
@@ -407,6 +419,11 @@ public class Main {
         }
         if (deathScreenFrames > 0) {  // If animation is playing
             deathScreenFrames++;
+            for (UIObject uiObject : UIObjectPool.getObjects()) {  // Game scene UI only updates on death screen
+                if (uiObject.active()) {
+                    uiObject.update();
+                }
+            }
         }
         for (int i = 0; i <= Graphics.PERFORMANCE_MODE; i++) {
             // Compute required framebuffer scaling
@@ -418,8 +435,9 @@ public class Main {
                 player.updateUpgradeBars();
             }
         }
+
         Leaderboard.update();
-        if (deathScreenFrames == 0) {
+        if (deathScreenFrames == 0) {  // If death screen is not active
             player.updateBars();
         }
         TextureLoader.refreshTankTextures();

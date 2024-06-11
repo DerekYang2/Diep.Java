@@ -86,12 +86,12 @@ public class Leaderboard {
 
     public static Tank getTankRank(int rank) {
         if (rank >= tankList.size() || rank < 0) return null;
-        Tank tank;
+        Tank tank = null;
         do {
             tank = tankList.get(rank);
             rank++;
         } while ((tank == null || tank.isDead) && rank < tankList.size());
-        return tankList.get(rank);
+        return tank;
     }
 
     // Utility

@@ -261,18 +261,18 @@ public class Graphics extends Raylib {
 
     public static void updateMouse() {
         mouse = rCore.GetMousePosition();
-        virtualMouse.x = (mouse.x - (screenWidth - (cameraWidth * screenScale)) * 0.5f) / screenScale;
-        virtualMouse.y = (mouse.y - (screenHeight - (cameraHeight * screenScale)) * 0.5f) / screenScale;
-        ClampValue(virtualMouse, new Vector2(0, 0), new Vector2((float) cameraWidth, (float) cameraHeight));
+        mouse.x = (mouse.x - (screenWidth - (cameraWidth * screenScale)) * 0.5f) / screenScale;
+        mouse.y = (mouse.y - (screenHeight - (cameraHeight * screenScale)) * 0.5f) / screenScale;
+        ClampValue(mouse, new Vector2(0, 0), new Vector2((float) cameraWidth, (float) cameraHeight));
 
-        virtualMouse = rlj.core.GetScreenToWorld2D(virtualMouse, camera);
+        virtualMouse = rlj.core.GetScreenToWorld2D(mouse, camera);
     }
 
     public static void beginDrawMode() {
         rlj.core.BeginDrawing();
         rlj.core.ClearBackground(Color.BLACK);
         Graphics.rlj.core.BeginBlendMode(RL_BLEND_CUSTOM);
-   }
+    }
 
     public static void beginTargetTexture() {
         rlj.core.BeginTextureMode(target);
@@ -627,7 +627,7 @@ public class Graphics extends Raylib {
         rlj.text.DrawTextEx(outlineSmallFont, text, new Vector2(xLeft, yCenter - fontSize * 0.5f), fontSize, (float) fontSize / outlineSmallFont.getBaseSize(), color);
     }
     public static void drawTextCentered(String text, int xCenter, int yCenter, int fontSize, Color color) {
-       Vector2 textDimensions = rText.MeasureTextEx(outlineSmallFont, text, fontSize, (float) fontSize / outlineSmallFont.getBaseSize());
+        Vector2 textDimensions = rText.MeasureTextEx(outlineSmallFont, text, fontSize, (float) fontSize / outlineSmallFont.getBaseSize());
         rlj.text.DrawTextEx(outlineSmallFont, text, new Vector2(xCenter - textDimensions.getX() * 0.5f, yCenter - textDimensions.getY() * 0.5f), fontSize, (float) fontSize / outlineSmallFont.getBaseSize(), color);
     }
     public static void drawTextCenteredBackground(String text, int xCenter, int yCenter, int fontSize, float spacingFactor, Color color, Color backgroundCol) {
@@ -757,7 +757,7 @@ public class Graphics extends Raylib {
         // Return normalized angle
         return normalizeAngle(fromRadians + (toRadians - fromRadians) * percentage);
     }
-    
+
     public static float randf() {
         return (float) Math.random();
     }

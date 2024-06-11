@@ -12,6 +12,10 @@ public abstract class UIObject implements Updatable, Drawable {
         addToPools();
     }
 
+    public boolean active() {
+        return SceneManager.getScene() == scene.ordinal();
+    }
+
     @Override
     public abstract void update();
     @Override

@@ -54,7 +54,7 @@ public class Player extends Tank {
 
         // Set upgrade paths
         setUpgradePath(TankBuild.getRandomUpgradePath());
-        setUpgradePath(new String[]{"ranger"});
+        //setUpgradePath(new String[]{"ranger"});
     }
 
     /**

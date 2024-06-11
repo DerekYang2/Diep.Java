@@ -37,6 +37,18 @@ public class Main {
         lastReset.start();
     }
 
+    public static void respawn() {
+        deathScreenFrames = 0;
+        // new TestObj();
+        player = new Player(new Vector2((float) (Main.arenaWidth * Math.random()), (float) (Main.arenaHeight * Math.random())), "tank");
+        player.group = 0;  // Blue team
+        // Initialize camera
+        cameraHost = player;
+        cameraTarget = player.pos;
+        Graphics.setCameraTarget(cameraTarget);
+        cameraBox = Graphics.getCameraWorld();
+    }
+
     public static void returnToMenu() {
         SceneManager.setScene(Scene.MENU);
         pendingMenuReset = true;
@@ -86,7 +98,12 @@ public class Main {
             menuFrames--;  // Undo menu frame increment for simulation
         }
 
-        new Button(Scene.GAME, new Rectangle(10, 10, 100, 50), Main::returnToMenu);
+        new Button(Scene.MENU, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 75), "Play", 40, () -> {
+            SceneManager.setScene(Scene.GAME);
+            pendingReset = true;
+        });
+        new Button(Scene.GAME, new Vector2(Graphics.cameraWidth * 0.5f, Graphics.cameraHeight * 0.5f + 250), "Return to Menu", 25, Main::returnToMenu);
+        new Button(Scene.GAME, new Vector2(Graphics.cameraWidth * 0.5f - 200, Graphics.cameraHeight * 0.5f + 250), "Respawn", 25, Main::respawn);
     }
 
     /**
@@ -141,11 +158,6 @@ public class Main {
         cameraTarget = cameraHost.pos;
         Graphics.setCameraTarget(cameraTarget);
         cameraBox = Graphics.getCameraWorld();
-
-        new Button(Scene.MENU, new Rectangle(100, 100, 200, 100),  () -> {
-            SceneManager.setScene(Scene.GAME);
-            pendingReset = true;
-        });
     }
 
     /**

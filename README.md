@@ -20,7 +20,7 @@ JSON file with all tank stats and geometry (barrel size, angle, etc) are parsed 
 
 The external .jar libraries are already included in the `libs` folder. This includes a Raylib (OpenGL-based game library) port for Java and the JSON parsing library. Add these external libraries to your project (depends on your IDE). For example, in VSCode, add them to `Referenced Libraries` and in IntelliJ IDEA, add them to `Modules` in the `Project Structure` settings.
 
-Next, add the root folder, `assets`, and `config` to the classpath.
+Next, add the folders `src`, `assets`, and `config` to the classpath.
 
 Finally, run the `Main.java` file in the root folder.
 

@@ -1,3 +1,18 @@
+<h1 align="center">Diep.Java</h3>
+
+<p align="center">
+  <a href="#about">About</a> •
+  <a href="#features">Features</a> •
+  <a href="#build">Build</a> •
+  <a href="#running">Running</a>
+</p>
+
+<p align="center">
+  <img src="./Sample.webp" alt="Sample Webp" />
+</p>
+
+---
+
 ## About
 
 Grade 12 Computer Science final project. Clone of Diep.io in Java. 
@@ -24,7 +39,13 @@ Next, add the folders `src`, `assets`, and `config` to the classpath.
 
 Finally, run the `Main.java` file in the root folder.
 
-## Gallery
+## Running
+A pre-configured folder with an exe file can be found in releases. For now, any windows machine should be able to directly play the game without any installation.
+The folder comes with all required files and a JRE to run the game.
+
+
+
+
 
 
 

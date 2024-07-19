@@ -15,9 +15,7 @@
 
 ## About
 
-Grade 12 Computer Science final project. Clone of Diep.io in Java. 
-All tanks and stats are balanced from the original game thanks to reverse-engineering and research from https://github.com/ABCxFF/diepindepth.
-JSON file with all tank stats and geometry (barrel size, angle, etc) are parsed with the library https://github.com/stleary/JSON-java and drawn at runtime. As a result, there is no need to hardcode the art of tanks and their stats. Additionally, it is very easy to add new custom tank definitions or tweak existing ones.
+Remake of Diep.io in Java. All tanks and stats are balanced from the original game thanks to reverse-engineering and research from https://github.com/ABCxFF/diepindepth. A few tank definitions have been tweaked and the newest tank Glider has been added (too new to be found in `diepindepth` definitions). JSON file with all tank stats and geometry (barrel size, angle, etc) are parsed with the library https://github.com/stleary/JSON-java and drawn at runtime. As a result, there is no need to hardcode the art of tanks and their stats. Additionally, it is very easy to add new custom tank definitions or tweak existing ones.
 
 ## Features
 
